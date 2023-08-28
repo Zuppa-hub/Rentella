@@ -1,6 +1,6 @@
 services:
-  laravel-docker: 
-    container_name: laravel-docker  
+  laravel-docker:
+    container_name: laravel-docker
     build: .
     volumes:
       - ./laravel-app:/var/www/html
@@ -10,12 +10,23 @@ services:
     image: mysql:latest
     environment:
       MYSQL_DATABASE: Rentella_db
-      MYSQL_ROOT_PASSWORD: password  # Sostituisci con la tua password desiderata
+      MYSQL_ROOT_PASSWORD: password # change with .env file 
     ports:
       - 3306:3306
   phpmyadmin:
-    image: phpmyadmin:latest 
+    image: phpmyadmin:latest
     ports:
       - 9001:80
     environment:
       - PMA_ARBITRARY=1
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    ports:
+      - 8080:8080
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    depends_on:
+      - mysql_db
+ 
