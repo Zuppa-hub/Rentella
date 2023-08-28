@@ -1,24 +1,21 @@
-version: '3.8'
-
 services:
-  mysql_db_container:
-    image: mysql:latest
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "3306:3306"
+  laravel-docker: 
+    container_name: laravel-docker  
+    build: .
     volumes:
-      - mysql_db_data_container:/var/lib/mysql
-  adminer_container:
-    image: adminer:latest
-    environment:
-      ADMINER_DEFAULT_SERVER: mysql_db_container
+      - ./laravel-app:/var/www/html
     ports:
-      - 8080:8080
-volumes:
-  mysql_db_data_container:
+      - 9000:80
+  mysql_db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: Rentella_db
+      MYSQL_ROOT_PASSWORD: password  # Sostituisci con la tua password desiderata
+    ports:
+      - 3306:3306
+  phpmyadmin:
+    image: phpmyadmin:latest 
+    ports:
+      - 9001:80
+    environment:
+      - PMA_ARBITRARY=1
