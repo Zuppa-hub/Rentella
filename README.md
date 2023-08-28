@@ -1,6 +1,3 @@
-# ReadMe
-Status: In progress
-
 # Rentella
 
 Status: In progress
