@@ -1,0 +1,65 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "f115d1acec031b801f36cc94c8779e4c",
+    "packages": [
+        {
+            "name": "tung/export-migration",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tungtt1006/convert_migration.git",
+                "reference": "a6cfdf35a7fb249f0a0bfe95fd22032683b27b29"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tungtt1006/convert_migration/zipball/a6cfdf35a7fb249f0a0bfe95fd22032683b27b29",
+                "reference": "a6cfdf35a7fb249f0a0bfe95fd22032683b27b29",
+                "shasum": ""
+            },
+            "bin": [
+                "bin/phptung"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "App\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pham Xuan Tung"
+                }
+            ],
+            "description": "Tool for exporting db-diagram to migration file",
+            "homepage": "https://github.com/tungtt1006/convert_migration",
+            "keywords": [
+                "cli",
+                "command-line",
+                "dbdiagram",
+                "migration"
+            ],
+            "support": {
+                "issues": "https://github.com/tungtt1006/convert_migration/issues",
+                "source": "https://github.com/tungtt1006/convert_migration/tree/v1.1.0"
+            },
+            "time": "2022-08-28T11:50:43+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
+}
