@@ -3,7 +3,7 @@ services:
     container_name: laravel-docker
     build: .
     volumes:
-      - ./laravel-app:/var/www/html
+      - .:/var/www/html
     ports:
       - 9000:80
   mysql_db:
