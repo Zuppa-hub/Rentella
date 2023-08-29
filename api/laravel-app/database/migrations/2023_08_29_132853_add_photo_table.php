@@ -12,10 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('beach', function (Blueprint $table) {
-            $table->foreign('owner_id')->references('id')->on('admin'); // add external key
-            //$table->foreign('location_id')->references('id')->on('location'); 
+            $table->string("type");
         });
-
+        Schema::create('beach_picture', function (Blueprint $table) {
+            $table->id();
+            $table->string("photo");
+            $table->foreignId("beach_id")->constrained('beach');
+        });
     }
 
     /**
