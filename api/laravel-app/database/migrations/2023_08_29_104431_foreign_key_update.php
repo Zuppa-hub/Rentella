@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('admin', function (Blueprint $table) {
             $table->id();
@@ -27,11 +27,17 @@ return new class extends Migration
             $table->string("email");
             $table->timestamps();
         });
+        Schema::create('location', function (Blueprint $table) {
+            $table->id();
+            $table->string("city_name");
+            $table->integer("latitude");
+            $table->integer("longitude");
+        });
         Schema::create('beach', function (Blueprint $table) {
             $table->id();
-            $table->string("owner_id");
+            $table->foreignId("owner_id")->unsigned(); // Non utilizzare 'change()' qui
             $table->string("name");
-            $table->string("location_id");
+            $table->foreignId("location_id")->constrained('location'); // Correggi qui
             $table->string("description");
             $table->string("opening_date");
             $table->string("special_note");
@@ -48,14 +54,25 @@ return new class extends Migration
             $table->string("special_note");
             $table->string("latitude");
             $table->string("longitude");
-            $table->string("beach_id");
+            $table->foreignId("beach_id")->constrained('beach');
             $table->timestamps();
         });
-        Schema::create('umbrellas',function (Blueprint $table){
+        Schema::create('umbrellas', function (Blueprint $table) {
             $table->id();
-            $table->string("zone_id");
+            $table->foreignId("zone_id")->constrained(
+                table: 'BeachZone',
+                indexName: 'id'
+            );
             $table->integer("number");
             $table->string("description");
+        });
+
+        Schema::create('order', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId("umbrella_id")->constrained('umbrellas');
+            $table->dateTime("startdate");
+            $table->dateTime("enddate");
+            $table->foreignId("user_id")->constrained('user');
         });
     }
 
@@ -64,6 +81,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user');
+        // Drop foreign key constraints if needed in the down method
     }
 };

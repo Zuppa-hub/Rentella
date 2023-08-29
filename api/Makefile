@@ -13,3 +13,8 @@ composer-update:
 data: 
 	docker exec laravel-docker bash -c "php artisan migrate"
 	docker exec laravel-docker bash -c "php artisan db:seed"
+squeeze:
+	php artisan schema:dump
+	php artisan schema:dump --prune
+rollback:
+	php artisan migrate:rollback
