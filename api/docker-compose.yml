@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   laravel-docker:
     container_name: laravel-docker
@@ -6,19 +7,26 @@ services:
       - .:/var/www/html
     ports:
       - 9000:80
+
   mysql_db:
     image: mysql:latest
     environment:
       MYSQL_DATABASE: Rentella_db
-      MYSQL_ROOT_PASSWORD: password # change with .env file 
+      MYSQL_ROOT_PASSWORD: password # Cambia con la password corretta da .env
     ports:
       - 3306:3306
+    networks:
+      - keycloak-network
+
   phpmyadmin:
     image: phpmyadmin:latest
     ports:
       - 9001:80
     environment:
       - PMA_ARBITRARY=1
+    networks:
+      - keycloak-network
+
   keycloak:
     image: quay.io/keycloak/keycloak:22.0.1
     ports:
@@ -27,6 +35,21 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      DB_VENDOR: MYSQL
+      #KC_DB: MYSQL
+      #KC_DB_USERNAME: root
+      #KC_DB_PASSWORD: password
+      #KC_DB_URL: mysql_db
+      DB_ADDR: mysql_db
+      DB_PORT: 3306
+      DB_DATABASE: keycloak
+      DB_USER: root
+      DB_PASSWORD: password # Cambia con la password corretta da .env
+      HOSTNAME: keycloak   # Aggiungi questa linea
     depends_on:
       - mysql_db
- 
+    networks:
+      - keycloak-network
+networks:
+  keycloak-network:
+    driver: bridge
