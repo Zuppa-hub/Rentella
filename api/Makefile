@@ -7,19 +7,19 @@ build:
 	docker-compose build --no-cache --force-rm
 
 stop:
-	docker-compose stop
+	docker-compose -f ./deployment/docker-compose.yml stop
 
 up:
-	docker-compose up -d
+	docker-compose -f ./deployment/docker-compose.yml up -d
 
 composer-update:
-	docker exec laravel-docker bash -c "composer update"
+	docker exec Rentella_app bash -c "../composer update"
 
 data: 
-	docker exec laravel-docker bash -c "php artisan migrate"
-	docker exec laravel-docker bash -c "php artisan db:seed"
+	docker exec Rentella_app bash -c "php artisan migrate"
+	docker exec Rentella_app bash -c "php artisan db:seed"
 
-squeeze:
+squeeze:xs
 	php artisan schema:dump
 	php artisan schema:dump --prune
 
@@ -28,4 +28,4 @@ rollback:
 
 new_migration:	
 	$(eval MIGRATION_NAME := $(filter-out $@,$(MAKECMDGOALS)))
-	docker exec laravel-docker bash -c "php artisan make:migration $(MIGRATION_NAME)"
+	docker exec Rentella_app bash -c "cd.. && php artisan make:migration $(MIGRATION_NAME)"

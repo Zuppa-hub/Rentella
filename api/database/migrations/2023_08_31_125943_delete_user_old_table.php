@@ -11,14 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('beach', function (Blueprint $table) {
-            $table->string("type");
-        });
-        Schema::create('beach_picture', function (Blueprint $table) {
-            $table->id();
-            $table->string("photo");
-            $table->foreignId("beach_id")->constrained('beach');
-        });
+        Schema::dropIfExists('users');
     }
 
     /**
