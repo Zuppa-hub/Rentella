@@ -2,14 +2,18 @@ version: '3.8'
 services:
   laravel-docker:
     container_name: laravel-docker
-    build: .
+    build: 
+      context: ../
     volumes:
       - .:/var/www/html
     ports:
       - 9000:80
+    working_dir: /var/www
 
   mysql_db:
     image: mysql:latest
+    build: 
+      context: ../
     environment:
       MYSQL_DATABASE: Rentella_db
       MYSQL_ROOT_PASSWORD: password # Cambia con la password corretta da .env
@@ -19,6 +23,8 @@ services:
   #    - keycloak-network
   postgres:
     image: postgres:10-alpine
+    build: 
+      context: ../
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -27,6 +33,8 @@ services:
       POSTGRES_PASSWORD: secret
 
   phpmyadmin:
+    build: 
+      context: ../
     image: phpmyadmin:latest
     ports:
       - 9001:80
@@ -36,6 +44,8 @@ services:
  #     - keycloak-network
 
   keycloak:
+    build: 
+      context: ../
     image: quay.io/keycloak/keycloak:latest
     ports:
       - 8080:8080
@@ -53,14 +63,13 @@ services:
       DB_PASSWORD: secret
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: pass
-      
     depends_on:
       - postgres
 #   networks:
 #      - keycloak-network
-networks:
-  keycloak-network:
-    driver: bridge
+#networks:
+#  keycloak-network:
+#    driver: bridge
 volumes:
   postgres_data:
   keycloak_standalone_data:
