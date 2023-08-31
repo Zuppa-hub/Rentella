@@ -15,8 +15,16 @@ services:
       MYSQL_ROOT_PASSWORD: password # Cambia con la password corretta da .env
     ports:
       - 3306:3306
-    networks:
-      - keycloak-network
+  #  networks:
+  #    - keycloak-network
+  postgres:
+    image: postgres:10-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: secret
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -24,32 +32,36 @@ services:
       - 9001:80
     environment:
       - PMA_ARBITRARY=1
-    networks:
-      - keycloak-network
+ #   networks:
+ #     - keycloak-network
 
   keycloak:
-    image: quay.io/keycloak/keycloak:22.0.1
+    image: quay.io/keycloak/keycloak:latest
     ports:
       - 8080:8080
     command: start-dev
+    volumes:
+      - keycloak_standalone_data:/opt/jboss/keycloak/standalone/data
+      - keycloak_standalone_deployments:/opt/jboss/keycloak/standalone/deployments
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      DB_VENDOR: MYSQL
-      #KC_DB: MYSQL
-      #KC_DB_USERNAME: root
-      #KC_DB_PASSWORD: password
-      #KC_DB_URL: mysql_db
-      DB_ADDR: mysql_db
-      DB_PORT: 3306
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
       DB_DATABASE: keycloak
-      DB_USER: root
-      DB_PASSWORD: password # Cambia con la password corretta da .env
-      HOSTNAME: keycloak   # Aggiungi questa linea
+      DB_USER: keycloak
+      DB_PASSWORD: secret
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: pass
+      
     depends_on:
-      - mysql_db
-    networks:
-      - keycloak-network
+      - postgres
+#   networks:
+#      - keycloak-network
 networks:
   keycloak-network:
     driver: bridge
+volumes:
+  postgres_data:
+  keycloak_standalone_data:
+  keycloak_standalone_deployments:

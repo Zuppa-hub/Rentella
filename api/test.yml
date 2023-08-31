@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:10-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: secret
+
+  keycloak:
+    build:
+      context: ./
+      dockerfile: ./keycloak.Dockerfile
+    volumes:
+      - keycloak_standalone_data:/opt/jboss/keycloak/standalone/data
+      - keycloak_standalone_deployments:/opt/jboss/keycloak/standalone/deployments
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: secret
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: pass
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+
+  adminer:
+    image: adminer
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    ports:
+      - 40080:8080
+
+
+volumes:
+  postgres_data:
+  keycloak_standalone_data:
+  keycloak_standalone_deployments:
