@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,7 +11,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('admin', function (Blueprint $table) {
+        Schema::create('owners', function (Blueprint $table) {
             $table->id();
             $table->string("name");
             $table->string("surname");
@@ -19,59 +20,84 @@ return new class extends Migration
             $table->string("phone_number");
             $table->timestamps();
         });
-        Schema::create('user', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string("name");
             $table->string("surname");
             $table->string("email");
             $table->timestamps();
         });
-        Schema::create('location', function (Blueprint $table) {
+        Schema::create('cities_location', function (Blueprint $table) {
             $table->id();
             $table->string("city_name");
-            $table->integer("latitude");
-            $table->integer("longitude");
-        });
-        Schema::create('beach', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId("owner_id")->unsigned(); // Non utilizzare 'change()' qui
-            $table->string("name");
-            $table->foreignId("location_id")->constrained('location'); // Correggi qui
+            $table->float("latitude");
+            $table->float("longitude");
             $table->string("description");
-            $table->string("opening_date");
-            $table->string("special_note");
-            $table->string("latitude");
-            $table->string("longitude");
-            $table->boolean("allowed_animals");
             $table->timestamps();
         });
-        Schema::create('BeachZone', function (Blueprint $table) {
+        Schema::create('opening_dates', function (Blueprint $table) {
+            $table->id();
+            $table->dateTime("start_date");
+            $table->dateTime("end_date");
+            //$table->foreignId("beach_id")->constrained('beaches');
+            $table->timestamps();
+        });
+        Schema::create('beach_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('type');
+            $table->timestamps();
+        });
+        Schema::create('beaches', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId("owner_id")->constrained('owners'); // Non utilizzare 'change()' qui
+            $table->string("name");
+            $table->foreignId("location_id")->constrained('cities_location'); // Correggi qui
+            $table->string("description");
+            $table->foreignId("opening_date_id")->constrained('opening_dates');
+            $table->string("special_note");
+            $table->float("latitude");
+            $table->float("longitude");
+            $table->boolean("allowed_animals");
+            $table->foreignId("type_id")->constrained('beach_types');
+            $table->timestamps();
+        });
+        
+        Schema::create('prices', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+        Schema::create('beach_zones', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->float("price");
+            $table->foreignId("price_id")->constrained('prices');
             $table->string("description");
             $table->string("special_note");
-            $table->string("latitude");
-            $table->string("longitude");
-            $table->foreignId("beach_id")->constrained('beach');
+            $table->float("latitude");
+            $table->float("longitude");
+            $table->foreignId("beach_id")->constrained('beaches');
             $table->timestamps();
         });
         Schema::create('umbrellas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("zone_id")->constrained(
-                table: 'BeachZone',
-                indexName: 'id'
-            );
+            $table->foreignId("zone_id")->constrained('beach_zones');
             $table->integer("number");
-            $table->string("description");
+            $table->string("special_note");
+            $table->timestamps();
         });
-
-        Schema::create('order', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId("umbrella_id")->constrained('umbrellas');
-            $table->dateTime("startdate");
-            $table->dateTime("enddate");
-            $table->foreignId("user_id")->constrained('user');
+            $table->dateTime("start_date");
+            $table->dateTime("end_date");
+            $table->foreignId("user_id")->constrained('users');
+            $table->foreignId("price_id")->constrained('prices');
+            $table->timestamps();
+        });
+        
+        Schema::create('beach_pictures', function (Blueprint $table) {
+            $table->id();
+            $table->string("photo");
+            $table->foreignId("beach_id")->constrained('beaches');
         });
     }
 
@@ -81,5 +107,16 @@ return new class extends Migration
     public function down(): void
     {
         // Drop foreign key constraints if needed in the down method
+        Schema::dropIfExists('owners');
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('cities_location');
+        Schema::dropIfExists('beaches');
+        Schema::dropIfExists('beach_zones');
+        Schema::dropIfExists('umbrellas');
+        Schema::dropIfExists('orders');
+        Schema::dropIfExists('opening_dates');
+        Schema::dropIfExists('beach_types');
+        Schema::dropIfExists('prices');
+        Schema::dropIfExists('beach_pictures');
     }
 };

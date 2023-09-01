@@ -28,4 +28,4 @@ rollback:
 
 new_migration:	
 	$(eval MIGRATION_NAME := $(filter-out $@,$(MAKECMDGOALS)))
-	docker exec Rentella_app bash -c "cd.. && php artisan make:migration $(MIGRATION_NAME)"
+	docker exec Rentella_app bash -c "php artisan make:migration $(MIGRATION_NAME)"

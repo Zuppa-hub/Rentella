@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('users');
+        Schema::table('opening_dates', function (Blueprint $table) {
+            $table->foreignId("beach_id")->constrained('beaches');
+        });
     }
 
     /**
@@ -19,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('opening_dates', function (Blueprint $table) {
+            $table->dropColumn('beach_id');
+        });
     }
 };

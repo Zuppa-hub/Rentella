@@ -23,11 +23,12 @@ services:
     image: postgres:10-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: secret
-
   phpmyadmin:
     image: phpmyadmin:latest
     ports:
