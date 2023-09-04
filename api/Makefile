@@ -4,7 +4,7 @@ setup:
 	@make composer-update
 
 build:
-	docker-compose build --no-cache --force-rm
+	docker-compose -f ./deployment/docker-compose.yml build --no-cache --force-rm
 
 stop:
 	docker-compose -f ./deployment/docker-compose.yml stop

@@ -2,15 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Owner;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
-class UserFactory extends Factory
+class OwnerFactory extends Factory
 {
-    protected $model = User::class;
+    protected $model = Owner::class;
 
     public function definition()
     {
@@ -18,6 +15,8 @@ class UserFactory extends Factory
             'name' => $this->faker->firstName,
             'surname' => $this->faker->lastName,
             'email' => $this->faker->unique()->safeEmail,
+            'adress' => $this->faker->address,
+            'phone_number' => $this->faker->phoneNumber,
         ];
     }
 }
