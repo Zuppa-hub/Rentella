@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class OpeningDate extends Model
 {
     use HasFactory;
-    protected $fillable = ['start_date', 'end_date','beach_id'];
+    protected $fillable = ['start_date', 'end_date'];
 }

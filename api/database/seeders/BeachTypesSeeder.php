@@ -7,6 +7,6 @@ class BeachTypesSeeder extends Seeder
 {
     public function run()
     {
-        \App\Models\BeachType::factory(10)->create();
+        \App\Models\BeachType::factory(3)->create();
     }
 }

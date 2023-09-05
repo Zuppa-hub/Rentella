@@ -15,7 +15,7 @@ class BeachPictureFactory extends Factory
     {
         return [
             'beach_id' => \App\Models\Beach::factory(), // Crea un proprietario casuale
-            'photo' => $this->faker->url,
+            'photo' => $this->faker->url(),
         ];
     }
 }

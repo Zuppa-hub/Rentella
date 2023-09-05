@@ -16,7 +16,7 @@ class UmbrellaFactory extends Factory
     {
         return [
             'zone_id' => \App\Models\BeachZone::factory(), 
-            'number'=>$this->faker->unique()->randomNumber(2), 
+            'number'=>$this->faker->randomNumber(1,51), 
             'special_note'=>$this->faker->sentence,
         ];
     }

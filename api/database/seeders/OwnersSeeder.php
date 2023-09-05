@@ -7,6 +7,8 @@ class OwnersSeeder extends Seeder
 {
     public function run()
     {
-        \App\Models\Owner::factory(10)->create();
+        \App\Models\Beach::all()->each(function ($beach) {
+            \App\Models\Owner::factory()->count(1)->create(['beach_id' => $beach->id]);
+        });
     }
 }

@@ -16,7 +16,7 @@ class OpeningDateFactory extends Factory
         return [
             'start_date' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
             'end_date' => $this->faker->dateTimeBetween('+1 day', '+3 months'),
-            'beach_id' => \App\Models\Beach::factory(),
+            //'beach_id' => \App\Models\Beach::factory(),
         ];
     }
 }
