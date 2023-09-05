@@ -64,6 +64,7 @@ Response:
         "created_at": "2023-09-05T09:21:47.000000Z",
         "updated_at": "2023-09-05T09:21:47.000000Z"
     },
+]
 ```
 
 To get the list of cities in a given range of latitudes and longitudes 
