@@ -6,7 +6,36 @@ Rentella is an application for renting beach umbrellas. It uses a MySQL database
 
 ## Api usage
 
-To get the list of all cities 
+**First you must be authenticated**
+
+For getting JWT token: 
+[Response in JSON, make request using POST method.]
+
+```json
+localhost:8080/realms/Rentella/protocol/openid-connect/token
+```
+
+| Key  | Value |
+| --- | --- |
+| client_id | api |
+| grant_type | password |
+| client_secret | {{client_secret}} |
+| username | {{username}} |
+| password | {{password}} |
+| Realm | Rentella |
+- Email of the user will be checked if is in the users table of the db.
+
+Response if all key is correct will be a JWT token.
+
+Use the JWT token as bearer token in the header of the api request 
+
+| Key | Value |
+| --- | --- |
+| Authorization | Bearer
+{{Token}} |
+
+**To get the list of all cities** 
+
 [Response in JSON, make request using GET method.]
 
 ```php
@@ -35,8 +64,6 @@ Response:
         "created_at": "2023-09-05T09:21:47.000000Z",
         "updated_at": "2023-09-05T09:21:47.000000Z"
     },
-] 
-
 ```
 
 To get the list of cities in a given range of latitudes and longitudes 
@@ -74,3 +101,11 @@ Response
 4. Access the application at `http://localhost:9001` from your web browser to see phpmyadmin, `http://localhost:8000`to see Keycloak. 
 
 Note that the project is still in development and the code is subject to change.
+
+## How to use
+
+short overview of make command
+
+```json
+
+```
