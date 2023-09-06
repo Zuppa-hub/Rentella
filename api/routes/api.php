@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +29,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     //all cities 
     Route::get('city-locations', [LocationController::class, 'get_city']);
 });
+
+//unprotected enpoints 
+Route::post('/create-user', [UserController::class, 'createUser']);
+

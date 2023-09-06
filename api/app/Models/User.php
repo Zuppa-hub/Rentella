@@ -11,11 +11,6 @@ class User extends Authenticatable implements AuthenticatableContract
 {
     // Aggiungi eventuali campi aggiuntivi necessari
     use HasFactory;
-    protected $fillable = ['name', 'surname', 'email'];
+    protected $fillable = ['name', 'surname', 'email','uuid'];
 }
-
-/* class User extends 
-{
-    
-} */
 
