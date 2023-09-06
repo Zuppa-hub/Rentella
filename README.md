@@ -1,4 +1,4 @@
-# Rentella
+# Rentella Backend.
 
 Status: In progress
 
@@ -38,7 +38,7 @@ Use the JWT token as bearer token in the header of the api request
 
 [Response in JSON, make request using GET method.]
 
-```php
+```bash
 http://localhost:9000/public/api/city-locations
 ```
 
@@ -64,17 +64,16 @@ Response:
         "created_at": "2023-09-05T09:21:47.000000Z",
         "updated_at": "2023-09-05T09:21:47.000000Z"
     },
-]
 ```
 
 To get the list of cities in a given range of latitudes and longitudes 
 [Response in JSON, make request using GET method.]
 
-```php
+```bash
 http://localhost:9000/public/api/cities/{{Min_latitude}}/{{Max_latitude}}/{{Min_longitude}}/{{Max_longitude}}
 ```
 
-```php
+```bash
 http://localhost:9000/public/api/cities/40.0/70.0/140.0/180.0
 ```
 
@@ -105,8 +104,63 @@ Note that the project is still in development and the code is subject to change.
 
 ## How to use
 
-short overview of make command
+Short overview of make command 
 
-```json
-
+```bash
+make setup 
 ```
+
+Allow user to setup container and environment, then start all the services. 
+This command call `make build`, `make up` and `make composer-update` 
+
+ 
+
+```bash
+make build 
+```
+
+It is the short for `docker-compose -f ./deployment/docker-compose.yml build --no-cache --force-rm.` 
+It build all the container from the docker compose file stored deployment subfolder. 
+
+```bash
+make up 
+```
+
+It is the short for `docker-compose -f ./deployment/docker-compose.yml up -d`. 
+It start all the container present in the docker compose file in background, so you can still use your terminal console.
+
+```bash
+make composer-update
+```
+
+It is the short for `docker exec Rentella_app bash -c "../composer update”`. 
+It allow user to build the composer file. 
+
+```bash
+make data 
+```
+
+ It is the short for `docker exec Rentella_app bash -c "php artisan migrate”` and `docker exec Rentella_app bash -c "php artisan db:seed”`.
+
+It allow user to migrate database and seed the database. 
+
+```bash
+make rollback
+```
+
+It is the short for `php artisan migrate:rollback` 
+
+It allow user to rollback db from the last migration file. 
+
+```bash
+make new_migration {{migration_name}}
+```
+
+It is the short for 
+
+```bash
+$(eval MIGRATION_NAME := $(filter-out $@,$(MAKECMDGOALS)))
+	docker exec Rentella_app bash -c "php artisan make:migration $(MIGRATION_NAME)"
+```
+
+It accept argoument as migration name and create a new migration.
