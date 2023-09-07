@@ -18,9 +18,6 @@ class UserController extends Controller
 
     public function createUser(CreateUserRequest $request)
     {
-        // Data of the new user to be registered
-        $newUserData = $request->all();
-
         // Obtain an access token from Keycloak
         $tokenResponse = Http::asForm()
             ->post('keycloak:8080/realms/Rentella/protocol/openid-connect/token', [
@@ -35,13 +32,13 @@ class UserController extends Controller
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $accessToken,
             'Content-Type' => 'application/json',
-        ])->post($this->config->get('app.keycloak.get_token_uri'), $newUserData);
-        
+        ])->post($this->config->get('app.keycloak.get_token_uri'),  $request->all());
+
         //error cheking
         if ($response->status() != 201) {
             return response()->json(['error' => 'Error during new user creation'], $response->status());
         }
-        
+
         // Get the UUID from the Location header in Keycloak's response
         $locationHeader = $response->header('Location');
         $uuid = basename($locationHeader); // Extract the UUID from the URL
@@ -54,6 +51,6 @@ class UserController extends Controller
             'uuid' => $uuid,
         ]);
         $user->save();
-        return response()->json(['message' => 'User data saved successfully'], 201);
+        return response()->json(['message' => 'User data saved successfully', $request->all()], 201);
     }
 }
