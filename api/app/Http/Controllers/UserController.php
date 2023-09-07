@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
-use App\Http\Requests\CreateUserRequest;
+use App\Http\Requests\UserRequest;
 use Illuminate\Contracts\Config\Repository as Config;
 
 class UserController extends Controller
@@ -16,7 +16,7 @@ class UserController extends Controller
         $this->config = $config;
     }
 
-    public function createUser(CreateUserRequest $request)
+    public function store(UserRequest $request)
     {
         // Obtain an access token from Keycloak
         $tokenResponse = Http::asForm()
@@ -52,5 +52,24 @@ class UserController extends Controller
         ]);
         $user->save();
         return response()->json(['message' => 'User data saved successfully', $request->all()], 201);
+    }
+    public function index()
+    {
+        // Recupera tutti i libri e restituisci una risposta JSON
+    }
+
+    public function show($id)
+    {
+        // Recupera un libro specifico per ID e restituisci una risposta JSON
+    }
+
+    public function update(UserRequest $request, $id)
+    {
+        // Aggiorna un libro specifico per ID con i dati forniti nella richiesta e restituisci una risposta JSON
+    }
+
+    public function destroy($id)
+    {
+        // Cancella un libro specifico per ID e restituisci una risposta JSON
     }
 }

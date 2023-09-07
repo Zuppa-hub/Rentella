@@ -31,5 +31,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 });
 
 //unprotected enpoints 
-Route::post('/create-user', [UserController::class, 'createUser']);
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 
