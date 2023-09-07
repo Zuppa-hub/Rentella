@@ -184,5 +184,16 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
-
+     /*
+    |--------------------------------------------------------------------------
+    | Keycloak stuff 
+    |--------------------------------------------------------------------------
+    */
+    'keycloak' => [
+        'grant_type' => env('KEYCLOAK_GRANT_TYPE'),
+        'client_id' => env('KEYCLOAK_CLIENT_ID'),
+        'client_secret' => env('KEYCLOAK_CLIENT_SECRET'),
+        'get_token_uri' => env('KEYCLOAK_GET_TOKEN_URI'),
+    ],
+    
 ];
