@@ -20,7 +20,7 @@ class UserController extends Controller
     {
         // Obtain an access token from Keycloak
         $tokenResponse = Http::asForm()
-            ->post('keycloak:8080/realms/Rentella/protocol/openid-connect/token', [
+            ->post($this->config->get('app.keycloak.get_token_realm_uri'), [
                 'grant_type' => $this->config->get('app.keycloak.grant_type'),
                 'client_id' => $this->config->get('app.keycloak.client_id'),
                 'client_secret' => $this->config->get('app.keycloak.client_secret'),
@@ -55,21 +55,69 @@ class UserController extends Controller
     }
     public function index()
     {
-        // Recupera tutti i libri e restituisci una risposta JSON
+        //All users 
+        return response()->json(User::all());
     }
 
     public function show($id)
     {
-        // Recupera un libro specifico per ID e restituisci una risposta JSON
+        // Information related to specific book 
+        return response()->json(User::find($id));
     }
 
     public function update(UserRequest $request, $id)
     {
-        // Aggiorna un libro specifico per ID con i dati forniti nella richiesta e restituisci una risposta JSON
+        // get user for database 
+        $user = User::findOrFail($id);
+        // get keycloak token 
+        $tokenResponse = Http::asForm()
+            ->post($this->config->get('app.keycloak.get_token_realm_uri'), [
+                'grant_type' => $this->config->get('app.keycloak.grant_type'),
+                'client_id' => $this->config->get('app.keycloak.client_id'),
+                'client_secret' => $this->config->get('app.keycloak.client_secret'),
+            ]);
+        $accessToken = $tokenResponse->json('access_token');
+
+        // call keycloak server to update user 
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ])->put("keycloak:8080/admin/realms/Rentella/users/{$user->uuid}", $request->all());
+
+
+        // update user data in database 
+        $user->update([
+            'email' => $request->input('email'),
+            'name' => $request->input('firstName'),
+            'surname' => $request->input('lastName'),
+        ]);        
+        return response()->json(['message' => 'User data updated successfully', $request->all()]);
     }
+
 
     public function destroy($id)
     {
-        // Cancella un libro specifico per ID e restituisci una risposta JSON
+        // delete user from database and from keycloak server
+        // get user for database 
+        $user = User::findOrFail($id);
+        // get keycloak token 
+        $tokenResponse = Http::asForm()
+            ->post($this->config->get('app.keycloak.get_token_realm_uri'), [
+                'grant_type' => $this->config->get('app.keycloak.grant_type'),
+                'client_id' => $this->config->get('app.keycloak.client_id'),
+                'client_secret' => $this->config->get('app.keycloak.client_secret'),
+            ]);
+        $accessToken = $tokenResponse->json('access_token');
+
+        // call keycloak server to update user 
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ])->delete("keycloak:8080/admin/realms/Rentella/users/{$user->uuid}");
+
+
+        // update user data in database 
+        $user->delete();        
+        return response()->json(['message' => 'User data removed successfully',$id]);
     }
 }

@@ -194,6 +194,6 @@ return [
         'client_id' => env('KEYCLOAK_CLIENT_ID'),
         'client_secret' => env('KEYCLOAK_CLIENT_SECRET'),
         'get_token_uri' => env('KEYCLOAK_GET_TOKEN_URI'),
+        'get_token_realm_uri' => env('KEYCLOAK_GET_TOKEN_OF_REALM_URI'),
     ],
-    
 ];
