@@ -61,7 +61,7 @@ class UserController extends Controller
 
     public function show($id)
     {
-        // Information related to specific book 
+        // Information related to specific user 
         return response()->json(User::find($id));
     }
 

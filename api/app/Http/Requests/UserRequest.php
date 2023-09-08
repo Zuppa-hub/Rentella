@@ -6,12 +6,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
 {
-    public function authorize()
+    public function authorize() : bool
     {
-        return true; // Restituisci true per consentire la validazione
+        return true; // return true to allow the validation
     }
 
-    public function rules()
+    public function rules() : array
     {
         return [
             'email' => 'required|email|unique:users',
