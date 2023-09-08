@@ -16,9 +16,9 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+/* Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-});
+}); */
 //Route::get('city-locations', [LocationController::class, 'get_city']);
 // protected endpoints
 Route::group(['middleware' => 'auth:api', 'prefix' => 'users'], function () {
@@ -39,6 +39,13 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'locations'], function () 
     Route::post('/', [LocationController::class, 'store'])->name('locations.store');
     Route::put('/{id}', [LocationController::class, 'update'])->name('locations.update');
     Route::delete('/{id}', [LocationController::class, 'destroy'])->name('locations.destroy');
+});
+Route::group(['middleware' => 'auth:api', 'prefix' => 'beaches'], function () {
+    Route::get('/', [BeachController::class, 'index'])->name('beaches.index');
+    Route::get('/{id}', [BeachController::class, 'show'])->name('beaches.show');
+    Route::post('/', [BeachController::class, 'store'])->name('beaches.store');
+    Route::put('/{id}', [BeachController::class, 'update'])->name('beaches.update');
+    Route::delete('/{id}', [BeachController::class, 'destroy'])->name('beaches.destroy');
 });
 
 //unprotected enpoints 
