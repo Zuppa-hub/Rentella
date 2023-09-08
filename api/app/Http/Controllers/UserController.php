@@ -16,9 +16,9 @@ class UserController extends Controller
         $this->config = $config;
     }
 
-    public function store(UserRequest $request)
+    // Private method to obtain Keycloak access token
+    private function getKeycloakAccessToken()
     {
-        // Obtain an access token from Keycloak
         $tokenResponse = Http::asForm()
             ->post($this->config->get('app.keycloak.get_token_realm_uri'), [
                 'grant_type' => $this->config->get('app.keycloak.grant_type'),
@@ -26,8 +26,24 @@ class UserController extends Controller
                 'client_secret' => $this->config->get('app.keycloak.client_secret'),
             ]);
 
-        $accessToken = $tokenResponse->json('access_token');
+        return $tokenResponse->json('access_token');
+    }
+    public function index()
+    {
+        //All users 
+        return response()->json(User::all());
+    }
 
+    public function show($id)
+    {
+        // Information related to specific user 
+        return response()->json(User::find($id));
+    }
+
+    // Create a new user and handle errors
+    public function store(UserRequest $request)
+    {
+        $accessToken = $this->getKeycloakAccessToken();
         // Make the API call to register the new user
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $accessToken,
@@ -51,73 +67,59 @@ class UserController extends Controller
             'uuid' => $uuid,
         ]);
         $user->save();
-        return response()->json(['message' => 'User data saved successfully', $request->all()], 201);
-    }
-    public function index()
-    {
-        //All users 
-        return response()->json(User::all());
+        return response()->json(['message' => 'User data saved successfully', 'data' => User::findOrFail($user->id)], 201);
     }
 
-    public function show($id)
-    {
-        // Information related to specific user 
-        return response()->json(User::find($id));
-    }
-
+    // Update an existing user and handle errors
     public function update(UserRequest $request, $id)
     {
-        // get user for database 
-        $user = User::findOrFail($id);
-        // get keycloak token 
-        $tokenResponse = Http::asForm()
-            ->post($this->config->get('app.keycloak.get_token_realm_uri'), [
-                'grant_type' => $this->config->get('app.keycloak.grant_type'),
-                'client_id' => $this->config->get('app.keycloak.client_id'),
-                'client_secret' => $this->config->get('app.keycloak.client_secret'),
+        try {
+            $accessToken = $this->getKeycloakAccessToken();
+            $user = User::findOrFail($id);
+            // Rest of the code for updating the user
+            $updateUserUri = $this->config->get('app.keycloak.keycloak_user_update_url');
+            // call keycloak server to update user 
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json',
+            ])->put("$updateUserUri/{$user->uuid}", $request->all());
+            //return $response;
+            // update user data in database 
+            $user->update([
+                'email' => $request->input('email'),
+                'name' => $request->input('firstName'),
+                'surname' => $request->input('lastName'),
             ]);
-        $accessToken = $tokenResponse->json('access_token');
-
-        // call keycloak server to update user 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type' => 'application/json',
-        ])->put("keycloak:8080/admin/realms/Rentella/users/{$user->uuid}", $request->all());
-
-
-        // update user data in database 
-        $user->update([
-            'email' => $request->input('email'),
-            'name' => $request->input('firstName'),
-            'surname' => $request->input('lastName'),
-        ]);        
-        return response()->json(['message' => 'User data updated successfully', $request->all()]);
+            return response()->json(['message' => 'User data updated successfully', 'data' => User::findOrFail($id)]);
+            // Handle specific error cases here, e.g., user not found
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error during user update'], 500);
+        }
     }
 
-
+    // Delete an existing user and handle errors
     public function destroy($id)
     {
-        // delete user from database and from keycloak server
-        // get user for database 
-        $user = User::findOrFail($id);
-        // get keycloak token 
-        $tokenResponse = Http::asForm()
-            ->post($this->config->get('app.keycloak.get_token_realm_uri'), [
-                'grant_type' => $this->config->get('app.keycloak.grant_type'),
-                'client_id' => $this->config->get('app.keycloak.client_id'),
-                'client_secret' => $this->config->get('app.keycloak.client_secret'),
-            ]);
-        $accessToken = $tokenResponse->json('access_token');
+        try {
+            // delete user from database and from keycloak server
+            // get user for database 
+            $user = User::findOrFail($id);
+            // get keycloak token 
+            $accessToken = $this->getKeycloakAccessToken();
 
-        // call keycloak server to update user 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type' => 'application/json',
-        ])->delete("keycloak:8080/admin/realms/Rentella/users/{$user->uuid}");
+            // Rest of the code for deleting the user
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json',
+            ])->delete("keycloak:8080/admin/realms/Rentella/users/{$user->uuid}");
 
 
-        // update user data in database 
-        $user->delete();        
-        return response()->json(['message' => 'User data removed successfully',$id]);
+            // update user data in database 
+            $user->delete();
+            return response()->json(['message' => 'User data removed successfully', $id]);
+            // Handle specific error cases here, e.g., user not found
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error during user deletion'], 500);
+        }
     }
 }
