@@ -41,7 +41,7 @@ class LocationController extends Controller
     public function update(LocationRequest $request, $id)
     {
         $city = CityLocation::findOrFail($id);
-        $city = new CityLocation([
+        $city->update([
             'city_name' => $request->input('city_name'),
             'latitude' => $request->input('latitude'),
             'longitude' => $request->input('longitude'),
