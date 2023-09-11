@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\BeachRequest;
 use App\Models\Beach;
 
@@ -9,32 +10,50 @@ use Illuminate\Http\Request;
 
 class BeachController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        // if no return all the cities 
-        $cityLocations = Beach::all();
-        return response()->json($cityLocations);
+        $beaches = Beach::all();
+        return response()->json($beaches);
     }
+    
     public function show($id)
     {
-        // Information related to specific location 
-        return response()->json(Beach::find($id));
+        $beach = Beach::find($id);
+        
+        if (!$beach) {
+            return response()->json(['message' => 'Beach not found'], 404);
+        }
+        
+        return response()->json($beach);
     }
+    
     public function store(BeachRequest $request)
     {
-        $city = Beach::create($request->all());
-        return response()->json(['message' => 'City data saved successfully', 'data' => $city], 201);
+        $beach = Beach::create($request->all());
+        return response()->json(['message' => 'Beach data saved successfully', 'data' => $beach], 201);
     }
+    
     public function update(BeachRequest $request, $id)
     {
-        $city = Beach::findOrFail($id);
-        $city->update($request->all());
-        return response()->json(['message' => 'City data updated successfully', 'data' => Beach::findOrFail($id)], 200);
+        $beach = Beach::find($id);
+        
+        if (!$beach) {
+            return response()->json(['message' => 'Beach not found'], 404);
+        }
+        
+        $beach->update($request->all());
+        return response()->json(['message' => 'Beach data updated successfully', 'data' => $beach], 200);
     }
+    
     public function destroy($id)
     {
-        $city = Beach::findOrFail($id);
-        $city->delete();
-        return response()->json(['message' => 'City data removed successfully', 'id' => $id]);
+        $beach = Beach::find($id);
+        
+        if (!$beach) {
+            return response()->json(['message' => 'Beach not found'], 404);
+        }
+        
+        $beach->delete();
+        return response()->json(['message' => 'Beach data removed successfully', 'id' => $id]);
     }
 }

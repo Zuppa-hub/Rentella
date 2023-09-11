@@ -4,6 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BeachController;
+use App\Http\Controllers\BeachPictureController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +50,13 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'beaches'], function () {
     Route::post('/', [BeachController::class, 'store'])->name('beaches.store');
     Route::put('/{id}', [BeachController::class, 'update'])->name('beaches.update');
     Route::delete('/{id}', [BeachController::class, 'destroy'])->name('beaches.destroy');
+});
+Route::group(['middleware' => 'auth:api', 'prefix' => 'beach-pictures'], function () {
+    Route::get('/', [BeachPictureController::class, 'index'])->name('beach-pictures.index');
+    Route::get('/{id}', [BeachPictureController::class, 'show'])->name('beach-pictures.show');
+    Route::post('/', [BeachPictureController::class, 'store'])->name('beach-pictures.store');
+    Route::put('/{id}', [BeachPictureController::class, 'update'])->name('beach-pictures.update');
+    Route::delete('/{id}', [BeachPictureController::class, 'destroy'])->name('beach-pictures.destroy');
 });
 
 //unprotected enpoints 
