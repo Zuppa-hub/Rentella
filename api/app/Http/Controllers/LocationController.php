@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LocationFilterRequest;
 use App\Http\Requests\LocationRequest;
+use App\Models\Beach;
+use App\Models\BeachZone;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Models\CityLocation;
+use App\Models\Price;
 
 class LocationController extends Controller
 {
-    public function index(Request $request)
+    public function index(LocationFilterRequest $request)
     {
         // if request has location paramenters 
         if ($request->has(['minLatitude', 'maxLatitude', 'minLongitude', 'maxLongitude'])) {
@@ -17,16 +21,32 @@ class LocationController extends Controller
             $maxLatitude = $request->input('maxLatitude');
             $minLongitude = $request->input('minLongitude');
             $maxLongitude = $request->input('maxLongitude');
-
+            
+            // get the city details 
             $cities = CityLocation::whereBetween('latitude', [$minLatitude, $maxLatitude])
                 ->whereBetween('longitude', [$minLongitude, $maxLongitude])
                 ->get();
-
-            return response()->json($cities);
+            //array where store result of the price and city 
+            $results = [];
+            //search max and min prices for each cities 
+            foreach ($cities as $city) {
+                $cityBeaches = Beach::where('location_id', $city->id)->pluck('id');
+                $zones = BeachZone::whereIn('beach_id', $cityBeaches)
+                    ->selectRaw('MIN(prices.price) as min_price, MAX(prices.price) as max_price')
+                    ->join('prices', 'beach_zones.price_id', '=', 'prices.id')
+                    ->get();
+                $results[] = [
+                    'city' => $city,
+                    'min_price' => $zones->min('min_price'),
+                    'max_price' => $zones->max('max_price'),
+                ];
+            }
+            return response()->json($results);
         }
         // if no return all the cities 
-        $cityLocations = CityLocation::all();
-        return response()->json($cityLocations);
+        return response()->json(
+            CityLocation::all()
+        );
     }
     public function show($id)
     {
