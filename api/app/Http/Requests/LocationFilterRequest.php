@@ -21,6 +21,8 @@ class LocationFilterRequest extends FormRequest
             'maxLatitude' => 'numeric',  'gt:minLatitude',
             'minLongitude' => 'numeric',
             'maxLongitude' => 'numeric', 'gt:minLongitude',
+            'myLatitude' => 'numeric',
+            'myLongitude' => 'numeric',
         ];
     }
 }

@@ -16,7 +16,7 @@ class LocationController extends Controller
     public function index(LocationFilterRequest $request)
     {
         // if request has location paramenters 
-        if ($request->has(['minLatitude', 'maxLatitude', 'minLongitude', 'maxLongitude'])) {
+        if ($request->has(['minLatitude', 'maxLatitude', 'minLongitude', 'maxLongitude', 'myLatitude', 'myLongitude'])) {
             // get the city details 
             $cities = CityLocation::whereBetween(
                 'latitude',
@@ -41,6 +41,7 @@ class LocationController extends Controller
                     'min_price' => $zones->min('min_price'),
                     'max_price' => $zones->max('max_price'),
                     'beach_count' => $cityBeaches->count(), //number of the beach for each city
+                    'distance' => $this->calculateDistance($city->latitude, $city->longitude, $request->input('myLatitude'), $request->input('myLongitude')) . ' km',
                 ];
             }
             return response()->json($results);
@@ -49,6 +50,21 @@ class LocationController extends Controller
         return response()->json(
             CityLocation::all()
         );
+    }
+    //calculate distance between your position and beach location
+    function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        // hearh radius 
+        $earthRadius = 6371;
+
+        // difference bethween the two points and conversion from degrees to radians 
+        $latDiff = deg2rad($lat2) - deg2rad($lat1);
+        $lonDiff = deg2rad($lon2) - deg2rad($lon1);
+
+        // distance using the Heversine formula 
+        $a = sin($latDiff / 2) ** 2 + cos($lat1) * cos($lat2) * sin($lonDiff / 2) ** 2;
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return number_format($earthRadius * $c, 2); //formatted distance using 2 decimal numbers
     }
     public function show($id)
     {
