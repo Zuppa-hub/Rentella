@@ -17,14 +17,15 @@ class LocationController extends Controller
     {
         // if request has location paramenters 
         if ($request->has(['minLatitude', 'maxLatitude', 'minLongitude', 'maxLongitude'])) {
-            $minLatitude = $request->input('minLatitude');
-            $maxLatitude = $request->input('maxLatitude');
-            $minLongitude = $request->input('minLongitude');
-            $maxLongitude = $request->input('maxLongitude');
-            
             // get the city details 
-            $cities = CityLocation::whereBetween('latitude', [$minLatitude, $maxLatitude])
-                ->whereBetween('longitude', [$minLongitude, $maxLongitude])
+            $cities = CityLocation::whereBetween(
+                'latitude',
+                [$request->input('minLatitude'), $request->input('maxLatitude')]
+            )
+                ->whereBetween(
+                    'longitude',
+                    [$request->input('minLongitude'), $request->input('maxLongitude')]
+                )
                 ->get();
             //array where store result of the price and city 
             $results = [];
@@ -39,6 +40,7 @@ class LocationController extends Controller
                     'city' => $city,
                     'min_price' => $zones->min('min_price'),
                     'max_price' => $zones->max('max_price'),
+                    'beach_count' => $cityBeaches->count(), //number of the beach for each city
                 ];
             }
             return response()->json($results);
