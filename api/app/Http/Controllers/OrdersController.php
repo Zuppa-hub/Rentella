@@ -15,8 +15,20 @@ class OrdersController extends Controller
 
         if ($request->has('userId')) {
             $result = [];
+            $now = now();
+            $active = $request->input('active');
             $orders = Order::with(['price', 'umbrella'])
                 ->where('user_id', $request->input('userId'))
+                ->when($active === 'yes', function ($query) use ($now) {
+                    // active orders, future end date
+                    return $query
+                        ->where('end_date', '>', $now);
+                })
+                ->when($active === 'no', function ($query) use ($now) {
+                    // unactive orders, past end date
+                    return $query
+                        ->where('end_date', '<=', $now);
+                })
                 ->get();
             foreach ($orders as $order) {
                 $zone = $order->umbrella->beachzone; // Accedi alla relazione 'zone' definita nel modello Umbrella
