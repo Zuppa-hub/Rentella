@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BeachRequest;
 use App\Models\Beach;
+use App\Models\BeachZone;
 
 use Illuminate\Http\Request;
 
@@ -12,19 +13,37 @@ class BeachController extends Controller
 {
     public function index(Request $request)
     {
-        // if request has location paramenters 
-        if ($request->has('cityId')) {
-            return response()->json(
-                Beach::where(
-                    'location_id',
-                    $request->input('cityId')
-                )->get()
-            );
+        if ($request->has('cityId')) { //if the request has the city id parameters it only shows the beach of this city
+            $beaches = Beach::where('location_id', $request->input('cityId'))->get(); //get the beaches of this city
+
+            $results = $beaches->transform(function ($beach) {  //get maximum and minimum price of a beach 
+                $zonePrices = BeachZone::whereIn('beach_id', [$beach->id])
+                    ->join('prices', 'beach_zones.price_id', '=', 'prices.id')
+                    ->selectRaw('MIN(prices.price) as min_price, MAX(prices.price) as max_price')
+                    ->first();
+
+                $zones = BeachZone::whereIn('beach_id', [$beach->id])
+                    ->join('prices', 'beach_zones.price_id', '=', 'prices.id')
+                    ->withCount('umbrellas')
+                    ->selectRaw('name, description, special_note, latitude, longitude, prices.price')
+                    ->get();
+
+                $beach->allowed_animals = ($beach->allowed_animals == 1) ? 'yes' : 'no';
+
+                return [
+                    'beach' => $beach,
+                    'beach_min_price' => $zonePrices->min_price,
+                    'beach_max_price' => $zonePrices->max_price,
+                    'zones' => $zones,
+                ];
+            });
+
+            return response()->json($results);
         }
-        return response()->json(
-            Beach::all()
-        );
+
+        return response()->json(Beach::all());
     }
+
 
     public function show($id)
     {
