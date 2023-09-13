@@ -11,8 +11,8 @@ class Umbrella extends Model
     use HasFactory;
     protected $fillable = ['zone_id', 'number', 'special_note'];
 
-    public function zone()
+    public function beachzone()
     {
-        return $this->belongsTo(BeachZone::class, 'zone_id');
+        return $this->belongsTo(BeachZone::class, 'zone_id', 'id');
     }
 }

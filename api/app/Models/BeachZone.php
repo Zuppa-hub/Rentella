@@ -19,8 +19,4 @@ class BeachZone extends Model
     {
         return $this->belongsTo(Beach::class);
     }
-    public function umbrellas()
-    {
-        return $this->hasMany(Umbrella::class, 'zone_id', 'id');
-    }
 }

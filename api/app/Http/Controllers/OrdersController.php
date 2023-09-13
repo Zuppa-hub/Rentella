@@ -4,12 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
 use App\Models\Order;
+use App\Models\Umbrella;
 use Illuminate\Http\Request;
+use App\Models\BeachZone;
 
 class OrdersController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+
+        if ($request->has('userId')) {
+            $result = [];
+            $orders = Order::with(['price', 'umbrella'])
+                ->where('user_id', $request->input('userId'))
+                ->get();
+            foreach ($orders as $order) {
+                $zone = $order->umbrella->beachzone; // Accedi alla relazione 'zone' definita nel modello Umbrella
+                $result[] = [
+                    'orders' => $order,
+                    'zone' => $zone,
+                ];
+            }
+
+            return response()->json(
+                $result
+            );
+        }
         $orders = Order::all();
         return response()->json($orders);
     }
