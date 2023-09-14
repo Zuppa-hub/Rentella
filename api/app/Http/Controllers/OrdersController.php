@@ -3,48 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
+use App\Http\Requests\OrdersFilterRequest;
 use App\Models\Order;
-use App\Models\Umbrella;
-use Illuminate\Http\Request;
-use App\Models\BeachZone;
 
 class OrdersController extends Controller
 {
-    public function index(Request $request)
+    public function index(OrdersFilterRequest $request)
     {
-
         if ($request->has('userId')) {
             $result = [];
             $now = now();
             $active = $request->input('active');
+
             $orders = Order::with(['price', 'umbrella'])
-                ->where('user_id', $request->input('userId'))
-                ->when($active === 'yes', function ($query) use ($now) {
-                    // active orders, future end date
-                    return $query
-                        ->where('end_date', '>', $now);
-                })
-                ->when($active === 'no', function ($query) use ($now) {
-                    // unactive orders, past end date
-                    return $query
-                        ->where('end_date', '<=', $now);
-                })
-                ->get();
+                ->where('user_id', $request->input('userId'));
+
+            if ($active === 'true') {
+                // active orders
+                $orders->where('end_date', '>', $now);
+            } elseif ($active === 'false') {
+                // non active orders
+                $orders->where('end_date', '<=', $now);
+            }
+
+            $orders = $orders->get();
+
             foreach ($orders as $order) {
-                $zone = $order->umbrella->beachzone; // Accedi alla relazione 'zone' definita nel modello Umbrella
+                $zone = $order->umbrella->beachzone; // Accedi alla relazione 'beachzone' definita nel modello Umbrella
                 $result[] = [
                     'orders' => $order,
                     'zone' => $zone,
                 ];
             }
 
-            return response()->json(
-                $result
-            );
+            return response()->json($result);
         }
+
         $orders = Order::all();
         return response()->json($orders);
     }
+
 
     public function show($id)
     {
