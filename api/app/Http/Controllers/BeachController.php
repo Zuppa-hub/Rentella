@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BeachRequest;
+use App\Http\Requests\BeachFilterRequest;
 use App\Models\Beach;
 use App\Models\BeachZone;
 
-use Illuminate\Http\Request;
-
 class BeachController extends Controller
 {
-    public function index(Request $request)
+    public function index(BeachFilterRequest $request)
     {
         if ($request->has('cityId')) { //if the request has the city id parameters it only shows the beach of this city
             $beaches = Beach::where('location_id', $request->input('cityId'))->get(); //get the beaches of this city
