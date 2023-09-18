@@ -25,11 +25,9 @@ class OrdersController extends Controller
                 // non active orders
                 $orders->where('end_date', '<=', $now);
             }
-
             $orders = $orders->get();
-
             foreach ($orders as $order) {
-                $zone = $order->umbrella->beachzone; // Accedi alla relazione 'beachzone' definita nel modello Umbrella
+                $zone = $order->umbrella->beachzone;
                 $result[] = [
                     'orders' => $order,
                     'zone' => $zone,
@@ -38,50 +36,28 @@ class OrdersController extends Controller
 
             return response()->json($result);
         }
-
         $orders = Order::all();
         return response()->json($orders);
     }
 
-
     public function show($id)
     {
-        $order = Order::find($id);
-
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
-
+        $order = Order::findOrFail($id);
         return response()->json($order);
     }
 
     public function store(OrderRequest $request)
     {
-        $order = Order::create($request->all());
-        return response()->json(['message' => 'Order data saved successfully', 'data' => $order], 201);
+        return response()->json(Order::create($request->all()), 201);
     }
 
     public function update(OrderRequest $request, $id)
     {
-        $order = Order::find($id);
-
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
-
-        $order->update($request->all());
-        return response()->json(['message' => 'Order data updated successfully', 'data' => $order], 200);
+        return response()->json(Order::findOrFail($id)->update($request->all()), 200);
     }
 
     public function destroy($id)
     {
-        $order = Order::find($id);
-
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
-
-        $order->delete();
-        return response()->json(['message' => 'Order data removed successfully', 'id' => $id]);
+        return response()->json(Order::findOrFail($id)->delete());
     }
 }

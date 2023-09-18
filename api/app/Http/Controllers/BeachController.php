@@ -12,76 +12,70 @@ class BeachController extends Controller
 {
     public function index(BeachFilterRequest $request)
     {
-        if ($request->has('cityId')) { //if the request has the city id parameters it only shows the beach of this city
-            $beaches = Beach::where('location_id', $request->input('cityId'))->get(); //get the beaches of this city
+        $beachesQuery = Beach::query();
 
-            $results = $beaches->transform(function ($beach) {  //get maximum and minimum price of a beach 
-                $zonePrices = BeachZone::whereIn('beach_id', [$beach->id])
-                    ->join('prices', 'beach_zones.price_id', '=', 'prices.id')
-                    ->selectRaw('MIN(prices.price) as min_price, MAX(prices.price) as max_price')
-                    ->first();
-
-                $zones = BeachZone::whereIn('beach_id', [$beach->id])
-                    ->join('prices', 'beach_zones.price_id', '=', 'prices.id')
-                    ->withCount('umbrellas')
-                    ->selectRaw('name, description, special_note, latitude, longitude, prices.price')
-                    ->get();
-
-                $beach->allowed_animals = ($beach->allowed_animals == 1) ? 'yes' : 'no';
-
-                return [
-                    'beach' => $beach,
-                    'beach_min_price' => $zonePrices->min_price,
-                    'beach_max_price' => $zonePrices->max_price,
-                    'zones' => $zones,
-                ];
-            });
-
-            return response()->json($results);
+        foreach ($request->all() as $param => $value) {
+            switch ($param) {
+                case 'cityId':
+                    $beachesQuery->where('location_id', $value);
+                    break;
+                case 'allowed_animals':
+                    $value = ($value === 'yes') ? 1 : 0;
+                    $beachesQuery->where('allowed_animals', $value);
+                    break;
+            }
         }
 
-        return response()->json(Beach::all());
+        $beaches = $beachesQuery->with([
+            'zones.prices',
+            'zones' => function ($query) {
+                $query->withCount('umbrellas');
+            },
+        ])->get();
+
+        $results = $beaches->transform(function ($beach) {
+            $minPrice = $beach->zones->pluck('prices.price')->flatten()->min();
+            $maxPrice = $beach->zones->pluck('prices.price')->flatten()->max();
+
+            $beach->allowed_animals = ($beach->allowed_animals == 1) ? 'yes' : 'no';
+
+            return [
+                'beach' => $beach,
+                'beach_min_price' => $minPrice,
+                'beach_max_price' => $maxPrice,
+                'total_umbrellas' => $beach->zones->sum('umbrellas_count'),
+            ];
+        });
+
+        // Rimove umbrellas relation to avoid umbrellas list 
+        $results->transform(function ($result) {
+            return $result;
+        });
+
+        // Restituisce le spiagge filtrate
+        return response()->json($results);
     }
+
 
 
     public function show($id)
     {
-        $beach = Beach::find($id);
-
-        if (!$beach) {
-            return response()->json(['message' => 'Beach not found'], 404);
-        }
-
-        return response()->json($beach);
+        return response()->json(Beach::findOrfail($id));
     }
 
     public function store(BeachRequest $request)
     {
-        $beach = Beach::create($request->all());
-        return response()->json(['message' => 'Beach data saved successfully', 'data' => $beach], 201);
+        return response()->json(Beach::create($request->all()), 201);
     }
 
     public function update(BeachRequest $request, $id)
     {
-        $beach = Beach::find($id);
-
-        if (!$beach) {
-            return response()->json(['message' => 'Beach not found'], 404);
-        }
-
-        $beach->update($request->all());
-        return response()->json(['message' => 'Beach data updated successfully', 'data' => $beach], 200);
+        return response()->json(Beach::findOrFail($id)
+            ->update($request->all()), 200);
     }
 
     public function destroy($id)
     {
-        $beach = Beach::find($id);
-
-        if (!$beach) {
-            return response()->json(['message' => 'Beach not found'], 404);
-        }
-
-        $beach->delete();
-        return response()->json(['message' => 'Beach data removed successfully', 'id' => $id]);
+        return response()->json(Beach::findOrFail($id)->delete());
     }
 }

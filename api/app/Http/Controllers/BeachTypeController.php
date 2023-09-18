@@ -12,48 +12,27 @@ class BeachTypeController extends Controller
 {
     public function index()
     {
-        $beaches = BeachType::all();
-        return response()->json($beaches);
+        return response()->json(BeachType::all());
     }
-    
+
     public function show($id)
     {
-        $beachType = BeachType::find($id);
-        
-        if (!$beachType) {
-            return response()->json(['message' => 'Beach not found'], 404);
-        }
-        
-        return response()->json($beachType);
+        return response()->json(BeachType::findOrFail($id));
     }
-    
+
     public function store(BeachTypeRequest $request)
     {
-        $beachType = BeachType::create($request->all());
-        return response()->json(['message' => 'Beach data saved successfully', 'data' => $beachType], 201);
+        return response()->json(BeachType::create($request->all()), 201);
     }
-    
+
     public function update(BeachTypeRequest $request, $id)
     {
-        $beachType = BeachType::find($id);
-        
-        if (!$beachType) {
-            return response()->json(['message' => 'Beach not found'], 404);
-        }
-        
-        $beachType->update($request->all());
-        return response()->json(['message' => 'Beach data updated successfully', 'data' => $beachType], 200);
+        return response()->json(BeachType::findOrFail($id)->update($request->all()), 200);
     }
-    
+
     public function destroy($id)
     {
-        $beachType = BeachType::find($id);
-        
-        if (!$beachType) {
-            return response()->json(['message' => 'Beach not found'], 404);
-        }
-        
-        $beachType->delete();
-        return response()->json(['message' => 'Beach data removed successfully', 'id' => $id]);
+        $beachType = BeachType::findOrFail($id)->delete();
+        return response()->json($id);
     }
 }

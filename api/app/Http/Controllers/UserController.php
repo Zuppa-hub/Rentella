@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use App\Http\Requests\UserRequest;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Http\JsonResponse;
+
 
 class UserController extends Controller
 {
@@ -28,46 +30,59 @@ class UserController extends Controller
 
         return $tokenResponse->json('access_token');
     }
+    private function handleException(\Exception $e): JsonResponse
+    {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
     public function index()
     {
-        //All users 
-        return response()->json(User::all());
+        try {
+            return response()->json(User::all());
+        } catch (\Exception $e) {
+            return $this->handleException($e);
+        }
     }
 
     public function show($id)
     {
-        // Information related to specific user 
-        return response()->json(User::find($id));
+        try {
+            return response()->json(User::findOrFail($id));
+        } catch (\Exception $e) {
+            return $this->handleException($e);
+        }
     }
 
     // Create a new user and handle errors
     public function store(UserRequest $request)
     {
-        $accessToken = $this->getKeycloakAccessToken();
-        // Make the API call to register the new user
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type' => 'application/json',
-        ])->post($this->config->get('app.keycloak.get_token_uri'),  $request->all());
+        try {
+            $accessToken = $this->getKeycloakAccessToken();
+            // Make the API call to register the new user
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json',
+            ])->post($this->config->get('app.keycloak.get_token_uri'),  $request->all());
 
-        //error cheking
-        if ($response->status() != 201) {
-            return response()->json(['error' => 'Error during new user creation'], $response->status());
+            //error cheking
+            if ($response->status() != 201) {
+                return response()->json(['error' => 'Error during new user creation'], $response->status());
+            }
+
+            // Get the UUID from the Location header in Keycloak's response
+            $locationHeader = $response->header('Location');
+            $uuid = basename($locationHeader); // Extract the UUID from the URL
+
+            // Create a new user record in the local database
+            $user = User::create([
+                'email' => $request->input('email'),
+                'name' => $request->input('firstName'),
+                'surname' => $request->input('lastName'),
+                'uuid' => $uuid,
+            ]);
+            return response()->json(['message' => 'User data saved successfully', 'data' => User::findOrFail($user->id)], 201);
+        } catch (\Exception $e) {
+            return $this->handleException($e);
         }
-
-        // Get the UUID from the Location header in Keycloak's response
-        $locationHeader = $response->header('Location');
-        $uuid = basename($locationHeader); // Extract the UUID from the URL
-
-        // Create a new user record in the local database
-        $user = new User([
-            'email' => $request->input('email'),
-            'name' => $request->input('firstName'),
-            'surname' => $request->input('lastName'),
-            'uuid' => $uuid,
-        ]);
-        $user->save();
-        return response()->json(['message' => 'User data saved successfully', 'data' => User::findOrFail($user->id)], 201);
     }
 
     // Update an existing user and handle errors
@@ -93,7 +108,7 @@ class UserController extends Controller
             return response()->json(['message' => 'User data updated successfully', 'data' => User::findOrFail($id)]);
             // Handle specific error cases here, e.g., user not found
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error during user update'], 500);
+            return $this->handleException($e);
         }
     }
 
@@ -119,7 +134,7 @@ class UserController extends Controller
             return response()->json(['message' => 'User data removed successfully', $id]);
             // Handle specific error cases here, e.g., user not found
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error during user deletion'], 500);
+            return $this->handleException($e);
         }
     }
 }

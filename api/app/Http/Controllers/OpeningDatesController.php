@@ -10,48 +10,26 @@ class OpeningDatesController extends Controller
 {
     public function index()
     {
-        $openingDates = OpeningDate::all();
-        return response()->json($openingDates);
+        return response()->json(OpeningDate::all());
     }
     
     public function show($id)
-    {
-        $openingDate = OpeningDate::find($id);
-        
-        if (!$openingDate) {
-            return response()->json(['message' => 'OpeningDate not found'], 404);
-        }
-        
-        return response()->json($openingDate);
+    {        
+        return response()->json(OpeningDate::findOrFail($id));
     }
     
     public function store(OpeningDateRequest $request)
     {
-        $openingDate = OpeningDate::create($request->all());
-        return response()->json(['message' => 'OpeningDate data saved successfully', 'data' => $openingDate], 201);
+        return response()->json(OpeningDate::create($request->all()), 201);
     }
     
     public function update(OpeningDateRequest $request, $id)
     {
-        $openingDate = OpeningDate::find($id);
-        
-        if (!$openingDate) {
-            return response()->json(['message' => 'OpeningDate not found'], 404);
-        }
-        
-        $openingDate->update($request->all());
-        return response()->json(['message' => 'OpeningDate data updated successfully', 'data' => $openingDate], 200);
+        return response()->json( OpeningDate::findOrfail($id)->update($request->all()), 200);
     }
     
     public function destroy($id)
-    {
-        $openingDate = OpeningDate::find($id);
-        
-        if (!$openingDate) {
-            return response()->json(['message' => 'OpeningDate not found'], 404);
-        }
-        
-        $openingDate->delete();
-        return response()->json(['message' => 'OpeningDate data removed successfully', 'id' => $id]);
+    {   
+        return response()->json(OpeningDate::findOrFail($id)->delete(),200);
     }
 }

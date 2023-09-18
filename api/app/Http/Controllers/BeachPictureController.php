@@ -20,19 +20,16 @@ class BeachPictureController extends Controller
     }
     public function store(BeachPictureRequest $request)
     {
-        $beachPic = BeachPicture::create($request->all());
-        return response()->json(['message' => 'Picture data saved successfully', 'data' => $beachPic], 201);
+        return response()->json(BeachPicture::create($request->all()), 201);
     }
     public function update(BeachPictureRequest $request, $id)
     {
-        $beachPic = BeachPicture::findOrFail($id);
-        $beachPic->update($request->all());
-        return response()->json(['message' => 'Picture data updated successfully', 'data' => BeachPicture::findOrFail($id)], 200);
+        BeachPicture::findOrFail($id)->update($request->all());
+        return response()->json(BeachPicture::findOrFail($id), 200);
     }
     public function destroy($id)
     {
-        $beachPic = BeachPicture::findOrFail($id);
-        $beachPic->delete();
-        return response()->json(['message' => 'Picture data removed successfully', 'id' => $id]);
+        BeachPicture::findOrFail($id)->delete();
+        return response()->json($id);
     }
 }

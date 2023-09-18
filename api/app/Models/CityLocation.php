@@ -10,4 +10,8 @@ class CityLocation extends Model
     use HasFactory;
     protected $table = 'cities_location';
     protected $fillable = ['city_name', 'latitude', 'longitude', 'description'];
+    public function beaches()
+    {
+        return $this->hasMany(Beach::class, 'location_id');
+    }
 }

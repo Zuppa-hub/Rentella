@@ -25,8 +25,10 @@ class Beach extends Model
     {
         return $this->belongsTo(Owner::class, 'owner_id', 'id');
     }
-
-
+    public function zones()
+    {
+        return $this->hasMany(BeachZone::class, 'beach_id');
+    }
     public function location()
     {
         return $this->belongsTo(CityLocation::class, 'location_id');

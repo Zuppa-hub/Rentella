@@ -10,48 +10,30 @@ class PricesController extends Controller
 {
     public function index()
     {
-        $prices = Price::all();
-        return response()->json($prices);
+        return response()->json(
+            Price::all()
+        );
     }
 
     public function show($id)
     {
-        $price = Price::find($id);
-
-        if (!$price) {
-            return response()->json(['message' => 'Price not found'], 404);
-        }
-
-        return response()->json($price);
+        return response()->json(
+            Price::findOrFail($id)
+        );
     }
 
     public function store(PriceRequest $request)
     {
-        $price = Price::create($request->all());
-        return response()->json(['message' => 'Price data saved successfully', 'data' => $price], 201);
+        return response()->json(Price::create($request->all()), 201);
     }
 
     public function update(PriceRequest $request, $id)
     {
-        $price = Price::find($id);
-
-        if (!$price) {
-            return response()->json(['message' => 'Price not found'], 404);
-        }
-
-        $price->update($request->all());
-        return response()->json(['message' => 'Price data updated successfully', 'data' => $price], 200);
+        return response()->json(Price::findOrFail($id)->update($request->all()), 200);
     }
 
     public function destroy($id)
     {
-        $price = Price::find($id);
-
-        if (!$price) {
-            return response()->json(['message' => 'Price not found'], 404);
-        }
-
-        $price->delete();
-        return response()->json(['message' => 'Price data removed successfully', 'id' => $id]);
+        return response()->json(Price::findOrFail($id)->delete());
     }
 }

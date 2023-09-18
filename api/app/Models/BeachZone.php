@@ -10,11 +10,6 @@ class BeachZone extends Model
     use HasFactory;
     protected $fillable = ['name', 'price_id', 'description', 'special_note', 'latitude', 'longitude', 'beach_id'];
 
-    public function price()
-    {
-        return $this->belongsTo(Price::class);
-    }
-
     public function beach()
     {
         return $this->belongsTo(Beach::class);
@@ -22,5 +17,9 @@ class BeachZone extends Model
     public function umbrellas()
     {
         return $this->hasMany(Umbrella::class, 'zone_id');
+    }
+    public function prices()
+    {
+        return $this->belongsTo(Price::class, 'price_id');
     }
 }

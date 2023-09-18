@@ -16,42 +16,21 @@ class OwnersController extends Controller
 
     public function show($id)
     {
-        $owner = Owner::find($id);
-
-        if (!$owner) {
-            return response()->json(['message' => 'Owner not found'], 404);
-        }
-
-        return response()->json($owner);
+        return response()->json(Owner::findOrFail($id));
     }
 
     public function store(OwnerRequest $request)
     {
-        $owner = Owner::create($request->all());
-        return response()->json(['message' => 'Owner data saved successfully', 'data' => $owner], 201);
+        return response()->json(Owner::create($request->all()), 201);
     }
 
     public function update(OwnerRequest $request, $id)
     {
-        $owner = Owner::find($id);
-
-        if (!$owner) {
-            return response()->json(['message' => 'Owner not found'], 404);
-        }
-
-        $owner->update($request->all());
-        return response()->json(['message' => 'Owner data updated successfully', 'data' => $owner], 200);
+        return response()->json(Owner::findOrFail($id)->update($request->all()), 200);
     }
 
     public function destroy($id)
     {
-        $owner = Owner::find($id);
-
-        if (!$owner) {
-            return response()->json(['message' => 'Owner not found'], 404);
-        }
-
-        $owner->delete();
-        return response()->json(['message' => 'Owner data removed successfully', 'id' => $id]);
+        return response()->json(Owner::findOrFail($id)->delete());
     }
 }

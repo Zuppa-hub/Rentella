@@ -15,42 +15,51 @@ class LocationController extends Controller
 {
     public function index(LocationFilterRequest $request)
     {
-        // if request has location paramenters 
-        if ($request->has(['minLatitude', 'maxLatitude', 'minLongitude', 'maxLongitude', 'myLatitude', 'myLongitude'])) {
-            // get the city details 
-            $cities = CityLocation::whereBetween(
-                'latitude',
-                [$request->input('minLatitude'), $request->input('maxLatitude')]
-            )
-                ->whereBetween(
-                    'longitude',
-                    [$request->input('minLongitude'), $request->input('maxLongitude')]
-                )
-                ->get();
-            //array where store result of the price and city 
-            $results = [];
-            //search max and min prices for each cities 
-            foreach ($cities as $city) {
-                $cityBeaches = Beach::where('location_id', $city->id)->pluck('id');
-                $zones = BeachZone::whereIn('beach_id', $cityBeaches)
-                    ->selectRaw('MIN(prices.price) as min_price, MAX(prices.price) as max_price')
-                    ->join('prices', 'beach_zones.price_id', '=', 'prices.id')
-                    ->get();
-                $results[] = [
-                    'city' => $city,
-                    'min_price' => $zones->min('min_price'),
-                    'max_price' => $zones->max('max_price'),
-                    'beach_count' => $cityBeaches->count(), //number of the beach for each city
-                    'distance' => $this->calculateDistance($city->latitude, $city->longitude, $request->input('myLatitude'), $request->input('myLongitude')) . ' km',
-                ];
+        $filterParams = ['minLatitude', 'maxLatitude', 'minLongitude', 'maxLongitude', 'myLatitude', 'myLongitude'];
+
+        // initialize array of parameters
+        $params = [];
+
+        foreach ($filterParams as $param) {
+            if ($request->has($param)) {
+                // add parameters to array
+                $params[$param] = $request->input($param);
             }
+        }
+
+        // check if array is empty 
+        if (!empty($params)) {
+            // search for near cities 
+            $cities = CityLocation::whereBetween('latitude', [$params['minLatitude'], $params['maxLatitude']])
+                ->whereBetween('longitude', [$params['minLongitude'], $params['maxLongitude']])
+                ->get();
+
+            // obtain beach and zone 
+            $results = $cities->map(function ($city) use ($params) {
+                $cityBeaches = Beach::where('location_id', $city->id)->pluck('id');
+                $zones = BeachZone::whereIn('beach_id', $cityBeaches)->get();
+
+                // obtain price max and min 
+                $minPrice = $zones->min('prices.price');
+                $maxPrice = $zones->max('prices.price');
+
+                return [
+                    'city' => $city,
+                    'min_price' => $minPrice,
+                    'max_price' => $maxPrice,
+                    'beach_count' => $cityBeaches->count(),
+                    'distance' => $this->calculateDistance($city->latitude, $city->longitude, $params['myLatitude'], $params['myLongitude']) . ' km',
+                ];
+            });
+
+            // return data as json
             return response()->json($results);
         }
-        // if no return all the cities 
-        return response()->json(
-            CityLocation::all()
-        );
+
+        // return all cities if not parameter found 
+        return response()->json(CityLocation::all());
     }
+
     //calculate distance between your position and beach location
     function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
@@ -73,19 +82,17 @@ class LocationController extends Controller
     }
     public function store(LocationRequest $request)
     {
-        $city = CityLocation::create($request->all());
-        return response()->json(['message' => 'City data saved successfully', 'data' => $city], 201);
+        return response()->json(CityLocation::create($request->all()), 201);
     }
     public function update(LocationRequest $request, $id)
     {
-        $city = CityLocation::findOrFail($id);
-        $city->update($request->all());
-        return response()->json(['message' => 'City data updated successfully', 'data' => CityLocation::findOrFail($id)], 200);
+        return response()->json(CityLocation::findOrFail($id)->update($request->all()), 200);
     }
     public function destroy($id)
     {
-        $city = CityLocation::findOrFail($id);
-        $city->delete();
-        return response()->json(['message' => 'City data removed successfully', 'id' => $id]);
+        return response()->json(
+            CityLocation::findOrFail($id)->delete(),
+            200
+        );
     }
 }
