@@ -1,3 +1,8 @@
+# ReadMe
+
+Date: August 28, 2023 → September 1, 2023
+Status: In progress
+
 # Rentella Backend.
 
 Status: In progress
@@ -6,92 +11,14 @@ Rentella is an application for renting beach umbrellas. It uses a MySQL database
 
 ## Api usage
 
-**First you must be authenticated**
+All the api use CRUD scheme. 
 
-For getting JWT token: 
-[Response in JSON, make request using POST method.]
+api are divided into 11 groups, as many as there are database tables.
+The groups are: users, locations, beaches, beach-pictures, beach-types, beach-zones, opening-dates, orders, owners, prices, umbrellas. 
 
-```json
-localhost:8080/realms/Rentella/protocol/openid-connect/token
-```
+**Complete api documentation can be found here:** 
 
-| Key  | Value |
-| --- | --- |
-| client_id | api |
-| grant_type | password |
-| client_secret | {{client_secret}} |
-| username | {{username}} |
-| password | {{password}} |
-| Realm | Rentella |
-- Email of the user will be checked if is in the users table of the db.
-
-Response if all key is correct will be a JWT token.
-
-Use the JWT token as bearer token in the header of the api request 
-
-| Key | Value |
-| --- | --- |
-| Authorization | Bearer
-{{Token}} |
-
-**To get the list of all cities** 
-
-[Response in JSON, make request using GET method.]
-
-```bash
-http://localhost:9000/public/api/city-locations
-```
-
-Response: 
-
-```json
-[
-    {
-        "id": 1,
-        "city_name": "North Medaville",
-        "latitude": -50.49,
-        "longitude": -165.36,
-        "description": "Sint aut est possimus cumque a.",
-        "created_at": "2023-09-05T09:21:47.000000Z",
-        "updated_at": "2023-09-05T09:21:47.000000Z"
-    },
-    {
-        "id": 2,
-        "city_name": "Romaguerafort",
-        "latitude": 66.86,
-        "longitude": 148.33,
-        "description": "Et expedita libero voluptas rerum dolores accusantium.",
-        "created_at": "2023-09-05T09:21:47.000000Z",
-        "updated_at": "2023-09-05T09:21:47.000000Z"
-    },
-```
-
-To get the list of cities in a given range of latitudes and longitudes 
-[Response in JSON, make request using GET method.]
-
-```bash
-http://localhost:9000/public/api/cities/{{Min_latitude}}/{{Max_latitude}}/{{Min_longitude}}/{{Max_longitude}}
-```
-
-```bash
-http://localhost:9000/public/api/cities/40.0/70.0/140.0/180.0
-```
-
-Response 
-
-```json
-[
-    {
-        "id": 2,
-        "city_name": "Romaguerafort",
-        "latitude": 66.86,
-        "longitude": 148.33,
-        "description": "Et expedita libero voluptas rerum dolores accusantium.",
-        "created_at": "2023-09-05T09:21:47.000000Z",
-        "updated_at": "2023-09-05T09:21:47.000000Z"
-    }
-]
-```
+[](https://dark-zodiac-42041.postman.co/workspace/Team-Workspace~b9d9a449-2f75-41f1-8006-bb193b2a670e/collection/26738901-771c9524-b2e0-48dd-b2ce-17d5a7aebbcc?action=share&source=copy-link&creator=26738901)
 
 ## Compilation Instructions
 

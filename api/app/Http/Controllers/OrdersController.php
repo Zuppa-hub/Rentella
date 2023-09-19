@@ -13,15 +13,14 @@ class OrdersController extends Controller
         if ($request->has('userId')) {
             $result = [];
             $now = now();
-            $active = $request->input('active');
-
+            $active = boolval($request->input('active'));
             $orders = Order::with(['price', 'umbrella'])
                 ->where('user_id', $request->input('userId'));
 
-            if ($active === 'true') {
+            if ($active === true) {
                 // active orders
                 $orders->where('end_date', '>', $now);
-            } elseif ($active === 'false') {
+            } elseif ($active === false) {
                 // non active orders
                 $orders->where('end_date', '<=', $now);
             }

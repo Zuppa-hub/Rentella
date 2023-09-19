@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BeachRequest;
 use App\Http\Requests\BeachFilterRequest;
 use App\Models\Beach;
-use App\Models\BeachZone;
 
 class BeachController extends Controller
 {
