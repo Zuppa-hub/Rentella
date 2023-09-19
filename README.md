@@ -18,7 +18,7 @@ The groups are: users, locations, beaches, beach-pictures, beach-types, beach-zo
 
 **Complete api documentation can be found here:** 
 
-[](https://dark-zodiac-42041.postman.co/workspace/Team-Workspace~b9d9a449-2f75-41f1-8006-bb193b2a670e/collection/26738901-771c9524-b2e0-48dd-b2ce-17d5a7aebbcc?action=share&source=copy-link&creator=26738901)
+[Rentella api documentation](https://dark-zodiac-42041.postman.co/workspace/Team-Workspace~b9d9a449-2f75-41f1-8006-bb193b2a670e/collection/26738901-771c9524-b2e0-48dd-b2ce-17d5a7aebbcc?action=share&source=copy-link&creator=26738901)
 
 ## Compilation Instructions
 
