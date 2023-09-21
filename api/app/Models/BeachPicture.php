@@ -1,5 +1,6 @@
 <?php
-
+/* The BeachPicture class is a model that represents a picture of a beach and is associated with a
+Beach model. */
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
