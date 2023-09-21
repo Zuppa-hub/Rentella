@@ -1,14 +1,12 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-
 import App from './App.vue'
-import router from './router'
 
+createApp(App).mount('#app')
 const app = createApp(App)
+import KeyCloakService from "./KeycloakService";
 
-app.use(createPinia())
-app.use(router)
+const renderApp = () => {
+  createApp(App).mount("#app");
+};
 
-app.mount('#app')
+KeyCloakService.CallLogin(renderApp);

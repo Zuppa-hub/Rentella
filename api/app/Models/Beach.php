@@ -1,5 +1,6 @@
 <?php
-
+/* The Beach class is a model in a PHP Laravel application that represents a beach and its associated
+properties. */
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,10 @@ class Beach extends Model
 {
     use HasFactory;
     protected $fillable = [
+        /* The 'owner_id' field in the  array is specifying that the 'owner_id' column in the
+        'beaches' table can be mass assigned. This means that when creating or updating a Beach
+        model, you can pass an array with the 'owner_id' key to set the value of the 'owner_id'
+        column. */
         'owner_id',
         'name',
         'location_id',
