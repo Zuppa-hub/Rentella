@@ -1,7 +1,7 @@
 <template>
     <body class="h-screen">
         <div class="flex flex-row h-full">
-            <div class="flex-2 md:w-2/5 dark:bg-gray-950 overflow-y-auto">
+            <div class="md:w-2/5 dark:bg-gray-950 overflow-y-auto w-full">
                 <!-- Contenuto della prima colonna -->
                 <div class="grid grid-rows-4 gap-4 content-center">
                     <div class="bg-LogoLight dark:bg-LogoDark mx-2 mt-1" style="background-repeat: no-repeat;"></div>
@@ -76,7 +76,7 @@
                     </p>
                 </div>
             </div>
-            <div class="flex-3 md:w-4/5 bg-cover bg-center bg-backgroundImage"></div>
+            <div class="hidden md:flex flex-3 md:w-4/5 bg-cover bg-center bg-backgroundImage"></div>
         </div>
     </body>
 </template>
@@ -90,7 +90,7 @@ export default {
             email: "",
             password: "",
             password_confirm: "",
-            isLoginFormVisible: false,
+            isLoginFormVisible: true,
         };
     },
     methods: {
