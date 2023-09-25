@@ -8,15 +8,15 @@
                     <hr class="border-b border-gray-300 dark:border-gray-600 mb-2" />
                     <!-- Testo centrato sotto la linea nera -->
                     <div class="flex items-center justify-center">
-                        <div class="text-zinc-800 text-3xl font-bold dark:text-zinc-300" v-show="!isLoginFormVisible">
+                        <div class="text-zinc-800 text-3xl font-bold dark:text-zinc-300 text-center" v-show="!isLoginFormVisible">
                             Register</div>
-                        <div class="text-zinc-800 text-3xl font-bold dark:text-zinc-300" v-show="isLoginFormVisible">Welcome
+                        <div class="text-zinc-800 text-3xl font-bold dark:text-zinc-300 text-center" v-show="isLoginFormVisible">Welcome
                             to Rentella</div>
                     </div>
-                    <p class="flex items-center justify-center text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400 "
+                    <p class="flex items-center justify-center text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400 text-center"
                         v-show="!isLoginFormVisible">
                         Create an Account for FREE</p>
-                    <p class="flex items-center justify-center text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400 "
+                    <p class="flex items-center justify-center text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400 text-center"
                         v-show="isLoginFormVisible">
                         The easiest way to rent an Umbrella on the beach.</p>
                     <form class="mx-6 " >
@@ -82,7 +82,12 @@
 </template>
   
 <script lang="ts">
+import Modal from "../components/Modal.vue"
+
 export default {
+    components: {
+    Modal,
+  },
     data() {
         return {
             name: "",
@@ -91,6 +96,7 @@ export default {
             password: "",
             password_confirm: "",
             isLoginFormVisible: true,
+            modalVisible: false,
         };
     },
     methods: {
