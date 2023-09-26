@@ -82,11 +82,9 @@
 </template>
   
 <script lang="ts">
-import Modal from "../components/Modal.vue"
 
 export default {
     components: {
-    Modal,
   },
     data() {
         return {

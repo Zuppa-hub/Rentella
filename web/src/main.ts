@@ -1,13 +1,11 @@
+import './assets/style.css'
+
 import { createApp } from 'vue'
 import App from './App.vue'
-import "./assets/style.css"
+import router from './router'
 
-createApp(App).mount('#app')
 const app = createApp(App)
-import KeyCloakService from "./KeycloakService";
 
-const renderApp = () => {
-  createApp(App).mount("#app");
-};
+app.use(router)
 
-KeyCloakService.CallLogin(renderApp);
+app.mount('#app')

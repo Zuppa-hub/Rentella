@@ -1,22 +1,11 @@
+<script setup lang="ts">
+import { RouterLink, RouterView } from 'vue-router'
+import Login from './views/Login.vue';
+</script>
+
 <template>
-  <div id="app">
-    <router-view></router-view>
-    <Login v-if="showLoginComponent" />
-  </div>
+  <RouterView />
+  <Login/>
 </template>
 
-
-<script lang="ts">
-import Login from './components/Login.vue'
-export default
-  {
-    data() {
-      return {
-        showLoginComponent: true, // Cambia questa variabile in base alla tua logica
-      };
-    },
-    components: {
-      Login, // Registra il componente Login
-    },
-  };
-</script>
+<style scoped></style>
