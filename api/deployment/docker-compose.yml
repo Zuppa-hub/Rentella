@@ -16,7 +16,7 @@ services:
     image: mysql:latest
     environment:
       MYSQL_DATABASE: Rentella_db
-      MYSQL_ROOT_PASSWORD: password 
+      MYSQL_ROOT_PASSWORD: password
     ports:
       - 3306:3306
     networks:
@@ -48,10 +48,7 @@ services:
       - 8080:8080
     command: start-dev --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     volumes:
-      - ../themes/keycloak-theme-vuejs:/opt/keycloak/themes/Rentella
-      - ../disable-theme-cache.cli:/opt/jboss/startup-scripts/disable-theme-cache.cli 
-
-
+      - ../themes/Rentella:/opt/keycloak/themes/Rentella
       - keycloak_standalone_data:/opt/jboss/keycloak/standalone/data
       - keycloak_standalone_deployments:/opt/jboss/keycloak/standalone/deployments
     environment:
