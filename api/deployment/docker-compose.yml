@@ -2,7 +2,7 @@ version: '3.8'
 services:
   laravel-docker:
     container_name: Rentella_app
-    build: 
+    build:
       context: ../
       dockerfile: ./deployment/Dockerfile
     volumes:
@@ -14,9 +14,9 @@ services:
 
   mysql_db:
     image: mysql:latest
-    environment: 
+    environment:
       MYSQL_DATABASE: Rentella_db
-      MYSQL_ROOT_PASSWORD: password # Cambia con la password corretta da .env
+      MYSQL_ROOT_PASSWORD: password 
     ports:
       - 3306:3306
     networks:
@@ -46,8 +46,12 @@ services:
     image: quay.io/keycloak/keycloak:latest
     ports:
       - 8080:8080
-    command: start-dev
+    command: start-dev --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     volumes:
+      - ../themes/keycloak-theme-vuejs:/opt/keycloak/themes/Rentella
+      - ../disable-theme-cache.cli:/opt/jboss/startup-scripts/disable-theme-cache.cli 
+
+
       - keycloak_standalone_data:/opt/jboss/keycloak/standalone/data
       - keycloak_standalone_deployments:/opt/jboss/keycloak/standalone/deployments
     environment:
