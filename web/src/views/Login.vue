@@ -7,7 +7,7 @@
                     <div class="bg-LogoLight dark:bg-LogoDark mx-2 mt-1" style="background-repeat: no-repeat;"></div>
                     <hr class="border-b border-gray-300 dark:border-gray-600 mb-2" />
                     <!-- Testo centrato sotto la linea nera -->
-                    <div class="flex items-center justify-center">
+                    <div class="flex items-center justify-center ">
                         <div class="text-zinc-800 text-3xl font-bold dark:text-zinc-300 text-center"
                             v-show="!isLoginFormVisible">
                             Register</div>
@@ -133,6 +133,4 @@ export default {
     },
 };
 </script>
-  
-<style scoped></style>
-  
+    

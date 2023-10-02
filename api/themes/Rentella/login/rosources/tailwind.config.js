@@ -13,7 +13,7 @@ module.exports = {
         'LogoDark': "url('src/assets/LogoDark.svg')",
       }),
     },
-    colors: {
+    colors: {w
       // extend default colors of Tailwind CSS
       ...require('tailwindcss/colors'),
 
