@@ -11,6 +11,10 @@ module.exports = {
         'backgroundImage': "url('src/assets/img/BeachFromAbove.jpeg')",
         'LogoLight': "url('src/assets/LogoLight.svg')",
         'LogoDark': "url('src/assets/LogoDark.svg')",
+        'HomeIcon': "url('src/assets/icons/Home.svg')",
+        'ActiveIcon': "url('src/assets/icons/Active.svg')",
+        'HistoryIcon': "url('src/assets/icons/History.svg')",
+        'SettingsIcon': "url('src/assets/icons/Settings.svg')",
       }),
     },
     colors: {

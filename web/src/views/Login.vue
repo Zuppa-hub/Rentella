@@ -96,10 +96,13 @@
 </template>
   
 <script lang="ts">
+import TopBar from '@/components/TopBar.vue';
+
 
 export default {
     components: {
-    },
+    TopBar
+},
     data() {
         return {
             name: "",
