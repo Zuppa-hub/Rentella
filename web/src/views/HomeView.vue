@@ -1,18 +1,48 @@
+// The code you provided is a Vue component written in TypeScript. It represents the Home component of
+// a Vue application. Let's break down the code:
 <script lang="ts">
+import axios from "axios";
 import TopBar from '@/components/TopBar.vue';
+import NavBar from '@/components/NavBar.vue';
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
+import KeyCloakService from "../KeycloakService";
+
 export default {
   name: "Home",
   components: {
     LMap,
     LTileLayer,
-    TopBar
+    TopBar,
+    NavBar,
   },
   data() {
     return {
       zoom: 10,
+      apiData: null,
+      token: "",
     };
+  },
+  methods: {
+    async fetchData() {
+      try {
+        const response = await axios.get('http://localhost:9000/public/api/locations/?minLatitude=-200&maxLatitude=200&minLongitude=-200&maxLongitude=200&myLatitude=100&myLongitude=-134', {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            Accept: `*/*`,
+          },
+        });
+        this.apiData = response.data;
+      } catch (error) {
+        console.error("Errore nella chiamata API:", error);
+      }
+    },
+
+  },
+  created() {
+    const token = KeyCloakService.GetAccesToken();
+    this.token = token ? token : "";
+    this.fetchData();
   },
 };
 </script>
@@ -20,10 +50,8 @@ export default {
 <template>
   <body class="h-screen">
     <TopBar />
-    <div class="flex flex-row h-full map-container">
+    <div class="flex flex-row h-full map-container md:calc(100vh - 72px)">
       <div class="md:w-2/5 dark:bg-gray-950 overflow-y-auto w-full">
-        <!-- Contenuto della prima colonna -->
-        <!-- Testo centrato sotto la linea nera -->
         <div class="flex items-center justify-center  dark:text-white">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ut nunc sit amet lacus dignissim facilisis at dictum
           tellus. Ut vel nulla at diam interdum rutrum non vel felis. Quisque ac velit egestas, pretium est eget, rutrum
@@ -70,6 +98,6 @@ export default {
 
       </div>
     </div>
-
+    <NavBar />
   </body>
 </template>

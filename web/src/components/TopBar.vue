@@ -5,6 +5,12 @@
                 <svg height="40" class=" bg-LogoDark object-left " style="background-repeat: no-repeat;">
                 </svg>
                 <hr class="border-b border-gray-300 dark:border-gray-600 mb-2" />
+                <div class="sm:flex sticky top-0 ml-4 md:hidden">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                        <span class="text-primary-700 text-xl font-semibold">{{ profileLetter }}</span>
+                        <!-- La lettera del profilo -->
+                    </div>
+                </div>
                 <div class="hidden md:flex justify-end items-center object-left">
                     <ul class="flex font-medium flex-row space-x-8 object-left">
                         <RouterLink :to="{ name: 'Home' }">
@@ -50,7 +56,7 @@
                                 </a>
                             </li>
                         </RouterLink>
-                        <div class="relative ml-4">
+                        <div class="sm:flex relative ml-4">
                             <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
                                 <span class="text-primary-700 text-xl font-semibold">{{ profileLetter }}</span>
                                 <!-- La lettera del profilo -->
@@ -63,7 +69,6 @@
     </header>
 </template>
 <script lang="ts">
-import axios from "axios";
 import { RouterLink } from "vue-router";
 import KeyCloakService from "../KeycloakService";
 
@@ -78,7 +83,7 @@ export default {
         // Utilizza il metodo GetUserName() di KeyCloakService per ottenere il nome utente
         const userName = KeyCloakService.GetUserName();
         // Imposta il valore di profileLetter in base all'esistenza del nome utente
-        this.profileLetter = userName ? userName[0] : "";
+        this.profileLetter = userName ? userName[0].toUpperCase() : "";
     },
 };
 

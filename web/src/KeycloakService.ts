@@ -31,7 +31,7 @@ const LogOut = () => keycloakInstance.logout();
 
 const UserRoles = (): string[] | undefined => {
   if (keycloakInstance.resourceAccess === undefined) return undefined;
-  return keycloakInstance.resourceAccess["vuejs"].roles;
+  return keycloakInstance.resourceAccess["api"].roles;
 };
 
 const KeyCloakService = {
