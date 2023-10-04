@@ -20,7 +20,7 @@ export default {
 <template>
   <body class="h-screen">
     <TopBar />
-    <div class="flex flex-row h-full">
+    <div class="flex flex-row h-full map-container">
       <div class="md:w-2/5 dark:bg-gray-950 overflow-y-auto w-full">
         <!-- Contenuto della prima colonna -->
         <!-- Testo centrato sotto la linea nera -->
@@ -62,7 +62,7 @@ export default {
           Integer dapibus placerat tincidu
         </div>
       </div>
-      <div class="hidden md:flex flex-3 md:w-4/5 bg-cover bg-center">
+      <div class="hidden md:flex md:w-3/5 bg-cover bg-center">
         <l-map ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482]">
           <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
             name="OpenStreetMap"></l-tile-layer>
@@ -70,5 +70,6 @@ export default {
 
       </div>
     </div>
+
   </body>
 </template>
