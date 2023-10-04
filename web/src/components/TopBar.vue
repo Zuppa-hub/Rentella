@@ -1,5 +1,5 @@
 <template>
-    <header class="sticky">
+    <header class="sticky top-0 ">
         <nav class="bg-primary duration-100">
             <div class="w-full flex items-center justify-between p-4">
                 <svg height="40" class=" bg-LogoDark object-left " style="background-repeat: no-repeat;">
