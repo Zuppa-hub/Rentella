@@ -12,7 +12,7 @@ interface CallbackOneParam<T1 = void, T2 = void> {
  */
 const Login = (onAuthenticatedCallback: CallbackOneParam): void => {
   keycloakInstance
-    .init({ onLoad: "login-required" })
+    .init({ onLoad: "login-required", responseMode: "query" })
     .then(function (authenticated) {
       authenticated ? onAuthenticatedCallback() : alert("non authenticated");
     })

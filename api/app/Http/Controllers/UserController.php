@@ -65,7 +65,7 @@ class UserController extends Controller
 
             //error cheking
             if ($response->status() != 201) {
-                return response()->json(['error' => 'Error during new user creation'], $response->status());
+                return response()->json($response->status());
             }
 
             // Get the UUID from the Location header in Keycloak's response
