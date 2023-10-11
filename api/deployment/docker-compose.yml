@@ -11,16 +11,16 @@ services:
       - 9000:80
     networks:
       - keycloak-network
-  vue-docker:
-    container_name: Rentella_app_front
-    image: node:lts
-    working_dir: /var/www/html/app/
-    entrypoint: /bin/bash
-    expose:
-      - 8000
+  vue:
+    container_name: vue
+    build:
+      context: ../../web/
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
     volumes:
-      - ../../:/var/www/html/app
-    tty: true
+      - ../../web/:/var/www/html/app
+      - /var/www/html/app/node_modules
     networks:
       - keycloak-network
   mysql_db:

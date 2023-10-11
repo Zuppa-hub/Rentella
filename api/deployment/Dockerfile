@@ -18,5 +18,5 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN docker-php-ext-install gettext intl pdo_mysql gd
 
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg \
-&& docker-php-ext-install -j$(nproc) gd
+    && docker-php-ext-install -j$(nproc) gd
 
