@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.map-container {
+  height: calc(100vh - 152px);
+}
+
+/* Sovrascrivi l'altezza per schermi md o superiori */
+@media (min-width: 768px) {
+  .map-container {
+    height: calc(100vh - 72px);
+  }
+}
+
+.rounded-corner {
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+/* Sovrascrivi l'altezza per schermi md o superiori */
+@media (min-width: 768px) {
+  .rounded-corner {
+    border-bottom-right-radius: 30px;
+    border-top-right-radius: 30px;
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
+  }
+}
