@@ -23,6 +23,13 @@ services:
       - /var/www/html/app/node_modules
     networks:
       - keycloak-network
+  cors:
+    build:
+      context: ./
+      dockerfile: cors.Dockerfile
+    container_name: cors
+    ports:
+      - "4545:80"
   mysql_db:
     image: mysql:latest
     environment:
