@@ -11,6 +11,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "@vue-leaflet/vue-leaflet": "^0.10.1",
         "keycloak-js": "^22.0.3",
         "tailwindcss": "^3.3.3"
     }

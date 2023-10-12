@@ -1,7 +1,4 @@
-// The code you provided is a Vue component written in TypeScript. It represents the Home component of
-// a Vue application. Let's break down the code:
 <script lang="ts">
-import axios from "axios";
 import TopBar from '../components/TopBar.vue';
 import NavBar from '../components/NavBar.vue';
 import "leaflet/dist/leaflet.css";
@@ -27,18 +24,18 @@ export default {
   },
   methods: {
     async fetchData() {
+      const headers = {
+        'Authorization': `Bearer ${this.token}`,
+      };
       try {
-        const response = await axios.get('http://localhost:9000/public/api/locations/?minLatitude=-200&maxLatitude=200&minLongitude=-200&maxLongitude=200&myLatitude=100&myLongitude=-134', {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-            Accept: `*/*`,
-          },
-        });
-        this.apiData = response.data;
+        const response = await fetch('http://localhost:9000/public/api/beaches', { headers });
+        this.apiData = await response.json();
+        console.log(this.apiData);
       } catch (error) {
-        console.error("Errore nella chiamata API:", error);
+        console.error(error);
       }
-    },
+    }
+
   },
   created() {
     const token = KeyCloakService.GetAccesToken();

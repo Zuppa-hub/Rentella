@@ -30,6 +30,8 @@ services:
     container_name: cors
     ports:
       - "4545:80"
+    networks:
+      - keycloak-network
   mysql_db:
     image: mysql:latest
     environment:
