@@ -1,17 +1,20 @@
 <script lang="ts">
 import TopBar from '../components/TopBar.vue';
 import NavBar from '../components/NavBar.vue';
-import "leaflet/dist/leaflet.css";
-import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
 import KeyCloakService from "../KeycloakService";
 import Modal from "../components/Modal.vue";
-
+import { ref } from 'vue';
+import "leaflet/dist/leaflet.css";
+import type L from "leaflet";
+import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
 
 export default {
   name: "Home",
   components: {
     LMap,
     LTileLayer,
+    LMarker,
+    LPopup,
     TopBar,
     NavBar,
     Modal
@@ -19,10 +22,16 @@ export default {
   data() {
     return {
       zoom: 10,
-      apiData: null,
+      apiData: [],
       token: "",
       searchTerm: "",
-      toggleModal: true
+      toggleModal: false,
+      maxLatitude: 200,
+      minLatitude: -200,
+      maxLongitude: 200,
+      minLongitude: -200,
+      myLatitude: ref(0),
+      myLongitude: ref(0),
     };
   },
   methods: {
@@ -31,7 +40,7 @@ export default {
         'Authorization': `Bearer ${this.token}`,
       };
       try {
-        const response = await fetch('http://localhost:9000/public/api/locations ', { headers });
+        const response = await fetch('http://localhost:9000/public/api/locations?minLatitude=-200&maxLatitude=200&minLongitude=-200&maxLongitude=200&myLatitude=100&myLongitude=-134', { headers });
         this.apiData = await response.json();
         console.log(this.apiData);
       } catch (error) {
@@ -49,12 +58,23 @@ export default {
         return item.city_name.toLowerCase().includes(searchTermLower);
       });
     },
-
+    // The `Geolocate()` method is used to get the current latitude and longitude coordinates of the
+    // user's device using the Geolocation API.
+    Geolocate() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          this.myLatitude = position.coords.latitude;
+          this.myLongitude = position.coords.longitude;
+          console.log(this.myLatitude, this.myLongitude);
+        });
+      }
+    }
   },
   created() {
     const token = KeyCloakService.GetAccesToken();
     this.token = token ? token : "";
     this.fetchData();
+    this.Geolocate();
   },
 };
 </script>
@@ -94,34 +114,45 @@ export default {
                 class="flex p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
 
                 <!-- Titolo a sinistra -->
-                <div class="flex-1">
+                <div class="flex">
+                  <svg height="24" width="24" class="bg-HomeIcon mx-2" style="background-repeat: no-repeat;">
+                  </svg>
                   <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">{{ item.city_name }}
                   </p>
                 </div>
 
-                <div class="flex-1">
-                  <p class="flex-1 text-center font-normal text-gray-700 dark:text-gray-400">100-200</p>
+                <div class="flex">
+                  <svg height="24" width="24" class="bg-MoneyIcon " style="background-repeat: no-repeat;">
+                  </svg>
+                  <p class="flex-1 text-center font-normal text-gray-700 dark:text-gray-400">{{ item.min_price }} - {{
+                    item.max_price }}</p>
                 </div>
                 <!-- Numeri al centro -->
 
                 <!-- Km a destra -->
-                <div class="flex-1">
-                  <p class="text-right font-normal text-gray-700 dark:text-gray-400">23km.</p>
+                <div class="flex">
+                  <svg height="24" width="24" class="bg-DistanceIcon " style="background-repeat: no-repeat;">
+                  </svg>
+                  <p class="text-right font-normal text-gray-700 dark:text-gray-400">{{ item.distance }}.</p>
                 </div>
               </a>
             </li>
           </ul>
-
-
-
         </div>
       </div>
       <div class="hidden md:flex md:w-4/5 bg-cover bg-center">
-        <l-map ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482]">
-          <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
-            name="OpenStreetMap"></l-tile-layer>
-        </l-map>
+        <div style="height:540px; width:800px">
+          <l-map ref="map" v-model:zoom="zoom" :center="[myLatitude, myLongitude]">
+            <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
+              name="OpenStreetMap"></l-tile-layer>
 
+            <!-- Utilizza v-for per creare marker e popup per ogni elemento in apiData -->
+            <l-marker v-for="(item, index) in apiData" :key="index" :lat-lng="[item.latitude, item.longitude]">
+              <l-popup>{{ item.city_name }}</l-popup>
+            </l-marker>
+          </l-map>
+
+        </div>
       </div>
     </div>
     <NavBar />

@@ -38,15 +38,14 @@ class LocationController extends Controller
             $results = $cities->map(function ($city) use ($params) {
                 $cityBeaches = Beach::where('location_id', $city->id)->pluck('id');
                 $zones = BeachZone::whereIn('beach_id', $cityBeaches)->get();
-
-                // obtain price max and min 
-                $minPrice = $zones->min('prices.price');
-                $maxPrice = $zones->max('prices.price');
-
                 return [
-                    'city' => $city,
-                    'min_price' => $minPrice,
-                    'max_price' => $maxPrice,
+                    'id' => $city->id,
+                    'city_name' => $city->city_name,
+                    'latitude' => $city->latitude,
+                    'longitude' => $city->longitude,
+                    'description' => $city->description,
+                    'min_price' =>  $zones->min('prices.price'),
+                    'max_price' => $zones->max('prices.price'),
                     'beach_count' => $cityBeaches->count(),
                     'distance' => $this->calculateDistance($city->latitude, $city->longitude, $params['myLatitude'], $params['myLongitude']) . ' km',
                 ];
