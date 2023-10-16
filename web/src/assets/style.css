@@ -31,3 +31,13 @@
     border-top-left-radius: 0px;
   }
 }
+.sidebar-container {
+  width: 600px;
+}
+
+/* Sovrascrivi l'altezza per schermi md o superiori */
+@media (min-width: 768px) {
+  .sidebar-container {
+    width: 100%;
+  }
+}

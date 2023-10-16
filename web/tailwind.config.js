@@ -17,6 +17,7 @@ module.exports = {
         'SettingsIcon': "url('src/assets/icons/Settings.svg')",
         'MoneyIcon': "url('src/assets/icons/Money.svg')",
         'DistanceIcon': "url('src/assets/icons/Distance.svg')",
+        'ArrowIcon': "url('src/assets/icons/Arrow.svg')",
       }),
     },
     colors: {
