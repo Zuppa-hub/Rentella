@@ -4,12 +4,14 @@
 
 .map-container {
   height: calc(100vh - 152px);
+  width: 100%;
 }
 
 /* Sovrascrivi l'altezza per schermi md o superiori */
 @media (min-width: 768px) {
   .map-container {
     height: calc(100vh - 72px);
+    width: 100%;
   }
 }
 
