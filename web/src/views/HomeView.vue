@@ -1,23 +1,17 @@
 <script lang="ts">
 import TopBar from '../components/TopBar.vue';
 import NavBar from '../components/NavBar.vue';
+import Map from '../components/Map.vue';
 import KeyCloakService from "../KeycloakService";
 import Modal from "../components/Modal.vue";
-import { ref } from 'vue';
-import "leaflet/dist/leaflet.css";
-import { LMap, LTileLayer, LMarker, LPopup, LControlZoom } from "@vue-leaflet/vue-leaflet";
 
 export default {
   name: "Home",
   components: {
-    LMap,
-    LTileLayer,
-    LMarker,
-    LPopup,
-    LControlZoom,
     TopBar,
     NavBar,
-    Modal
+    Modal,
+    Map,
   },
   data() {
     return {
@@ -30,8 +24,6 @@ export default {
       minLatitude: -200,
       maxLongitude: 200,
       minLongitude: -200,
-      myLatitude: ref(0),
-      myLongitude: ref(0),
     };
   },
   methods: {
@@ -61,21 +53,12 @@ export default {
     },
     // The `Geolocate()` method is used to get the current latitude and longitude coordinates of the
     // user's device using the Geolocation API.
-    Geolocate() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          this.myLatitude = position.coords.latitude;
-          this.myLongitude = position.coords.longitude;
-          console.log(this.myLatitude, this.myLongitude);
-        });
-      }
-    }
+
   },
   created() {
     const token = KeyCloakService.GetAccesToken();
     this.token = token ? token : "";
     this.fetchData();
-    this.Geolocate();
   },
 };
 </script>
@@ -113,49 +96,35 @@ export default {
               </p>
             </div>
           </div>
-
-
-          <ul class="divide-gray-500 dark:divide-gray-700  ">
-            <li class="pb-3 sm:pb-4 " v-for="(item, index) in filterItems()" :key="index">
-              <a href="#"
-                class="flex p-6  bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 ">
-
+          <ul class="divide-gray-500 dark:divide-gray-700 flex flex-col">
+            <li class="pb-4 mb-4" v-for="(item, index) in filterItems()" :key="index">
+              <a
+                class="flex items-center justify-center p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 content-center">
                 <!-- Titolo a sinistra -->
-                <div class="flex-1">
+                <div class="flex-1 "> <!-- Aggiunto "items-center" per allineamento verticale -->
                   <div class="flex items-baseline">
                     <div class="w-10 h-10 mr-2 bg-white rounded-full flex items-center justify-center">
                       <span class="text-black text-xl font-semibold">{{ index }}</span>
-                      <!-- La lettera del profilo -->
                     </div>
-                    <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">{{ item.city_name }}
-                    </p>
+                    <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">{{ item.city_name }}</p>
                   </div>
-
                 </div>
-
-
-                <div class="flex-1 ">
-                  <div class="flex ">
-                    <svg height="24" width="24" class="bg-MoneyIcon " style="background-repeat: no-repeat;">
-                    </svg>
-                    <p class="flex-1 font-normal text-gray-700 dark:text-gray-400">{{ item.min_price }} - {{
+                <div class="flex-1 "> <!-- Aggiunto "items-center" per allineamento verticale -->
+                  <div class="flex justify-center items-center">
+                    <svg height="16" width="24" class="bg-MoneyIcon" style="background-repeat: no-repeat;"></svg>
+                    <p class="flex font-normal text-gray-700 dark:text-gray-400">{{ item.min_price }} - {{
                       item.max_price }}</p>
                   </div>
-
                 </div>
-                <!-- Numeri al centro -->
-
                 <!-- Km a destra -->
-                <div class="flex-1">
-                  <div class="flex">
-                    <svg height="24" width="24" class="bg-DistanceIcon " style="background-repeat: no-repeat;">
-                    </svg>
+                <div class="flex-1"> <!-- Aggiunto "items-center" per allineamento verticale -->
+                  <div class="flex justify-center items-center">
+                    <svg height="16" width="24" class="bg-DistanceIcon" style="background-repeat: no-repeat;"></svg>
                     <p class="text-right font-normal text-gray-700 dark:text-gray-400">{{ item.distance }}.</p>
                   </div>
                 </div>
-                <div class="flex-1">
-                  <svg height="24" width="24" class="bg-ArrowIcon " style="background-repeat: no-repeat;">
-                  </svg>
+                <div class="flex-none"> <!-- Aggiunto "items-center" per allineamento verticale -->
+                  <svg height="24" width="24" class="bg-ArrowIcon" style="background-repeat: no-repeat;"></svg>
                 </div>
               </a>
             </li>
@@ -163,18 +132,7 @@ export default {
         </div>
       </div>
       <div class="hidden md:flex md:w-4/5 bg-cover bg-center -ml-8 z-0">
-        <div class="map-container">
-          <l-map ref="map" v-model:zoom="zoom" :center="[myLatitude, myLongitude]" :options="{ zoomControl: false, }">
-            <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
-              name="OpenStreetMap"></l-tile-layer>
-            <l-control-zoom :position="'bottomright'"></l-control-zoom>
-            <!-- Utilizza v-for per creare marker e popup per ogni elemento in apiData -->
-            <l-marker v-for="(item, index) in apiData" :key="index" :lat-lng="[item.latitude, item.longitude]">
-              <l-popup>{{ item.city_name }}</l-popup>
-            </l-marker>
-          </l-map>
-
-        </div>
+        <Map :apiData="apiData" />
       </div>
     </div>
     <NavBar />
