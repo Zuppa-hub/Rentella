@@ -24,6 +24,8 @@ const Login = (onAuthenticatedCallback: CallbackOneParam): void => {
 
 const UserName = (): string | undefined =>
   keycloakInstance?.tokenParsed?.preferred_username;
+const Uid = (): string | undefined =>
+  keycloakInstance?.tokenParsed?.sub;
 
 const Token = (): string | undefined => keycloakInstance?.token;
 
@@ -35,6 +37,7 @@ const UserRoles = (): string[] | undefined => {
 };
 
 const KeyCloakService = {
+  GetUid: Uid,
   CallLogin: Login,
   GetUserName: UserName,
   GetAccesToken: Token,

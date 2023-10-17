@@ -40,7 +40,7 @@ class LocationController extends Controller
                 $zones = BeachZone::whereIn('beach_id', $cityBeaches)->get();
                 return [
                     'id' => $city->id,
-                    'city_name' => $city->city_name,
+                    'name' => $city->city_name,
                     'latitude' => $city->latitude,
                     'longitude' => $city->longitude,
                     'description' => $city->description,

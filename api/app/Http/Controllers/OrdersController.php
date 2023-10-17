@@ -29,10 +29,9 @@ class OrdersController extends Controller
                 $zone = $order->umbrella->beachzone;
                 $result[] = [
                     'orders' => $order,
-                    'zone' => $zone,
+                    'name' => $zone->name
                 ];
             }
-
             return response()->json($result);
         }
         $orders = Order::all();
