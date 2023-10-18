@@ -80,9 +80,14 @@ export default {
             });
         },
         openModalForItem(item) {
-            console.log(item);
             this.selectedItem = item; // Memorizza i dettagli dell'elemento selezionato
             this.showModal = true; // Apri la modal
+            if (item.orders != null) {
+                console.log("ordine");
+            }
+            else {
+                console.log("locations");
+            }
         },
         closeModal() {
             this.showModal = false;

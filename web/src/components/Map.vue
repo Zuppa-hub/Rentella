@@ -48,7 +48,7 @@ export default {
         // available and then calls the `getCurrentPosition` method to get the user's position. Once
         // the position is obtained, the latitude and longitude values are stored in the component's
         // `myLatitude` and `myLongitude` data properties.
-        Geolocate() {
+        async Geolocate() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
                     this.myLatitude = position.coords.latitude;
