@@ -1,5 +1,5 @@
 <template>
-    <div class=" dark:bg-gray-950 bg-white overflow-y-auto rounded-corner z-40 w-full">
+    <div class="dark:bg-gray-950 bg-white overflow-y-auto z-40 w-full" :class="{ 'rounded-corner': !roundedCornerFlag }">
         <div class="mx-4 items-start justify-start  dark:text-white">
             <SearchBar :apiData="apiData" :searchTerm="searchTerm" @updateSearchTerm="updateSearchTerm" />
             <div class="flex items-baseline my-3">
@@ -42,6 +42,11 @@ export default {
             type: String,
             required: true,
         },
+        roundedCornerFlag: {
+            type: Boolean,
+            required: false,
+            default: false,
+        }
     },
     components: {
         SearchBar,

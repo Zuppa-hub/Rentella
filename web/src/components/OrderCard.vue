@@ -4,13 +4,26 @@
         <!-- Titolo a sinistra -->
         <div class="flex-1 "> <!-- Aggiunto "items-center" per allineamento verticale -->
             <div class="flex items-baseline">
-                <div class="w-10 h-10 mr-2 bg-white rounded-full flex items-center justify-center">
-                    <span class="text-black text-xl font-semibold">{{ index }}</span>
+                <div class="flex-1">
+                    <div class="flex-row">
+                        <p>Beach zone</p>
+                        <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">{{
+                            item.name }}</p>
+                    </div>
                 </div>
-                <div class="flex-row">
-                    <p>Beach zone</p>
-                    <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">{{
-                        item.name }}</p>
+                <div class="flex-1">
+                    <div class="flex-row">
+                        <p>Order Id</p>
+                        <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">#{{
+                            item.orders.id }}</p>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <div class="flex-row">
+                        <p>Date</p>
+                        <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">{{
+                            item.orders.start_date }}</p>
+                    </div>
                 </div>
 
             </div>
@@ -33,6 +46,9 @@ export default {
             type: Number,
             required: true,
         }
-    }
+    },
+    created() {
+        console.log(this.item);
+    },
 }
 </script>

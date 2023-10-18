@@ -34,7 +34,7 @@
                                 </a>
                             </li>
                         </RouterLink>
-                        <RouterLink :to="{ name: 'Home' }">
+                        <RouterLink :to="{ name: 'History' }">
                             <li>
                                 <a href="#"
                                     class="flex py-2 pr-4 pl-3 text-white rounded bg-primary-700 bg-transparent text-primary-700 dark:text-white hover:text-gray-300 duration-150 items-center"

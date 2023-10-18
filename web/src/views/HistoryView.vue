@@ -1,9 +1,9 @@
 <template>
-<Modal></Modal>
     <body class="h-screen">
         <TopBar />
         <div class="flex h-full map-container">
-            <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'" :roundedCornerFlag="true" />
+            <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'"
+                :roundedCornerFlag="true" />
         </div>
         <NavBar></NavBar>
     </body>
@@ -13,14 +13,12 @@ import KeyCloakService from "../KeycloakService";
 import TopBar from '../components/TopBar.vue';
 import Sidebar from '../components/Sidebar.vue';
 import { fetchData } from '../apiService';
-import Modal from '../components/Modal.vue';
 import NavBar from "../components/NavBar.vue";
 export default {
-    name: "Order",
+    name: "History",
     components: {
         Sidebar,
         TopBar,
-        Modal,
         NavBar,
     },
     data() {
@@ -28,7 +26,7 @@ export default {
             OrderData: [],
             UserData: [],
             token: "",
-            title: "List of orders",
+            title: "History of orders",
             subtitle: "Number of orders: ",
         };
     },
@@ -44,7 +42,8 @@ export default {
             }
         },
         async fetchOrderData(userId: Number) {
-            const apiUrl = `http://localhost:9000/public/api/orders?userId=${userId}&active=true`;
+            this.OrderData = [];
+            const apiUrl = `http://localhost:9000/public/api/orders?userId=${userId}`;
             try {
                 this.OrderData = await fetchData(apiUrl);
             } catch (error) {

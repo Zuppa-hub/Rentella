@@ -6,8 +6,6 @@
         <Transition name="modal-inner">
           <div v-if="modalActive" class="p-4 bg-white self-start mt-32 max-w-screen-md">
             <slot />
-            <button v-if="LocationChoose" class="text-white mt-8 bg-weather-primary py-2 px-6">
-            </button>
             <button class="text-white mt-8 bg-weather-primary py-2 px-6" @click="$emit('close-modal')">
               Close
             </button>
@@ -25,12 +23,8 @@ defineProps({
     type: Boolean,
     default: false,
   },
-  LocationChoose: {
-    type: Boolean,
-    default: false,
-  },
-
 });
+
 </script>
 
 <style scoped>

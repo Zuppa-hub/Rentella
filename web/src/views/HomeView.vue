@@ -2,9 +2,9 @@
 import TopBar from '../components/TopBar.vue';
 import NavBar from '../components/NavBar.vue';
 import Map from '../components/Map.vue';
-import KeyCloakService from "../KeycloakService";
 import Modal from "../components/Modal.vue";
 import Sidebar from '../components/Sidebar.vue';
+import { fetchData } from '../apiService';
 
 export default {
   name: "Home",
@@ -18,8 +18,8 @@ export default {
   data() {
     return {
       zoom: 10,
-      title: "Avaiable Locations",
-      subtitle: "Number of location: ",
+      title: "Available Locations",
+      subtitle: "Number of locations: ",
       LocationData: [],
       token: "",
       toggleModal: false,
@@ -30,14 +30,10 @@ export default {
     };
   },
   methods: {
-
     async fetchData() {
-      const headers = {
-        'Authorization': `Bearer ${this.token}`,
-      };
+      const apiUrl = `http://localhost:9000/public/api/locations?minLatitude=${this.minLatitude}&maxLatitude=${this.maxLatitude}&minLongitude=${this.minLongitude}&maxLongitude=${this.maxLongitude}&myLatitude=100&myLongitude=-134`;
       try {
-        const response = await fetch('http://localhost:9000/public/api/locations?minLatitude=-200&maxLatitude=200&minLongitude=-200&maxLongitude=200&myLatitude=100&myLongitude=-134', { headers });
-        this.LocationData = await response.json();
+        this.LocationData = await fetchData(apiUrl);
         console.log(this.LocationData);
       } catch (error) {
         console.error(error);
@@ -45,13 +41,11 @@ export default {
     },
   },
   created() {
-    const token = KeyCloakService.GetAccesToken();
-    this.token = token ? token : "";
     this.fetchData();
-    console.log(this.token);
-  },
-};
+  }
+}
 </script>
+
 
 <template>
   <body class="h-screen">
@@ -60,7 +54,7 @@ export default {
     <div v-if="toggleModal" class="fixed  "></div>
     <TopBar />
     <div class="flex h-full map-container">
-      <Sidebar :apiData="LocationData" :title="title" :subtitle="subtitle" :componentType="'LocationCard'"/>
+      <Sidebar :apiData="LocationData" :title="title" :subtitle="subtitle" :componentType="'LocationCard'" />
       <div class="hidden md:flex md:w-4/5 bg-cover bg-center -ml-8 z-0">
         <Map :apiData="LocationData" />
       </div>
