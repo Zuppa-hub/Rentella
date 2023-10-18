@@ -1,57 +1,66 @@
 <template>
-  <Teleport to="body">
-    <Transition name="modal-outer">
-      <div v-show="modalActive"
-        class="absolute w-full bg-black bg-opacity-30 h-screen top-0 left-0 flex justify-center px-8">
-        <Transition name="modal-inner">
-          <div v-if="modalActive" class="p-4 bg-white self-start mt-32 max-w-screen-md">
-            <slot />
-            <button class="text-white mt-8 bg-weather-primary py-2 px-6" @click="$emit('close-modal')">
-              Close
-            </button>
-          </div>
-        </Transition>
+  <teleport to='body'>
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>{{ title }}</h2>
+          <button @click="closeModal">Chiudi</button>
+        </div>
+        <div class="modal-content">
+          <!-- Contenuto della modal -->
+        </div>
       </div>
-    </Transition>
-  </Teleport>
+    </div>
+  </teleport>
 </template>
 
-<script setup lang="ts">
-defineEmits(["close-modal"]);
-defineProps({
-  modalActive: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-</script>
-
 <style scoped>
-.modal-outer-enter-active,
-.modal-outer-leave-active {
-  transition: opacity 0.3s cubic-bezier(0.52, 0.02, 0.19, 1.02);
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Sfondo trasparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  /* Valore di z-index elevato */
 }
 
-.modal-outer-enter-from,
-.modal-outer-leave-to {
-  opacity: 0;
+.modal {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 70%;
+  /* Larghezza personalizzabile */
+  max-width: 400px;
+  /* Larghezza massima personalizzabile */
+  padding: 20px;
+  text-align: center;
+  z-index: 1001;
+  /* Valore di z-index superiore a modal-overlay */
 }
 
-.modal-inner-enter-active {
-  transition: all 0.3s cubic-bezier(0.52, 0.02, 0.19, 1.02) 0.15s;
-}
-
-.modal-inner-leave-active {
-  transition: all 0.3s cubic-bezier(0.52, 0.02, 0.19, 1.02);
-}
-
-.modal-inner-enter-from {
-  opacity: 0;
-  transform: scale(0.8);
-}
-
-.modal-inner-leave-to {
-  transform: scale(0.8);
-}
+/* Altri stili CSS per personalizzare ulteriormente la modal */
 </style>
+
+
+
+<script lang="ts">
+export default {
+  name: "Modal",
+  props: {
+    title: String
+  },
+  emits: ['close-modal'],
+  methods: {
+    closeModal() {
+      // Emetti un evento per chiudere la modal
+      this.$emit('close-modal');
+    },
+  }
+}
+</script>

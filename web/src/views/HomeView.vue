@@ -2,9 +2,9 @@
 import TopBar from '../components/TopBar.vue';
 import NavBar from '../components/NavBar.vue';
 import Map from '../components/Map.vue';
-import Modal from "../components/Modal.vue";
 import Sidebar from '../components/Sidebar.vue';
 import { fetchData } from '../apiService';
+import Modal from '../components/Modal.vue';
 
 export default {
   name: "Home",
@@ -22,14 +22,18 @@ export default {
       subtitle: "Number of locations: ",
       LocationData: [],
       token: "",
-      toggleModal: false,
       maxLatitude: 200,
       minLatitude: -200,
       maxLongitude: 200,
       minLongitude: -200,
+      toggleModal: false, // Imposta questa variabile su true per aprire la modal
+      modalTitle: "Titolo della Modal",
     };
   },
   methods: {
+    manageModal() {
+      this.toggleModal = !this.toggleModal; // Chiude la modal impostando la variabile su false
+    },
     async fetchData() {
       const apiUrl = `http://localhost:9000/public/api/locations?minLatitude=${this.minLatitude}&maxLatitude=${this.maxLatitude}&minLongitude=${this.minLongitude}&maxLongitude=${this.maxLongitude}&myLatitude=100&myLongitude=-134`;
       try {
@@ -49,9 +53,6 @@ export default {
 
 <template>
   <body class="h-screen">
-    <div v-if="toggleModal" class="absolute inset-0 z-40 opacity-25 bg-black">
-    </div>
-    <div v-if="toggleModal" class="fixed  "></div>
     <TopBar />
     <div class="flex h-full map-container">
       <Sidebar :apiData="LocationData" :title="title" :subtitle="subtitle" :componentType="'LocationCard'" />

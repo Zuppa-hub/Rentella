@@ -33,6 +33,8 @@
 <script lang="ts">
 export default {
     name: "LocationCard",
+    data() {
+    },
     props: {
         item: {
             type: Array,
@@ -42,6 +44,8 @@ export default {
             type: Number,
             required: true,
         }
+    },
+    methods: {
     }
 }
 

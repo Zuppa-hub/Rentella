@@ -12,17 +12,21 @@
                 </div>
             </div>
             <ul class="divide-gray-500 dark:divide-gray-700 flex flex-col">
-                <li class="pb-4 mb-4" v-for="(item, index) in filterItems()" :key="index">
+                <li class="pb-4 mb-4" v-for="(item, index) in filterItems()" :key="index" @click="openModalForItem(item)">
                     <component :is="componentType" :item="item" :index="index + 1" />
                 </li>
             </ul>
         </div>
+    </div>
+    <div v-if="showModal" class="modal-overlay">
+        <Modal :title="selectedItem.name" :data="selectedItem" :show="showModal" @close-modal="closeModal" />
     </div>
 </template>
 <script lang="ts">
 import LocationCard from './LocationCard.vue';
 import OrderCard from './OrderCard.vue';
 import SearchBar from './SearchBar.vue';
+import Modal from './Modal.vue';
 export default {
     name: "Sidebar",
     props: {
@@ -51,11 +55,14 @@ export default {
     components: {
         SearchBar,
         LocationCard,
-        OrderCard
+        OrderCard,
+        Modal
     },
     data() {
         return {
             searchTerm: "",
+            showModal: false,
+            selectedItem: null,
         }
     },
     methods: {
@@ -72,6 +79,14 @@ export default {
                 return item.name.toLowerCase().includes(searchTermLower);
             });
         },
+        openModalForItem(item) {
+            console.log(item);
+            this.selectedItem = item; // Memorizza i dettagli dell'elemento selezionato
+            this.showModal = true; // Apri la modal
+        },
+        closeModal() {
+            this.showModal = false;
+        }
     }
 }
 </script>

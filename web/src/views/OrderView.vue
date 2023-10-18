@@ -1,5 +1,4 @@
 <template>
-<Modal></Modal>
     <body class="h-screen">
         <TopBar />
         <div class="flex h-full map-container">
