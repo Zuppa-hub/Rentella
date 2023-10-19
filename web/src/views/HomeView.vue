@@ -55,7 +55,7 @@ export default {
   <body class="h-screen">
     <TopBar />
     <div class="flex h-full map-container">
-      <Sidebar :apiData="LocationData" :title="title" :subtitle="subtitle" :componentType="'LocationCard'" />
+      <Sidebar :apiData="LocationData" :title="title" :subtitle="subtitle" :componentType="'LocationCard'" :searchBarTitle="'cities'"/>
       <div class="hidden md:flex md:w-4/5 bg-cover bg-center -ml-8 z-0">
         <Map :apiData="LocationData" />
       </div>

@@ -2,7 +2,7 @@
     <body class="h-screen">
         <TopBar />
         <div class="flex h-full map-container">
-            <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'" :roundedCornerFlag="true" />
+            <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'" :roundedCornerFlag="true" :searchBarTitle="'orders'"/>
         </div>
         <NavBar></NavBar>
     </body>

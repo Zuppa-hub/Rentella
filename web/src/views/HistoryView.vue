@@ -3,7 +3,7 @@
         <TopBar />
         <div class="flex h-full map-container">
             <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'"
-                :roundedCornerFlag="true" />
+                :roundedCornerFlag="true" :searchBarTitle="'in the history of orders'" />
         </div>
         <NavBar></NavBar>
     </body>

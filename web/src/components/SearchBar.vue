@@ -9,9 +9,10 @@
                 </svg>
             </div>
             <input type="search" id="default-search"
-                class="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 "
-                :value="searchTerm" @input="$emit('updateSearchTerm', $event.target.value)" placeholder="Search cities"
+                class="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500"
+                :value="searchTerm" @input="$emit('updateSearchTerm', $event.target.value)" :placeholder="'Search ' + name"
                 required>
+
         </div>
     </form>
 </template>
@@ -28,6 +29,10 @@ export default {
             type: String,
             required: true,
         },
+        name: {
+            type: String,
+            required: true,
+        },
     },
     computed: {
         searchTermComputed: {
@@ -38,6 +43,9 @@ export default {
                 this.$emit('update:searchTerm', value);
             },
         },
+    },
+    created() {
+        console.log(this.name);
     },
 }
 </script>

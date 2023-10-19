@@ -1,7 +1,8 @@
 <template>
     <div class="dark:bg-gray-950 bg-white overflow-y-auto z-40 w-full" :class="{ 'rounded-corner': !roundedCornerFlag }">
         <div class="mx-4 items-start justify-start  dark:text-white">
-            <SearchBar :apiData="apiData" :searchTerm="searchTerm" @updateSearchTerm="updateSearchTerm" />
+            <SearchBar :apiData="apiData" :searchTerm="searchTerm" :name="searchBarTitle"
+                @updateSearchTerm="updateSearchTerm" />
             <div class="flex items-baseline my-3">
                 <div class="flex-1">
                     <p class="text-xl font-bold">{{ title }}</p>
@@ -50,7 +51,12 @@ export default {
             type: Boolean,
             required: false,
             default: false,
-        }
+        },
+        searchBarTitle: {
+            type: String,
+            required: true,
+        },
+
     },
     components: {
         SearchBar,

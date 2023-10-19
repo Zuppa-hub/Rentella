@@ -1,7 +1,6 @@
 <template>
   <teleport to="body">
     <div class="fixed inset-0 flex items-center justify-center z-50">
-      <!-- Aggiungi una patina semitrasparente sotto la modal -->
       <div class="fixed inset-0 bg-slate-800 opacity-50 mix-blend-difference"></div>
       <div class="modal max-w-md p-6 bg-white dark:bg-black rounded-lg shadow-md relative">
         <div class="modal-header flex text-white p-4 ">

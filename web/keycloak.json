@@ -4,5 +4,6 @@
   "ssl-required": "external",
   "resource": "api",
   "public-client": true,
+  "refreshToken": true,
   "confidential-port": 0
 }
