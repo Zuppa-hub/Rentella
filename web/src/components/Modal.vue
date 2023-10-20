@@ -5,12 +5,13 @@
       <div class="modal max-w-md p-3 min-w-[400px] bg-white dark:bg-black rounded-lg shadow-md relative">
         <div class="modal-header flex text-white ">
           <div class="flex-1">
-            <h2 class="text-xl text-black dark:text-white"> <b></b>{{ item.name }}</h2>
+            <h2 class="text-2xl text-black dark:text-white"> <b>{{ item.name }} </b> </h2>
           </div>
           <div class="flex-none">
             <button @click="closeModal" class="text-black text-lg dark:text-white focus:outline-none">&times;</button>
           </div>
         </div>
+        <hr class="border-b border-gray-300 dark:border-gray-600 mt-4" />
         <div class="modal-content pt-4">
           <!-- Modal content -->
           <!--The line `<component :is="contentComponet" :item="item" @close-modal="closeModal" />` 
@@ -21,7 +22,6 @@
     </div>
   </teleport>
 </template>
-
 
 <script lang="ts">
 import OrderModalDetail from './OrderModalDetail.vue';

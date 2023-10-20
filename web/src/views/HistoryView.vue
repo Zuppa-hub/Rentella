@@ -14,7 +14,7 @@
 import KeyCloakService from "../KeycloakService";
 import TopBar from '../components/TopBar.vue';
 import Sidebar from '../components/Sidebar.vue';
-import { fetchData } from '../apiService';
+import { apiHelper } from '../apiService';
 import NavBar from "../components/NavBar.vue";
 export default {
     name: "History",
@@ -25,14 +25,8 @@ export default {
     },
     data() {
         return {
-            OrderData: {
-                type: Object,
-                default: [],
-            },
-            UserData: {
-                type: Object,
-                default: [],
-            },
+            OrderData: Array,
+            UserData: Array,
             token: "",
             title: "History of orders",
             subtitle: "Number of orders: ",
@@ -43,7 +37,7 @@ export default {
             const uid = KeyCloakService.GetUid();
             const apiUrl = `http://localhost:9000/public/api/users/${uid}`;
             try {
-                this.UserData = await fetchData(apiUrl);
+                this.UserData = await apiHelper(apiUrl, "GET");
                 this.fetchOrderData(this.UserData.id);
             } catch (error) {
                 console.error(error);
@@ -52,12 +46,11 @@ export default {
         async fetchOrderData(userId: Number) {
             const apiUrl = `http://localhost:9000/public/api/orders?userId=${userId}`;
             try {
-                this.OrderData = await fetchData(apiUrl);
+                this.OrderData = await apiHelper(apiUrl, "GET");
             } catch (error) {
                 console.error(error);
             }
         },
-
     },
     created() {
         this.fetchUserId();

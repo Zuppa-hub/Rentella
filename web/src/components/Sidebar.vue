@@ -31,6 +31,7 @@
             @close-modal="closeModal" />
     </div>
 </template>
+
 <script lang="ts">
 import LocationCard from './LocationCard.vue';
 import OrderCard from './OrderCard.vue';
@@ -102,6 +103,7 @@ export default {
             selectedItem: [],
         }
     },
+    emits: ['deleted'],
     methods: {
         updateSearchTerm(newSearchTerm: string) {
             this.searchTerm = newSearchTerm;
@@ -128,7 +130,7 @@ export default {
         },
         closeModal() {
             this.showModal = false;
-        }
+        },
     }
 }
 </script>

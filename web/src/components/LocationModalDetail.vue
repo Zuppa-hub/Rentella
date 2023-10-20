@@ -1,29 +1,8 @@
 <template>
     <div class="scrollable-content">
-        <div class="flex dark:text-white">
-            <div class="flex-1">
-                <p>Distance:</p>
-            </div>
-            <div class="flex-none">
-                {{ item.distance }}
-            </div>
-        </div>
-        <div class="flex dark:text-white">
-            <div class="flex-1">
-                <p>Number of beaches:</p>
-            </div>
-            <div class="flex-none">
-                {{ item.beach_count }}
-            </div>
-        </div>
-        <div class="flex dark:text-white">
-            <div class="flex-1">
-                <p>Price range:</p>
-            </div>
-            <div class="flex-none">
-                {{ item.min_price }} - {{ item.max_price }}
-            </div>
-        </div>
+        <modalInfoTile :title="'Distance'" :detail="item.distance"></modalInfoTile>
+        <modalInfoTile :title="'Number of beaches:'" :detail="item.beach_count"></modalInfoTile>
+        <modalInfoTile :title="'Price range'" :detail="item.min_price + ' - ' + item.max_price"></modalInfoTile>
     </div>
     <div class="flex dark:text-white mt-4">
         <div class="flex-1">
@@ -37,6 +16,7 @@
 </template>
   
 <script lang="ts">
+import modalInfoTile from './modalInfoTile.vue';
 export default {
     name: "LocationModalDetail",
     props: {
@@ -44,6 +24,9 @@ export default {
             type: Object,
             required: true,
         },
+    },
+    components: {
+        modalInfoTile,
     },
     emits: ['close-modal'],
     methods: {

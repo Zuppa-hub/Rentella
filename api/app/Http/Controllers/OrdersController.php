@@ -14,7 +14,7 @@ class OrdersController extends Controller
             $result = [];
             $now = now();
             $active = boolval($request->input('active'));
-            $orders = Order::with(['price', 'umbrella'])
+            $orders = Order::with(['price', 'umbrella', 'umbrella.beachzone.beach', 'umbrella.beachzone.beach.location'])
                 ->where('user_id', $request->input('userId'));
 
             if ($active === true) {
@@ -29,7 +29,7 @@ class OrdersController extends Controller
                 $zone = $order->umbrella->beachzone;
                 $result[] = [
                     'orders' => $order,
-                    'name' => $zone->name
+                    'name' => $zone->beach->name,
                 ];
             }
             return response()->json($result);

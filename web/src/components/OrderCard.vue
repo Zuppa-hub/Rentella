@@ -6,7 +6,7 @@
             <div class="flex items-baseline">
                 <div class="flex-1">
                     <div class="flex-row">
-                        <p>Beach zone</p>
+                        <p>Beach</p>
                         <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">{{
                             item.name }}</p>
                     </div>
@@ -22,7 +22,7 @@
                     <div class="flex-row">
                         <p>Date</p>
                         <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">{{
-                            item.orders.start_date }}</p>
+                            item.orders.start_date }} </p>
                     </div>
                 </div>
 
