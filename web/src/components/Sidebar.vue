@@ -13,14 +13,22 @@
                 </div>
             </div>
             <ul class="divide-gray-500 dark:divide-gray-700 flex flex-col">
+                <!-- This code is rendering a list of items using the `v-for` directive. It iterates over the
+                `filterItems()` method, which returns a filtered array of items based on the `searchTerm` property. -->
                 <li class="pb-4 mb-4" v-for="(item, index) in filterItems()" :key="index" @click="openModalForItem(item)">
                     <component :is="componentType" :item="item" :index="index + 1" />
                 </li>
             </ul>
+            <!--The code is conditionally rendering a `<bottomButton>` component based on the value of
+            // the `bottomButtonShow` prop. -->
+            <div v-if="bottomButtonShow">
+                <bottomButton :title="bottomButtonTitle" :button="bottomButtonText"></bottomButton>
+            </div>
         </div>
     </div>
     <div v-if="showModal" class="modal-overlay">
-        <Modal :title="selectedItem.name" :data="selectedItem" :show="showModal" @close-modal="closeModal" />
+        <Modal :item="selectedItem" :data="selectedItem" :show="showModal" :contentComponet="ModalContentComponent"
+            @close-modal="closeModal" />
     </div>
 </template>
 <script lang="ts">
@@ -28,6 +36,7 @@ import LocationCard from './LocationCard.vue';
 import OrderCard from './OrderCard.vue';
 import SearchBar from './SearchBar.vue';
 import Modal from './Modal.vue';
+import bottomButton from './bottomButton.vue';
 export default {
     name: "Sidebar",
     props: {
@@ -56,23 +65,45 @@ export default {
             type: String,
             required: true,
         },
+        bottomButtonShow: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
+        bottomButtonTitle: {
+            type: String,
+            required: false,
+            default: null
+        },
+        bottomButtonText: {
+            type: String,
+            required: false,
+            default: null
+        },
+        ModalContentComponent: {
+            type: String,
+            required: false,
+            default: "",
+        }
+
 
     },
     components: {
         SearchBar,
         LocationCard,
         OrderCard,
-        Modal
+        Modal,
+        bottomButton,
     },
     data() {
         return {
             searchTerm: "",
             showModal: false,
-            selectedItem: null,
+            selectedItem: [],
         }
     },
     methods: {
-        updateSearchTerm(newSearchTerm) {
+        updateSearchTerm(newSearchTerm: string) {
             this.searchTerm = newSearchTerm;
         },
         filterItems() {
@@ -85,7 +116,7 @@ export default {
                 return item.name.toLowerCase().includes(searchTermLower);
             });
         },
-        openModalForItem(item) {
+        openModalForItem(item: Object) {
             this.selectedItem = item; // Memorizza i dettagli dell'elemento selezionato
             this.showModal = true; // Apri la modal
             if (item.orders != null) {

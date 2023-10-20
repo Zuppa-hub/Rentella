@@ -13,7 +13,7 @@
         </div>
         <div class="flex-1 "> <!-- Aggiunto "items-center" per allineamento verticale -->
             <div class="flex justify-center items-center">
-                <svg height="16" width="24" class="bg-MoneyIcon" style="background-repeat: no-repeat;"></svg>
+                <svg height="16" width="24" class="bg-MoneyIcon stroke-black" style="background-repeat: no-repeat;"></svg>
                 <p class="flex font-normal text-gray-700 dark:text-gray-400">{{ item.min_price }} - {{
                     item.max_price }}</p>
             </div>
@@ -26,18 +26,16 @@
             </div>
         </div>
         <div class="flex-none"> <!-- Aggiunto "items-center" per allineamento verticale -->
-            <svg height="24" width="24" class="bg-ArrowIcon" style="background-repeat: no-repeat;"></svg>
+            <svg height="24" width="24" class="fill-black bg-ArrowIcon " style="background-repeat: no-repeat;"></svg>
         </div>
     </a>
 </template>
 <script lang="ts">
 export default {
     name: "LocationCard",
-    data() {
-    },
     props: {
         item: {
-            type: Array,
+            type: Object,
             required: true,
         },
         index: {

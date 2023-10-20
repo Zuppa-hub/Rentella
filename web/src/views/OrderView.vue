@@ -2,7 +2,10 @@
     <body class="h-screen">
         <TopBar />
         <div class="flex h-full map-container">
-            <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'" :roundedCornerFlag="true" :searchBarTitle="'orders'"/>
+            <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'"
+                :roundedCornerFlag="true" :searchBarTitle="'orders'" :bottomButtonShow="true"
+                :bottomButtonTitle="'Looking for Previous Orders?'" :bottomButtonText="'History'"
+                :ModalContentComponent="'OrderModalDetail'" />
         </div>
         <NavBar></NavBar>
     </body>

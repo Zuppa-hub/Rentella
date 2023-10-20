@@ -39,7 +39,7 @@ export default {
     name: "OrderCard",
     props: {
         item: {
-            type: Array,
+            type: Object,
             required: true,
         },
         index: {

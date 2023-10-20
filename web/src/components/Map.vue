@@ -17,7 +17,7 @@
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LPopup, LControlZoom } from "@vue-leaflet/vue-leaflet";
 export default {
-    name: "map",
+    name: "leaflet-map",
     components: {
         // The lines `LMap, LTileLayer, LMarker, LPopup, LControlZoom` are importing specific components from
         // the `@vue-leaflet/vue-leaflet` library. These components are used to render a map, tile layers,
@@ -31,7 +31,7 @@ export default {
     },
     props: {
         apiData: {
-            type: Array,
+            type: Object,
             required: true,
         },
     },
