@@ -1,5 +1,7 @@
-<template>
-    {{ item }}
+<template >
+    <div class="scrollable-content">
+        {{ item }}
+    </div>
     <div class="flex dark:text-white">
         <div class="flex-1">
             <p>Order Id:</p>

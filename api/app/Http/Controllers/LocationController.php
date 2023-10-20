@@ -33,7 +33,6 @@ class LocationController extends Controller
             $cities = CityLocation::whereBetween('latitude', [$params['minLatitude'], $params['maxLatitude']])
                 ->whereBetween('longitude', [$params['minLongitude'], $params['maxLongitude']])
                 ->get();
-
             // obtain beach and zone 
             $results = $cities->map(function ($city) use ($params) {
                 $cityBeaches = Beach::where('location_id', $city->id)->pluck('id');
