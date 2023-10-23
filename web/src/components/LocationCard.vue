@@ -26,7 +26,8 @@
             </div>
         </div>
         <div class="flex-none"> <!-- Aggiunto "items-center" per allineamento verticale -->
-            <svg height="24" width="24" class="fill-black bg-ArrowIcon " style="background-repeat: no-repeat;"></svg>
+            <svg height="24" width="24" class="fill-black bg-ArrowIcon dark:bg-ArrowIconDark "
+                style="background-repeat: no-repeat;"></svg>
         </div>
     </a>
 </template>

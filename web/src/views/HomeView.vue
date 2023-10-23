@@ -1,10 +1,13 @@
 <template>
-  <body class="h-screen">
+  <body class="h-screen ">
     <TopBar />
-    <div class="flex map-container">
+    <div class="flex md:flex-row flex-col map-container">
+      <div class=" md:hidden flex-1 h-2/5 -ml-8 z-0">
+        <Map :apiData="LocationData" />
+      </div>
       <Sidebar :apiData="LocationData" :title="title" :subtitle="subtitle" :componentType="'LocationCard'"
         :searchBarTitle="'cities'" :-modal-content-component="'LocationModalDetail'" />
-      <div class="flex h-4/5 md:w-4/5 bg-cover bg-center -ml-8 z-0">
+      <div class="hidden md:block md:h-4/5 md:w-4/5 md:bg-cover md:bg-center md:-ml-8 z-0">
         <Map :apiData="LocationData" />
       </div>
     </div>
