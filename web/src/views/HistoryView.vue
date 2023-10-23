@@ -16,6 +16,13 @@ import TopBar from '../components/TopBar.vue';
 import Sidebar from '../components/Sidebar.vue';
 import { apiHelper } from '../apiService';
 import NavBar from "../components/NavBar.vue";
+// The `interface UserData` is defining the structure of an object that represents user data. It
+// specifies that the object should have a property called `id` of type `number`. This interface is
+// used to ensure that the `UserData` object has the required properties and types when it is used in
+// the component.
+interface UserData {
+    id: number;
+}
 export default {
     name: "History",
     components: {
@@ -25,8 +32,8 @@ export default {
     },
     data() {
         return {
-            OrderData: Array,
-            UserData: Array,
+            OrderData: [],
+            UserData: {} as UserData,
             token: "",
             title: "History of orders",
             subtitle: "Number of orders: ",

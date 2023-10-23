@@ -7,7 +7,7 @@
                 :bottomButtonTitle="'Looking for Previous Orders?'" :bottomButtonText="'History'"
                 :ModalContentComponent="'OrderModalDetail'" />
         </div>
-        <NavBar></NavBar>
+        <NavBar />
     </body>
 </template>
 <script lang="ts">
@@ -17,6 +17,13 @@ import Sidebar from '../components/Sidebar.vue';
 import { apiHelper } from '../apiService';
 import Modal from '../components/Modal.vue';
 import NavBar from "../components/NavBar.vue";
+// The `interface UserData` is defining the structure of an object that represents user data. It
+// specifies that the object should have a property called `id` of type `number`. This interface is
+// used to ensure that the `UserData` object has the required properties and types when it is used in
+// the component.
+interface UserData {
+    id: number;
+}
 export default {
     name: "Order",
     components: {
@@ -27,8 +34,11 @@ export default {
     },
     data() {
         return {
-            OrderData: Array,
-            UserData: Array,
+            OrderData: [],
+            // The line `UserData: {} as UserData` is initializing the `UserData` property as an empty object and
+            // asserting its type to be `UserData`. This is done to ensure that the `UserData` object has the
+            // required properties and types specified in the `UserData` interface.
+            UserData: {} as UserData,
             token: "",
             title: "List of orders",
             subtitle: "Number of orders: ",

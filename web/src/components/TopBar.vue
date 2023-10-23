@@ -59,7 +59,7 @@
                         <div class="sm:flex relative ml-4">
                             <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
                                 <span class="text-primary-700 text-xl font-semibold">{{ profileLetter }}</span>
-                                <!-- La lettera del profilo -->
+                                <!-- profile letter-->
                             </div>
                         </div>
                     </ul>
@@ -74,15 +74,19 @@ import KeyCloakService from "../KeycloakService";
 
 export default {
     name: "topbar",
+    emits: ['resetFilteredVar',],
     data() {
         return {
             profileLetter: "",
         };
     },
     created() {
-        // Utilizza il metodo GetUserName() di KeyCloakService per ottenere il nome utente
+        // The line `const userName = KeyCloakService.GetUserName();` is calling the `GetUserName()` method
+        // from the `KeyCloakService` module. It is retrieving the username of the currently logged-in user and
+        // assigning it to the `userName` variable.
         const userName = KeyCloakService.GetUserName();
-        // Imposta il valore di profileLetter in base all'esistenza del nome utente
+        // The line `this.profileLetter = userName ? userName[0].toUpperCase() : "";` is assigning a value to
+        // the `profileLetter` data property.
         this.profileLetter = userName ? userName[0].toUpperCase() : "";
     },
 };

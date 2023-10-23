@@ -15,6 +15,9 @@
             <ul class="divide-gray-500 dark:divide-gray-700 flex flex-col">
                 <!-- This code is rendering a list of items using the `v-for` directive. It iterates over the
                 `filterItems()` method, which returns a filtered array of items based on the `searchTerm` property. -->
+                <li class="pb-4 mb-4" v-if="apiData.length == 0" v-for="number in 10" :key="number">
+                    <SkeletonLoader class="w-full h-20" />
+                </li>
                 <li class="pb-4 mb-4" v-for="(item, index) in filterItems()" :key="index" @click="openModalForItem(item)">
                     <component :is="componentType" :item="item" :index="index + 1" />
                 </li>
@@ -33,16 +36,23 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from "vue";
 import LocationCard from './LocationCard.vue';
 import OrderCard from './OrderCard.vue';
 import SearchBar from './SearchBar.vue';
 import Modal from './Modal.vue';
 import bottomButton from './bottomButton.vue';
-export default {
+import SkeletonLoader from './SkeletonLoader.vue';
+
+interface ApiDataItem {
+    name: string;
+}
+
+export default defineComponent({
     name: "Sidebar",
     props: {
         apiData: {
-            type: Array,
+            type: Array as () => ApiDataItem[], 
             required: true,
         },
         title: {
@@ -53,7 +63,7 @@ export default {
             type: String,
             required: true,
         },
-        componentType: { // Prop per specificare il tipo di componente da renderizzare
+        componentType: {
             type: String,
             required: true,
         },
@@ -69,25 +79,23 @@ export default {
         bottomButtonShow: {
             type: Boolean,
             required: false,
-            default: false
+            default: false,
         },
         bottomButtonTitle: {
             type: String,
             required: false,
-            default: null
+            default: null,
         },
         bottomButtonText: {
             type: String,
             required: false,
-            default: null
+            default: null,
         },
         ModalContentComponent: {
             type: String,
             required: false,
             default: "",
-        }
-
-
+        },
     },
     components: {
         SearchBar,
@@ -95,16 +103,20 @@ export default {
         OrderCard,
         Modal,
         bottomButton,
+        SkeletonLoader,
     },
     data() {
         return {
             searchTerm: "",
             showModal: false,
-            selectedItem: [],
-        }
+            selectedItem: {} as ApiDataItem, // Inizializza come oggetto vuoto di tipo ApiDataItem
+        };
     },
     emits: ['deleted'],
     methods: {
+        test() {
+            console.log("ciao");
+        },
         updateSearchTerm(newSearchTerm: string) {
             this.searchTerm = newSearchTerm;
         },
@@ -118,19 +130,13 @@ export default {
                 return item.name.toLowerCase().includes(searchTermLower);
             });
         },
-        openModalForItem(item: Object) {
+        openModalForItem(item: ApiDataItem) {
             this.selectedItem = item; // Memorizza i dettagli dell'elemento selezionato
             this.showModal = true; // Apri la modal
-            if (item.orders != null) {
-                console.log("ordine");
-            }
-            else {
-                console.log("locations");
-            }
         },
         closeModal() {
             this.showModal = false;
         },
-    }
-}
+    },
+});
 </script>

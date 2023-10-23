@@ -10,13 +10,10 @@
             </div>
             <input type="search" id="default-search"
                 class="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500"
-                :value="searchTerm" @input="$emit('updateSearchTerm', $event.target.value)" :placeholder="'Search ' + name"
-                required>
-
+                :value="searchTerm" @input="updateSearchTerm($event.target.value)" :placeholder="'Search ' + name" required>
         </div>
     </form>
 </template>
-
 <script lang="ts">
 export default {
     name: "SearchBar",
@@ -34,14 +31,12 @@ export default {
             required: true,
         },
     },
-    computed: {
-        searchTermComputed: {
-            get() {
-                return this.searchTerm;
-            },
-            set(value) {
-                this.$emit('update:searchTerm', value);
-            },
+    methods: {
+        updateSearchTerm(value: string) {
+            // Assicurati che il valore non sia null prima di emettere l'evento
+            if (value !== null) {
+                this.$emit('updateSearchTerm', value);
+            }
         },
     },
     created() {

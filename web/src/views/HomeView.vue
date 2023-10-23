@@ -1,3 +1,17 @@
+<template>
+  <body class="h-screen">
+    <TopBar />
+    <div class="flex map-container">
+      <Sidebar :apiData="LocationData" :title="title" :subtitle="subtitle" :componentType="'LocationCard'"
+        :searchBarTitle="'cities'" :-modal-content-component="'LocationModalDetail'" />
+      <div class="flex h-4/5 md:w-4/5 bg-cover bg-center -ml-8 z-0">
+        <Map :apiData="LocationData" />
+      </div>
+    </div>
+    <NavBar />
+  </body>
+</template>
+
 <script lang="ts">
 import TopBar from '../components/TopBar.vue';
 import NavBar from '../components/NavBar.vue';
@@ -51,16 +65,3 @@ export default {
 </script>
 
 
-<template>
-  <body class="h-screen">
-    <TopBar />
-    <div class="flex map-container">
-      <Sidebar :apiData="LocationData" :title="title" :subtitle="subtitle" :componentType="'LocationCard'"
-        :searchBarTitle="'cities'" :-modal-content-component="'LocationModalDetail'" />
-      <div class="flex h-4/5 md:w-4/5 bg-cover bg-center -ml-8 z-0">
-        <Map :apiData="LocationData" />
-      </div>
-    </div>
-    <NavBar />
-  </body>
-</template>
