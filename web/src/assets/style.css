@@ -31,3 +31,21 @@
     border-top-left-radius: 0px;
   }
 }
+
+.sidebar-container {
+  width: 600px;
+}
+
+/* Sovrascrivi l'altezza per schermi md o superiori */
+@media (min-width: 768px) {
+  .sidebar-container {
+    width: 100%;
+  }
+}
+
+.scrollable-content {
+  max-height: 300px;
+  /* Imposta l'altezza massima desiderata per la modal */
+  overflow-y: auto;
+  /* Abilita lo scroll verticale se il contenuto supera l'altezza massima */
+}

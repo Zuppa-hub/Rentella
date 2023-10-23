@@ -9,6 +9,10 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Http\JsonResponse;
 
 
+/* The `class UserController extends Controller` is defining a PHP class called `UserController` that
+extends the `Controller` class. This means that the `UserController` class inherits all the
+properties and methods from the `Controller` class, allowing it to use and override those methods as
+needed. */
 class UserController extends Controller
 {
     protected $config;
@@ -43,14 +47,33 @@ class UserController extends Controller
         }
     }
 
-    public function show($id)
+    /**
+     * The function retrieves a user with a specific UID and returns a JSON response containing the
+     * user's information, or an empty JSON response with a 404 status code if the user is not found.
+     * 
+     * @param uid The parameter "uid" is the unique identifier of the user that we want to retrieve
+     * from the database.
+     * 
+     * @return a JSON response. If a user with the given UID is found, the function will return a JSON
+     * response containing the user's information. If no user is found, it will return an empty JSON
+     * response with a status code of 404. If an exception occurs during the execution of the function,
+     * it will be caught and handled by the `handleException` method.
+     */
+    public function show($uuid)
     {
         try {
-            return response()->json(User::findOrFail($id));
+            $user = User::where('uuid', $uuid)->first();
+
+            if ($user) {
+                return response()->json($user);
+            } else {
+                return response()->json([], 404);
+            }
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
     }
+
 
     // Create a new user and handle errors
     public function store(UserRequest $request)

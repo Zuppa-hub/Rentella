@@ -1,63 +1,57 @@
 <template>
-  <Teleport to="body">
-    <Transition name="modal-outer">
-      <div v-show="modalActive"
-        class="absolute w-full bg-black bg-opacity-30 h-screen top-0 left-0 flex justify-center px-8">
-        <Transition name="modal-inner">
-          <div v-if="modalActive" class="p-4 bg-white self-start mt-32 max-w-screen-md">
-            <slot />
-            <button v-if="LocationChoose" class="text-white mt-8 bg-weather-primary py-2 px-6">
-            </button>
-            <button class="text-white mt-8 bg-weather-primary py-2 px-6" @click="$emit('close-modal')">
-              Close
-            </button>
+  <teleport to="body">
+    <div class="fixed inset-0 flex items-center justify-center z-50">
+      <div class="fixed inset-0 bg-slate-900 opacity-50 mix-blend-difference"></div>
+      <div class="modal max-w-md p-3 min-w-[400px] bg-white dark:bg-black rounded-lg shadow-md relative">
+        <div class="modal-header flex text-white ">
+          <div class="flex-1">
+            <h2 class="text-2xl text-black dark:text-white"> <b>{{ item.name }} </b> </h2>
           </div>
-        </Transition>
+          <div class="flex-none">
+            <button @click="closeModal" class="text-black text-lg dark:text-white focus:outline-none">&times;</button>
+          </div>
+        </div>
+        <hr class="border-b border-gray-300 dark:border-gray-600 mt-4" />
+        <div class="modal-content pt-4">
+          <!-- Modal content -->
+          <!--The line `<component :is="contentComponet" :item="item" @close-modal="closeModal" />` 
+            is dynamically rendering a component based on the value of the `contentComponet` prop. -->
+          <component :is="contentComponet" :item="item" @close-modal="closeModal" />
+        </div>
       </div>
-    </Transition>
-  </Teleport>
+    </div>
+  </teleport>
 </template>
 
-<script setup lang="ts">
-defineEmits(["close-modal"]);
-defineProps({
-  modalActive: {
-    type: Boolean,
-    default: false,
+<script lang="ts">
+import OrderModalDetail from './OrderModalDetail.vue';
+import LocationModalDetail from './LocationModalDetail.vue';
+export default {
+  name: "Modal",
+  components: {
+    OrderModalDetail,
+    LocationModalDetail,
   },
-  LocationChoose: {
-    type: Boolean,
-    default: false,
+  props: {
+    contentComponet: { // Prop per specificare il tipo di componente da renderizzare
+      type: String,
+      required: true,
+    },
+    item: {
+      type: Object,
+      required: false,
+      default: []
+    }
   },
-
-});
+  emits: ['close-modal'],
+  methods: {
+    // The `closeModal()` method is emitting a custom event called 'close-modal'. This allows the parent
+    // component to listen for this event and perform any necessary actions when the modal is closed. By
+    // emitting this event, the parent component can handle the logic to close the modal or perform any
+    // other desired actions.
+    closeModal() {
+      this.$emit('close-modal');
+    },
+  }
+}
 </script>
-
-<style scoped>
-.modal-outer-enter-active,
-.modal-outer-leave-active {
-  transition: opacity 0.3s cubic-bezier(0.52, 0.02, 0.19, 1.02);
-}
-
-.modal-outer-enter-from,
-.modal-outer-leave-to {
-  opacity: 0;
-}
-
-.modal-inner-enter-active {
-  transition: all 0.3s cubic-bezier(0.52, 0.02, 0.19, 1.02) 0.15s;
-}
-
-.modal-inner-leave-active {
-  transition: all 0.3s cubic-bezier(0.52, 0.02, 0.19, 1.02);
-}
-
-.modal-inner-enter-from {
-  opacity: 0;
-  transform: scale(0.8);
-}
-
-.modal-inner-leave-to {
-  transform: scale(0.8);
-}
-</style>
