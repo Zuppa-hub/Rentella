@@ -1,8 +1,11 @@
 <template>
     <div class="dark:bg-gray-950 bg-white overflow-y-auto z-40 w-full " :class="{ 'rounded-corner': !roundedCornerFlag }">
         <div class="flex justify-center">
+            <div v-if="isScreenMdOrLarger">
+                {{ showSidebarOnMdOrBigger() }}
+            </div>
             <button @click="toggleSidebar" class="md:hidden mb-2 dark:text-white px-4 py-2">
-                <div class="flex items-center"> <!-- Aggiunto "items-center" per centrare verticalmente -->
+                <div class="flex items-center">
                     <p>{{ isSidebarHidden ? 'Show' : 'Hide' }}</p>
                     <span v-if="isSidebarHidden">
                         <svg height="9" width="24" class="bg-ArrowUpIcon dark:bg-ArrowUpDarkIcon ml-3"
@@ -177,9 +180,26 @@ export default defineComponent({
             showModal: false,
             selectedItem: {} as ApiDataItem, // Inizializza come oggetto vuoto di tipo ApiDataItem
             isSidebarHidden: false,
+            isScreenMdOrLarger: false,
+
         };
     },
+    created() {
+        // check dimension on component start 
+        this.checkScreenSize();
+        // Add listner for window resize 
+        window.addEventListener("resize", this.checkScreenSize);
+    },
+    destroyed() {
+        // Remove listener when component is destroyed
+        window.removeEventListener("resize", this.checkScreenSize);
+    },
     methods: {
+        //check if window size is more or equal than md 
+        checkScreenSize() {
+            this.isScreenMdOrLarger = window.innerWidth >= 768; // "md" in Tailwind CSS è 768px
+        },
+
         // The `toggleSidebar()` method is a function that is called when the button with
         // `@click="toggleSidebar"` is clicked. It toggles the value of the `isSidebarHidden` data property
         // between `true` and `false`.
@@ -216,6 +236,11 @@ export default defineComponent({
         closeModal() {
             this.showModal = false;
         },
+        // The above code is defining a method called "showSidebarOnMdOrBigger" in a Vue component. This method
+        // sets the value of the "isSidebarHidden" data property to false.
+        showSidebarOnMdOrBigger() {
+            this.isSidebarHidden = false;
+        }
     },
 });
 </script>

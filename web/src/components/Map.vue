@@ -1,7 +1,8 @@
 <template>
     <div class="map-container">
         <!-- Vue component that renders a map using the Leaflet library.-->
-        <l-map v-model:zoom="zoom" :center="[myLatitude, myLongitude]" :options="{ zoomControl: false, }">
+        <l-map :use-global-leaflet="false" v-model:zoom="zoom" :center="[myLatitude, myLongitude]"
+            :options="{ zoomControl: false, }">
             <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
                 name="OpenStreetMap"></l-tile-layer>
             <l-control-zoom :position="'bottomright'"></l-control-zoom>
