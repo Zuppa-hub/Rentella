@@ -1,22 +1,24 @@
 <template>
     <div class="dark:bg-gray-950 bg-white overflow-y-auto z-40 w-full " :class="{ 'rounded-corner': !roundedCornerFlag }">
         <div class="flex justify-center">
-            <div v-if="isScreenMdOrLarger">
-                {{ showSidebarOnMdOrBigger() }}
-            </div>
-            <button @click="toggleSidebar" class="md:hidden mb-2 dark:text-white px-4 py-2">
-                <div class="flex items-center">
-                    <p>{{ isSidebarHidden ? 'Show' : 'Hide' }}</p>
-                    <span v-if="isSidebarHidden">
-                        <svg height="9" width="24" class="bg-ArrowUpIcon dark:bg-ArrowUpDarkIcon ml-3"
-                            style="background-repeat: no-repeat;"></svg>
-                    </span>
-                    <span v-else>
-                        <svg height="9" width="24" class="bg-ArrowDownIcon dark:bg-ArrowDownDarkIcon ml-3"
-                            style="background-repeat: no-repeat;"></svg>
-                    </span>
+            <div v-if="$route.path === '/'">
+                <div v-if="isScreenMdOrLarger">
+                    {{ showSidebarOnMdOrBigger() }}
                 </div>
-            </button>
+                <button @click="toggleSidebar" class="md:hidden mb-2 dark:text-white px-4 py-2">
+                    <div class="flex items-center">
+                        <p>{{ isSidebarHidden ? 'Show' : 'Hide' }}</p>
+                        <span v-if="isSidebarHidden">
+                            <svg height="9" width="24" class="bg-ArrowUpIcon dark:bg-ArrowUpDarkIcon ml-3"
+                                style="background-repeat: no-repeat;"></svg>
+                        </span>
+                        <span v-else>
+                            <svg height="9" width="24" class="bg-ArrowDownIcon dark:bg-ArrowDownDarkIcon ml-3"
+                                style="background-repeat: no-repeat;"></svg>
+                        </span>
+                    </div>
+                </button>
+            </div>
         </div>
 
         <div class="mx-4 items-start justify-start  dark:text-white">
