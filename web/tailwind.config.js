@@ -28,6 +28,11 @@ module.exports = {
         'ArrowUpIcon': "url('src/assets/icons/ArrowUp.svg')",
         'ArrowUpDarkIcon': "url('src/assets/icons/ArrowUpDark.svg')",
         'ArrowDownDarkIcon': "url('src/assets/icons/ArrowDownDark.svg')",
+        'BeachTypeIcon': "url('src/assets/icons/BeachType.svg')",
+        'AllowedAnimalsIcon': "url('src/assets/icons/AllowedAnimals.svg')",
+        'UmbrellaIcon': "url('src/assets/icons/umbrella.svg')",
+        'ArrowUpListIcon': "url('src/assets/icons/ArrowUpList.svg')",
+        'ArrowDownListIcon': "url('src/assets/icons/ArrowDownList.svg')",
       }),
     },
     colors: {

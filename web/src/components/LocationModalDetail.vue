@@ -9,9 +9,11 @@
             <button @click="closeModal" class="w-full dark:text-white font-medium mt-2">Cancel</button>
         </div>
         <div class="flex-1">
-            <button @click="selectedLocation"
-                class="w-full text-white bg-primary font-medium rounded-lg text-sm px-6 py-2.5">Select
-                location</button>
+            <router-link
+                :to="{ name: 'BeachSelection', params: { id: item.id }, query: { cityName: item.name, distance: item.distance } }">
+                <button class="w-full text-white bg-primary font-medium rounded-lg text-sm px-6 py-2.5">Select
+                    location</button>
+            </router-link>
         </div>
     </div>
 </template>
@@ -29,13 +31,10 @@ export default {
     components: {
         modalInfoTile,
     },
-    emits: ['close-modal', 'selectLocation'],
+    emits: ['close-modal'],
     methods: {
         closeModal() {
             this.$emit('close-modal');
-        },
-        selectedLocation() { //capisci come implemetare 
-            this.$emit('selectLocation', this.item.id);
         },
     }
 };

@@ -1,61 +1,68 @@
 <template>
-    <div class="dark:bg-gray-950 bg-white overflow-y-auto z-40 w-full " :class="{ 'rounded-corner': !roundedCornerFlag }">
-        <div class="flex justify-center">
-            <div v-if="$route.path === '/'">
-                <div v-if="isScreenMdOrLarger">
-                    {{ showSidebarOnMdOrBigger() }}
-                </div>
-                <button @click="toggleSidebar" class="md:hidden mb-2 dark:text-white px-4 py-2">
-                    <div class="flex items-center">
-                        <p>{{ isSidebarHidden ? 'Show' : 'Hide' }}</p>
-                        <span v-if="isSidebarHidden">
-                            <svg height="9" width="24" class="bg-ArrowUpIcon dark:bg-ArrowUpDarkIcon ml-3"
-                                style="background-repeat: no-repeat;"></svg>
-                        </span>
-                        <span v-else>
-                            <svg height="9" width="24" class="bg-ArrowDownIcon dark:bg-ArrowDownDarkIcon ml-3"
-                                style="background-repeat: no-repeat;"></svg>
-                        </span>
+    <Transition name="sidebar-slide">
+        <div class="dark:bg-gray-950 bg-white overflow-y-auto z-40 w-full "
+            :class="{ 'rounded-corner': !roundedCornerFlag }">
+            <div class="flex justify-center">
+                <div v-if="$route.path === '/'">
+                    <div v-if="isScreenMdOrLarger">
+                        {{ showSidebarOnMdOrBigger() }}
                     </div>
-                </button>
+                    <button @click="toggleSidebar" class="md:hidden mb-2 dark:text-white px-4 py-2">
+                        <div class="flex items-center">
+                            <p>{{ isSidebarHidden ? 'Show' : 'Hide' }}</p>
+                            <span v-if="isSidebarHidden">
+                                <svg height="9" width="24" class="bg-ArrowUpIcon dark:bg-ArrowUpDarkIcon ml-3"
+                                    style="background-repeat: no-repeat;"></svg>
+                            </span>
+                            <span v-else>
+                                <svg height="9" width="24" class="bg-ArrowDownIcon dark:bg-ArrowDownDarkIcon ml-3"
+                                    style="background-repeat: no-repeat;"></svg>
+                            </span>
+                        </div>
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <div class="mx-4 items-start justify-start  dark:text-white">
-            <SearchBar :apiData="apiData" :searchTerm="searchTerm" :name="searchBarTitle"
-                @updateSearchTerm="updateSearchTerm" />
-            <div v-if="!isSidebarHidden" class="mx-4 items-start justify-start dark:text-white">
-                <!-- ... Altri contenuti ... -->
-                <div class="flex items-baseline my-3">
-                    <div class="flex-1">
-                        <p class="text-xl font-bold">{{ title }}</p>
+            <div class="mx-4 items-start justify-start  dark:text-white">
+                <SearchBar :apiData="apiData" :searchTerm="searchTerm" :name="searchBarTitle"
+                    @updateSearchTerm="updateSearchTerm" />
+                <div v-if="!isSidebarHidden" class="mx-4 items-start justify-start dark:text-white">
+                    <!-- ... Altri contenuti ... -->
+                    <div class="flex items-baseline my-3">
+                        <div class="flex-1">
+                            <p class="text-xl font-bold">{{ title }}</p>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 text-right">{{ subtitle }} {{
+                                filterItems().length }}
+                            </p>
+                        </div>
                     </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-500 dark:text-gray-400 text-right">{{ subtitle }} {{
-                            filterItems().length }}
-                        </p>
-                    </div>
-                </div>
-                <ul class="divide-gray-500 dark:divide-gray-700 flex flex-col">
-                    <!-- This code is rendering a list of items using the `v-for` directive. It iterates over the
+                    <ul class="divide-gray-500 dark:divide-gray-700 flex flex-col">
+                        <!-- This code is rendering a list of items using the `v-for` directive. It iterates over the
                 `filterItems()` method, which returns a filtered array of items based on the `searchTerm` property. -->
-                    <li class="pb-4 mb-4" v-if="apiData.length == 0" v-for="number in 10" :key="number">
-                        <SkeletonLoader class="w-full h-20" />
-                    </li>
-                    <li class="pb-4 mb-4" v-for="(item, index) in filterItems()" :key="index"
-                        @click="openModalForItem(item)">
-                        <component :is="componentType" :item="item" :index="index + 1" />
-                    </li>
-                </ul>
-                <!--The code is conditionally rendering a `<bottomButton>` component based on the value of
+                        <li class="pb-4 mb-4" v-if="apiData.length == 0" v-for="number in 10" :key="number">
+                            <SkeletonLoader class="w-full h-20" />
+                        </li>
+                        <li class="pb-4 mb-4" v-for="(item, index) in filterItems()" :key="index">
+                            <div v-if="componentType != 'beachCard'" @click="openModalForItem(item)">
+                                <component :is="componentType" :item="item" :index="index + 1" />
+                            </div>
+                            <div v-else>
+                                <component :is="componentType" :item="item" :index="index + 1" />
+                            </div>
+                        </li>
+                    </ul>
+                    <!--The code is conditionally rendering a `<bottomButton>` component based on the value of
             // the `bottomButtonShow` prop. -->
-                <div v-if="bottomButtonShow">
-                    <bottomButton :title="bottomButtonTitle" :button="bottomButtonText"></bottomButton>
+                    <div v-if="bottomButtonShow">
+                        <bottomButton :title="bottomButtonTitle" :button="bottomButtonText"></bottomButton>
+                    </div>
                 </div>
-            </div>
 
+            </div>
         </div>
-    </div>
+    </Transition>
     <div v-if="showModal" class="modal-overlay">
         <Modal :item="selectedItem" :data="selectedItem" :show="showModal" :contentComponet="ModalContentComponent"
             @close-modal="closeModal" />
@@ -70,6 +77,7 @@ import SearchBar from './SearchBar.vue';
 import Modal from './Modal.vue';
 import bottomButton from './bottomButton.vue';
 import SkeletonLoader from './SkeletonLoader.vue';
+import beachCard from "./beachCard.vue";
 
 // The `interface ApiDataItem` is defining the structure or shape of an object that represents an item
 // in the `apiData` array. It specifies that each item should have a `name` property of type `string`.
@@ -175,6 +183,7 @@ export default defineComponent({
         Modal,
         bottomButton,
         SkeletonLoader,
+        beachCard,
     },
     data() {
         return {
@@ -191,6 +200,7 @@ export default defineComponent({
         this.checkScreenSize();
         // Add listner for window resize 
         window.addEventListener("resize", this.checkScreenSize);
+        console.log(this.apiData);
     },
     destroyed() {
         // Remove listener when component is destroyed
@@ -246,3 +256,19 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.sidebar-slide-enter-active,
+.sidebar-slide-leave-active {
+    transition: transform 1.5s;
+}
+
+.sidebar-slide-enter,
+.sidebar-slide-leave-to {
+    transform: translateY(0);
+}
+
+.sidebar-slide-enter-to,
+.sidebar-slide-leave {
+    transform: translateY(-100%);
+}
+</style>

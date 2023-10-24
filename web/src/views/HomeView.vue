@@ -38,7 +38,6 @@ export default {
       title: "Available Locations",
       subtitle: "Number of locations: ",
       LocationData: [],
-      token: "",
       maxLatitude: 200,
       minLatitude: -200,
       maxLongitude: 200,
@@ -55,7 +54,6 @@ export default {
       const apiUrl = `http://localhost:9000/public/api/locations?minLatitude=${this.minLatitude}&maxLatitude=${this.maxLatitude}&minLongitude=${this.minLongitude}&maxLongitude=${this.maxLongitude}&myLatitude=100&myLongitude=-134`;
       try {
         this.LocationData = await apiHelper(apiUrl, "GET");
-        console.log(this.LocationData);
       } catch (error) {
         console.error(error);
       }
