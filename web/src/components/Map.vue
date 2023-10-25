@@ -7,15 +7,24 @@
                 name="OpenStreetMap"></l-tile-layer>
             <l-control-zoom :position="'bottomright'"></l-control-zoom>
             <!-- Utilizza v-for per creare marker e popup per ogni elemento in apiData -->
-            <l-marker v-for="(item, index) in apiData" :key="index" :lat-lng="[item.latitude, item.longitude]">
-                <l-popup>{{ item.city_name }}</l-popup>
-            </l-marker>
+            <div v-if="apiData[0].name == undefined">
+                <l-marker v-for="(item, index) in apiData" :key="index"
+                    :lat-lng="[item.beach.latitude, item.beach.longitude]">
+                    <l-popup>{{ item.beach.name }}</l-popup>
+                </l-marker>
+            </div>
+            <div v-else>
+                <l-marker v-for="(item, index) in apiData" :key="index" :lat-lng="[item.latitude, item.longitude]">
+                    <l-popup>{{ item.name }}</l-popup>
+                </l-marker>
+            </div>
         </l-map>
     </div>
 </template>
 
 <script lang="ts">
 import "leaflet/dist/leaflet.css";
+import { Geolocate } from "../apiService";
 import { LMap, LTileLayer, LMarker, LPopup, LControlZoom } from "@vue-leaflet/vue-leaflet";
 export default {
     name: "leaflet-map",
@@ -43,25 +52,15 @@ export default {
             myLongitude: 0,
         }
     },
-    methods: {
-        // The `Geolocate` method is using the browser's geolocation API to retrieve the user's current
-        // latitude and longitude coordinates. It checks if the `navigator.geolocation` object is
-        // available and then calls the `getCurrentPosition` method to get the user's position. Once
-        // the position is obtained, the latitude and longitude values are stored in the component's
-        // `myLatitude` and `myLongitude` data properties.
-        async Geolocate() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    this.myLatitude = position.coords.latitude;
-                    this.myLongitude = position.coords.longitude;
-                    console.log(this.myLatitude, this.myLongitude);
-                });
-            }
-        }
-    },
     created() {
-        // The line `this.Geolocate();` is calling the `Geolocate` method when the component is created.
-        this.Geolocate();
+        Geolocate()
+            .then((coordinates) => {
+                this.myLatitude = coordinates.latitude;
+                this.myLongitude = coordinates.longitude
+            })
+            .catch((error) => {
+                console.error("Errore durante la geolocalizzazione:", error);
+            });
     },
 }
 </script>

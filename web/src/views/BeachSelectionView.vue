@@ -3,12 +3,12 @@
         <TopBar />
         <div class="flex md:flex-row flex-col map-container">
             <div class=" md:hidden flex-1 h-2/5 -ml-8 z-0">
-                <!-- <Map :apiData="LocationData" />-->
+                <Map :apiData="beachData" />
             </div>
             <Sidebar :apiData="beachData" :title="cityName" :subtitle="'Number of beaches:'" :componentType="'beachCard'"
                 :searchBarTitle="'beaches'" :-modal-content-component="''" />
             <div class="hidden md:block md:h-4/5 md:w-4/5 md:bg-cover md:bg-center md:-ml-8 z-0">
-                <!-- <Map :apiData="LocationData" />-->
+                <Map :apiData="beachData" />
             </div>
         </div>
         <NavBar />
@@ -38,6 +38,7 @@ export default {
             cityName: this.$route.query.cityName.toString() ?? "",
             distance: this.$route.query.distance,
             toggleModal: false, // Imposta questa variabile su true per aprire la modal
+            beachSpecificDataForMap: [],
         };
     },
     methods: {

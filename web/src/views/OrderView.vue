@@ -1,11 +1,16 @@
 <template>
     <body class="h-screen">
         <TopBar />
-        <div class="flex h-full map-container">
-            <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'"
-                :roundedCornerFlag="true" :searchBarTitle="'orders'" :bottomButtonShow="true"
-                :bottomButtonTitle="'Looking for Previous Orders?'" :bottomButtonText="'History'"
-                :ModalContentComponent="'OrderModalDetail'" />
+        <div class="md:flex h-full map-container ">
+            <div class="hidden md:block md:flex-auto md:basis-1/4 h-full">
+                <leftPagePanel :title="'Orders'" :total="OrderData.length"
+                    :bottomButtonTitle="'Looking for Previous Orders?'" :bottomButtonText="'History'"
+                    :favouriteBeach="favourite.name" :favouriteLocation="FavouriteCity" />
+            </div>
+            <div class="md:basis-3/4 h-full">
+                <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'"
+                    :roundedCornerFlag="true" :searchBarTitle="'orders'" :ModalContentComponent="'OrderModalDetail'" />
+            </div>
         </div>
         <NavBar />
     </body>
@@ -14,9 +19,10 @@
 import KeyCloakService from "../KeycloakService";
 import TopBar from '../components/TopBar.vue';
 import Sidebar from '../components/Sidebar.vue';
-import { apiHelper } from '../apiService';
+import { apiHelper, findMostFrequentElement } from '../apiService';
 import Modal from '../components/Modal.vue';
 import NavBar from "../components/NavBar.vue";
+import leftPagePanel from "../components/leftPagePanel.vue";
 // The `interface UserData` is defining the structure of an object that represents user data. It
 // specifies that the object should have a property called `id` of type `number`. This interface is
 // used to ensure that the `UserData` object has the required properties and types when it is used in
@@ -31,6 +37,7 @@ export default {
         TopBar,
         Modal,
         NavBar,
+        leftPagePanel,
     },
     data() {
         return {
@@ -42,6 +49,8 @@ export default {
             token: "",
             title: "List of orders",
             subtitle: "Number of orders: ",
+            favourite: [],
+            FavouriteCity: "",
         };
     },
     methods: {
@@ -59,6 +68,8 @@ export default {
             const apiUrl = `http://localhost:9000/public/api/orders?userId=${userId}&active=true`;
             try {
                 this.OrderData = await apiHelper(apiUrl, "GET");
+                this.favourite = findMostFrequentElement(this.OrderData);
+                this.FavouriteCity = this.favourite.orders.umbrella.beachzone.beach.location.city_name;
             } catch (error) {
                 console.error(error);
             }

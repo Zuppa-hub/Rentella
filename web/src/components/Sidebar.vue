@@ -1,9 +1,10 @@
 <template>
     <Transition name="sidebar-slide">
         <div class="dark:bg-gray-950 bg-white overflow-y-auto z-40 w-full "
-            :class="{ 'rounded-corner': !roundedCornerFlag }">
+            :class="{ 'rounded-corner': !roundedCornerFlag }"
+            v-bind:class="(componentType == 'LocationCard') ? 'md:h-full' : 'h-full'">
             <div class="flex justify-center">
-                <div v-if="$route.path === '/'">
+                <div v-if="$route.path !== '/Order' && $route.path != '/History'">
                     <div v-if="isScreenMdOrLarger">
                         {{ showSidebarOnMdOrBigger() }}
                     </div>
@@ -23,16 +24,16 @@
                 </div>
             </div>
 
-            <div class="mx-4 items-start justify-start  dark:text-white">
+            <div class="mx-4 items-start justify-start dark:text-white">
                 <SearchBar :apiData="apiData" :searchTerm="searchTerm" :name="searchBarTitle"
                     @updateSearchTerm="updateSearchTerm" />
-                <div v-if="!isSidebarHidden" class="mx-4 items-start justify-start dark:text-white">
+                <div v-if="!isSidebarHidden" class="!mx-4 !items-start !justify-start dark:text-white">
                     <!-- ... Altri contenuti ... -->
-                    <div class="flex items-baseline my-3">
-                        <div class="flex-1">
+                    <div class="!flex !items-baseline !my-3">
+                        <div class="!flex-1">
                             <p class="text-xl font-bold">{{ title }}</p>
                         </div>
-                        <div class="flex-1">
+                        <div class="!flex-1">
                             <p class="text-sm text-gray-500 dark:text-gray-400 text-right">{{ subtitle }} {{
                                 filterItems().length }}
                             </p>
@@ -59,7 +60,6 @@
                         <bottomButton :title="bottomButtonTitle" :button="bottomButtonText"></bottomButton>
                     </div>
                 </div>
-
             </div>
         </div>
     </Transition>

@@ -1,13 +1,18 @@
 <template>
     <body class="h-screen">
         <TopBar />
-        <div class="flex h-full map-container">
-            <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'"
-                :roundedCornerFlag="true" :searchBarTitle="'in the history of orders'" :bottomButtonShow="true"
-                :bottomButtonTitle="'Looking for Active Orders?'" :bottomButtonText="'Orders'"
-                :ModalContentComponent="'OrderModalDetail'" />
+        <div class="md:flex h-full map-container">
+            <div class="hidden md:block md:flex-auto md:basis-1/4 h-full">
+                <leftPagePanel :title="'Orders history'" :total="OrderData.length"
+                    :bottomButtonTitle="'Looking for Previous Orders?'" :bottomButtonText="'History'" />
+            </div>
+            <div class="md:basis-3/4 h-full">
+                <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'"
+                    :roundedCornerFlag="true" :searchBarTitle="'in the history of orders'"
+                    :ModalContentComponent="'OrderModalDetail'" />
+            </div>
         </div>
-        <NavBar></NavBar>
+        <NavBar />
     </body>
 </template>
 <script lang="ts">
@@ -16,6 +21,7 @@ import TopBar from '../components/TopBar.vue';
 import Sidebar from '../components/Sidebar.vue';
 import { apiHelper } from '../apiService';
 import NavBar from "../components/NavBar.vue";
+import leftPagePanel from "../components/leftPagePanel.vue";
 // The `interface UserData` is defining the structure of an object that represents user data. It
 // specifies that the object should have a property called `id` of type `number`. This interface is
 // used to ensure that the `UserData` object has the required properties and types when it is used in
@@ -29,6 +35,7 @@ export default {
         Sidebar,
         TopBar,
         NavBar,
+        leftPagePanel,
     },
     data() {
         return {

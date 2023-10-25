@@ -20,7 +20,7 @@ import TopBar from '../components/TopBar.vue';
 import NavBar from '../components/NavBar.vue';
 import Map from '../components/Map.vue';
 import Sidebar from '../components/Sidebar.vue';
-import { apiHelper } from '../apiService';
+import { apiHelper, Geolocate } from '../apiService';
 import Modal from '../components/Modal.vue';
 
 export default {
@@ -42,6 +42,8 @@ export default {
       minLatitude: -200,
       maxLongitude: 200,
       minLongitude: -200,
+      myLatitude: 0,
+      myLongitude: 0,
       toggleModal: false, // Imposta questa variabile su true per aprire la modal
       modalTitle: "Titolo della Modal",
     };
@@ -51,7 +53,7 @@ export default {
       this.toggleModal = !this.toggleModal; // Chiude la modal impostando la variabile su false
     },
     async fetchData() {
-      const apiUrl = `http://localhost:9000/public/api/locations?minLatitude=${this.minLatitude}&maxLatitude=${this.maxLatitude}&minLongitude=${this.minLongitude}&maxLongitude=${this.maxLongitude}&myLatitude=100&myLongitude=-134`;
+      const apiUrl = `http://localhost:9000/public/api/locations?minLatitude=${this.minLatitude}&maxLatitude=${this.maxLatitude}&minLongitude=${this.minLongitude}&maxLongitude=${this.maxLongitude}&myLatitude=${this.myLatitude}&myLongitude=${this.myLongitude}`;
       try {
         this.LocationData = await apiHelper(apiUrl, "GET");
       } catch (error) {
@@ -61,6 +63,14 @@ export default {
   },
   created() {
     this.fetchData();
+    Geolocate()
+      .then((coordinates) => {
+        this.myLatitude = coordinates.latitude;
+        this.myLongitude = coordinates.longitude
+      })
+      .catch((error) => {
+        console.error("Errore durante la geolocalizzazione:", error);
+      });
   }
 }
 </script>
