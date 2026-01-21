@@ -9,9 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@headlessui/react": "^1.7.17",
+    "@headlessui/vue": "^1.7.16",
     "axios": "^1.5.1",
     "keycloak-js": "^22.0.4",
+    "pinia": "^2.1.6",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5"
   },
