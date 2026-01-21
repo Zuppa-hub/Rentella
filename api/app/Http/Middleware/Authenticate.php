@@ -12,6 +12,7 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('login');
+        // For API requests with Keycloak guard, we don't redirect to a login route.
+        return null;
     }
 }

@@ -1,5 +1,6 @@
+/// <reference types="../../vite-env.d.ts" />
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios'
-import KeyCloakService from './KeycloakService'
+import KeyCloakService from '../KeycloakService'
 
 /**
  * API Response interface
@@ -51,7 +52,7 @@ const createApiClient = (): AxiosInstance => {
 
   // Response interceptor - Handle errors
   instance.interceptors.response.use(
-    (response) => response,
+    (response: any) => response,
     (error: AxiosError) => {
       // Handle 401 - Unauthorized (token expired)
       if (error.response?.status === 401) {
@@ -88,7 +89,7 @@ const createApiClient = (): AxiosInstance => {
         return Promise.reject({
           message: 'Validation failed',
           status: 422,
-          data: error.response?.data?.errors,
+          data: error.response?.data,
         } as ApiError)
       }
 
