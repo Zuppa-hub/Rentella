@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\BeachRequest;
+use App\Http\Requests\StoreBeachRequest;
+use App\Http\Requests\UpdateBeachRequest;
 use App\Http\Requests\BeachFilterRequest;
 use App\Models\Beach;
 
@@ -55,26 +56,30 @@ class BeachController extends Controller
         return response()->json($results);
     }
 
-
-
     public function show($id)
     {
-        return response()->json(Beach::findOrfail($id));
+        $beach = Beach::with(['owner', 'location', 'openingDate', 'beachType', 'zones.prices'])
+            ->findOrFail($id);
+        return response()->json($beach);
     }
 
-    public function store(BeachRequest $request)
+    public function store(StoreBeachRequest $request)
     {
-        return response()->json(Beach::create($request->all()), 201);
+        $beach = Beach::create($request->validated());
+        return response()->json($beach->load(['owner', 'location', 'openingDate', 'beachType']), 201);
     }
 
-    public function update(BeachRequest $request, $id)
+    public function update(UpdateBeachRequest $request, $id)
     {
-        return response()->json(Beach::findOrFail($id)
-            ->update($request->all()), 200);
+        $beach = Beach::findOrFail($id);
+        $beach->update($request->validated());
+        return response()->json($beach->load(['owner', 'location', 'openingDate', 'beachType']), 200);
     }
 
     public function destroy($id)
     {
-        return response()->json(Beach::findOrFail($id)->delete());
+        $beach = Beach::findOrFail($id);
+        $beach->delete();
+        return response()->json(null, 204);
     }
 }
