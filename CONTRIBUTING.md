@@ -1,165 +1,215 @@
-# Contributing to Rentella
+# Contributing
 
-## Code of Conduct
-Please be respectful and constructive in all interactions.
+Want to help? Great! Here's how.
 
-## Development Setup
+## Before you start
 
-### Prerequisites
-- Docker & Docker Compose
-- Git
-- Node.js 18+ (for local development)
-- PHP 8.1+ (for local development)
+- Fork the repository
+- Clone your fork locally
+- Set up the dev environment (see [DEVELOPMENT.md](./DEVELOPMENT.md))
+- Make sure tests pass: `make test`
 
-### Quick Start
+## Making changes
 
-1. **Clone and setup**
-   ```bash
-   git clone <repo>
-   cd Rentella
-   cp api/.env.example api/.env
-   cp web/.env.example web/.env
-   ```
-
-2. **Start Docker containers**
-   ```bash
-   make setup
-   ```
-
-3. **Install dependencies**
-   ```bash
-   cd api && composer install
-   cd ../web && npm install
-   ```
-
-4. **Generate app key**
-   ```bash
-   cd api && php artisan key:generate
-   ```
-
-5. **Run migrations**
-   ```bash
-   cd api && php artisan migrate --seed
-   ```
-
-6. **Start development servers**
-   ```bash
-   # Terminal 1 - Backend
-   cd api && php artisan serve --port=9000
-   
-   # Terminal 2 - Frontend
-   cd web && npm run dev
-   ```
-
-### Docker Commands
-```bash
-make setup          # Build and start all containers
-make build          # Build containers
-make up             # Start containers
-make down           # Stop containers
-make logs           # View container logs
-make composer-update # Update PHP dependencies
+### Branch naming
+```
+feature/description        # New features
+fix/description           # Bug fixes
+docs/description         # Documentation
+refactor/description     # Code cleanup
 ```
 
-## Git Workflow
+Example: `git checkout -b feature/add-user-validation`
 
-1. **Create a feature branch**
-   ```bash
-   git checkout -b feature/description
-   ```
+### Write tests first
+For every feature or fix:
+1. Write a failing test
+2. Implement the feature
+3. Test passes
+4. No test = no merge
 
-2. **Commit with conventional commits**
-   ```bash
-   git commit -m "feat: add new feature"
-   git commit -m "fix: resolve issue"
-   git commit -m "refactor: improve code"
-   ```
+Run tests before commit:
+```bash
+docker exec Rentella_app php artisan test tests/Feature/
+```
 
-3. **Push and create PR**
-   ```bash
-   git push origin feature/description
-   ```
+### Commit messages
+Use conventional commits. Clear and specific:
 
-## Commit Message Format
+✅ Good:
+- `feat: add ownership check to beach pictures`
+- `fix: correct umbrella inventory count`
+- `docs: update README with setup steps`
 
-Use Conventional Commits:
-- `feat: ` - New feature
-- `fix: ` - Bug fix
-- `docs: ` - Documentation
-- `style: ` - Code style (no logic changes)
-- `refactor: ` - Code refactoring
-- `perf: ` - Performance improvements
-- `test: ` - Tests
-- `chore: ` - Build, dependencies
-- `ci: ` - CI/CD changes
+❌ Bad:
+- `update stuff`
+- `bug fix`
+- `changes`
+
+Template:
+```
+type: short description
+
+Optional longer explanation if needed.
+Can be multiple lines.
+
+Fixes #123  (if closing an issue)
+```
+
+### Code style
+
+#### Backend (Laravel)
+- PSR-12 standard
+- Use early returns
+- Type hints on all methods
+- No unused imports
+- Meaningful variable names
 
 Example:
-```bash
-git commit -m "feat: add beach filter by location
-
-- Implements location filtering on beaches list
-- Adds geolocation support
-- Updates API endpoint with new parameters
-
-Closes #123"
+```php
+public function store(StoreBeachRequest $request): JsonResponse
+{
+    $owner = auth()->user();
+    
+    $beach = Beach::create([
+        'name' => $request->validated('name'),
+        'owner_id' => $owner->id,
+    ]);
+    
+    return response()->json($beach, 201);
+}
 ```
 
-## Code Standards
+#### Frontend (Vue 3)
+- TypeScript strict mode
+- Proper type annotations
+- Kebab-case for component file names (`BeachCard.vue`)
+- camelCase for methods and properties
+- No `any` types without good reason
 
-### PHP (Backend)
-- Follow PSR-12 standards
-- Use meaningful variable names
-- Add PHPDoc comments
-- Max line length: 120 characters
+Example:
+```typescript
+interface Beach {
+  id: number;
+  name: string;
+  owner_id: number;
+}
 
-### TypeScript/Vue (Frontend)
-- Use TypeScript strict mode
-- Follow Vue 3 Composition API patterns
-- Add proper type definitions
-- Use PascalCase for component names
+export default defineComponent({
+  name: 'BeachCard',
+  props: {
+    beach: {
+      type: Object as PropType<Beach>,
+      required: true,
+    },
+  },
+  setup(props) {
+    return {
+      beach: computed(() => props.beach),
+    };
+  },
+});
+```
 
-### General
-- Write self-documenting code
-- Add comments for complex logic
-- Keep functions small and focused
-- No console.log in production
+## Submitting changes
+
+### 1. Push your branch
+```bash
+git push origin feature/your-feature
+```
+
+### 2. Open a Pull Request
+- Clear title: describes what you did
+- Description: explains why and how
+- Reference issues if applicable
+- Screenshot/video if UI changes
+
+### 3. PR template
+```markdown
+## What
+Describe what you changed.
+
+## Why
+Explain why this change is needed.
+
+## How
+How does it work? (optional if obvious)
 
 ## Testing
+How did you test this?
 
-### Backend
-```bash
-cd api
-php artisan test                    # Run all tests
-php artisan test --filter=Beach    # Run specific test
-php artisan test --coverage        # Generate coverage report
+## Checklist
+- [ ] Tests pass
+- [ ] No breaking changes
+- [ ] Documentation updated
+- [ ] Code follows style guide
 ```
 
-### Frontend
+### 4. Review process
+- We'll review as soon as possible
+- Comments aren't criticism - let's collaborate
+- Make requested changes
+- We'll merge when ready
+
+## What we're looking for
+
+### Security
+- No SQL injection
+- No XSS
+- Input validation
+- Ownership checks (if relevant)
+- No credentials in code
+
+### Performance
+- No N+1 queries
+- Efficient algorithms
+- Reasonable request size
+
+### Tests
+- Feature tests for new endpoints
+- Edge cases covered
+- All tests pass
+
+### Code quality
+- Clear variable names
+- No duplicate code
+- Functions do one thing
+- Comments where non-obvious
+
+### Documentation
+- Code commented if complex
+- README updated if needed
+- Commit messages clear
+
+## Setting ADMIN_EMAILS
+
+If you're testing admin features:
+
 ```bash
-cd web
-npm run test                        # Run all tests
-npm run test:coverage              # Coverage report
-npm run test:watch                 # Watch mode
+# In .env
+ADMIN_EMAILS=yourname@example.com,another@example.com
 ```
 
-## Before Submitting PR
+Then restart:
+```bash
+make down && make up
+```
 
-- [ ] Code follows project standards
-- [ ] All tests pass (`npm run test`)
-- [ ] No console errors/warnings
-- [ ] Linting passes (`npm run lint`)
-- [ ] Documentation updated if needed
-- [ ] Commit messages are descriptive
-- [ ] No secrets committed
-- [ ] Branch is up-to-date with main
+## Need help?
 
-## Need Help?
+- Check existing issues and PRs
+- Ask in your PR
+- Open a discussion issue
+- Email maintainers
 
-- Check existing issues/discussions
-- Review ARCHITECTURE.md for design patterns
-- Ask in PR comments or issues
-- Contact maintainers
+## Recognition
+
+All contributors are listed in the project. Keep an eye on the [CONTRIBUTORS.md](./CONTRIBUTORS.md) file (we'll create one once we have contributions).
+
+## Code of Conduct
+
+Be respectful. We're all learning. Harassment, discrimination, or abuse won't be tolerated.
 
 ---
 
-**Happy coding! 🚀**
+Thank you for contributing! 🙌

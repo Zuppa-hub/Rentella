@@ -1,66 +1,257 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+The backend. Built with Laravel 10.
 
-## About Laravel
+## Quick start
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```bash
+cd api
+cp .env.example .env
+docker-compose up -d
+php artisan migrate
+php artisan db:seed
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+API runs on `http://localhost:9000/api`
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Architecture
 
-## Learning Laravel
+### Controllers (12 total)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**Read-only (public with auth):**
+- `BeachController` - Browse beaches
+- `UserController` - Your profile
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+**Ownership required:**
+- `BeachPictureController` - Photos
+- `BeachZonesController` - Zones
+- `UmbrellasController` - Umbrellas
+- `OpeningDatesController` - Hours
+- `PricesController` - Pricing
+- `OrdersController` - Bookings
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**Admin only:**
+- `OwnersController` - Manage owners
+- `LocationController` - Manage cities
+- `BeachTypeController` - Manage types
 
-## Laravel Sponsors
+### Models
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```
+Owner
+├── Beach
+│   ├── BeachPicture
+│   ├── BeachZone
+│   │   ├── Umbrella
+│   │   └── Price
+│   ├── OpeningDate
+│   └── BeachType
+└── BeachType
 
-### Premium Partners
+User
+└── Order
+    └── Beach
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+Relationships all in `app/Models/`
 
-## Contributing
+### Routes
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+All API routes defined in `routes/api.php`
 
-## Code of Conduct
+Middleware stack:
+1. Auth - Keycloak JWT verification
+2. CORS - Allow frontend requests
+3. Rate limit - Prevent abuse
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Authentication
 
-## Security Vulnerabilities
+Every request needs:
+```
+Authorization: Bearer {token}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Token from Keycloak. Verified in `app/Http/Middleware/Authenticate.php`
 
-## License
+Get user info:
+```php
+$user = auth()->user();  // Returns User model
+$email = auth()->user()->email;
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Database
+
+11 main tables:
+- users
+- owners
+- beaches
+- beach_pictures
+- beach_zones
+- umbrellas
+- prices
+- orders
+- opening_dates
+- beach_types
+- city_locations
+
+All have timestamps. Foreign keys enforced.
+
+Run migrations:
+```bash
+docker exec Rentella_app php artisan migrate
+```
+
+Seed test data:
+```bash
+docker exec Rentella_app php artisan db:seed
+```
+
+## Testing
+
+40+ tests covering all endpoints.
+
+Run them:
+```bash
+docker exec Rentella_app php artisan test tests/Feature/
+```
+
+Test structure:
+- `Feature/ApiHealthCheckTest.php` - Endpoint smoke tests
+- `Feature/DeepSecurityAuditTest.php` - Security validation
+- More in `tests/`
+
+## Configuration
+
+Key settings in `config/app.php`:
+
+```php
+'admin_emails' => explode(',', env('ADMIN_EMAILS', 'admin@rentella.com'))
+```
+
+Set in `.env`:
+```
+ADMIN_EMAILS=you@example.com,admin@example.com
+```
+
+## Useful commands
+
+```bash
+# Interactive shell
+php artisan tinker
+
+# View all routes
+php artisan route:list
+
+# Check migrations status
+php artisan migrate:status
+
+# Create new migration
+php artisan make:migration create_table_name
+
+# Create new controller
+php artisan make:controller NameController --model=Model
+
+# Run specific test
+php artisan test tests/Feature/SomeTest.php
+```
+
+## Error handling
+
+All errors standardized:
+
+```json
+{
+  "error": "Unauthorized",
+  "status": 401
+}
+```
+
+Status codes:
+- `200` - OK
+- `201` - Created
+- `400` - Bad request
+- `401` - Unauthorized (bad token)
+- `403` - Forbidden (not owner/admin)
+- `404` - Not found
+- `422` - Validation error
+- `500` - Server error
+
+## Performance
+
+Database queries optimized:
+- Relationship eager loading where needed
+- Indexed foreign keys
+- Query builder for efficiency
+
+No N+1 queries in main endpoints.
+
+## Security
+
+- No raw SQL queries
+- Input validation via Form Requests
+- Ownership checks on all write operations
+- Admin checks on system endpoints
+- CORS properly configured
+
+Details in [SECURITY.md](../SECURITY.md)
+
+## Development tips
+
+### Working with relationships
+
+Get related data efficiently:
+```php
+// Don't do this
+$beaches = Beach::all();
+foreach ($beaches as $beach) {
+    echo $beach->owner->name;  // N+1 query!
+}
+
+// Do this
+$beaches = Beach::with('owner')->get();
+foreach ($beaches as $beach) {
+    echo $beach->owner->name;  // Already loaded
+}
+```
+
+### Adding a new endpoint
+
+1. Create migration if needed
+2. Create controller method
+3. Add route
+4. Write tests
+5. Document in README
+
+Example:
+```php
+// routes/api.php
+Route::get('/beaches/{beach}', [BeachController::class, 'show']);
+
+// app/Http/Controllers/BeachController.php
+public function show(Beach $beach): JsonResponse
+{
+    return response()->json($beach);
+}
+
+// tests/Feature/BeachTest.php
+public function test_can_view_beach()
+{
+    $beach = Beach::factory()->create();
+    $response = $this->getJson("/api/beaches/{$beach->id}");
+    $response->assertStatus(200);
+}
+```
+
+## Deployment
+
+See `deployment/` folder for Docker setup.
+
+Quick start:
+```bash
+docker-compose -f deployment/docker-compose.yml up -d
+docker exec Rentella_app php artisan migrate --force
+```
+
+## That's it
+
+Read the code. It's well-documented. Questions? Check tests - they show usage patterns.
