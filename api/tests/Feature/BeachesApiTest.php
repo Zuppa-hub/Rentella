@@ -156,20 +156,27 @@ class BeachesApiTest extends TestCase
     {
         $this->actAsAuthenticatedUser();
         
-        $beach = Beach::firstOrCreate(
-            ['name' => 'Beach to Update'],
-            [
-                'owner_id' => Owner::firstOrCreate(['name' => 'Owner', 'surname' => 'Test'], ['email' => 'owner@test.com', 'adress' => 'Via Test', 'phone_number' => '1234567890'])->id,
-                'location_id' => CityLocation::firstOrCreate(['city_name' => 'City'], ['latitude' => 0.0, 'longitude' => 0.0, 'description' => 'City'])->id,
-                'opening_date_id' => OpeningDate::firstOrCreate(['start_date' => '2024-01-01', 'end_date' => '2024-12-31'])->id,
-                'description' => 'Test beach description',
-                'special_note' => 'Test special note',
-                'latitude' => 45.5,
-                'longitude' => 12.5,
-                'allowed_animals' => false,
-                'type_id' => BeachType::firstOrCreate(['type' => 'Rocky'])->id,
-            ]
-        );
+        // Create owner with same email as authenticated user
+        $owner = Owner::create([
+            'name' => 'Update Owner ' . time(),
+            'surname' => 'Test',
+            'email' => $this->testUser->email,
+            'adress' => 'Via Test',
+            'phone_number' => '1234567890'
+        ]);
+        
+        $beach = Beach::create([
+            'name' => 'Update Beach ' . time(),
+            'owner_id' => $owner->id,
+            'location_id' => CityLocation::firstOrCreate(['city_name' => 'City'], ['latitude' => 0.0, 'longitude' => 0.0, 'description' => 'City'])->id,
+            'opening_date_id' => OpeningDate::firstOrCreate(['start_date' => '2024-01-01', 'end_date' => '2024-12-31'])->id,
+            'description' => 'Test beach description',
+            'special_note' => 'Test special note',
+            'latitude' => 45.5,
+            'longitude' => 12.5,
+            'allowed_animals' => false,
+            'type_id' => BeachType::firstOrCreate(['type' => 'Rocky'])->id,
+        ]);
 
         $updateData = [
             'name' => 'Updated Beach Name',
@@ -191,8 +198,14 @@ class BeachesApiTest extends TestCase
     {
         $this->actAsAuthenticatedUser();
         
+        // Create owner with same email as authenticated user
+        $owner = Owner::firstOrCreate(
+            ['name' => 'Owner', 'surname' => 'Delete'],
+            ['email' => $this->testUser->email, 'adress' => 'Via Test', 'phone_number' => '1234567890']
+        );
+        
         $beach = Beach::create([
-            'owner_id' => Owner::firstOrCreate(['name' => 'Owner', 'surname' => 'Test'], ['email' => 'owner@test.com', 'adress' => 'Via Test', 'phone_number' => '1234567890'])->id,
+            'owner_id' => $owner->id,
             'location_id' => CityLocation::firstOrCreate(['city_name' => 'City'], ['latitude' => 0.0, 'longitude' => 0.0, 'description' => 'City'])->id,
             'opening_date_id' => OpeningDate::firstOrCreate(['start_date' => '2024-01-01', 'end_date' => '2024-12-31'])->id,
             'name' => 'Beach to Delete',

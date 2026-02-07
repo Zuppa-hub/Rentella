@@ -71,14 +71,38 @@ class BeachController extends Controller
 
     public function update(UpdateBeachRequest $request, $id)
     {
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
         $beach = Beach::findOrFail($id);
+        
+        // Check if the authenticated user is the beach owner
+        $owner = $beach->owner;
+        if (!$owner || $owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden: You can only edit beaches you own'], 403);
+        }
+        
         $beach->update($request->validated());
         return response()->json($beach->load(['owner', 'location', 'openingDate', 'beachType']), 200);
     }
 
     public function destroy($id)
     {
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
         $beach = Beach::findOrFail($id);
+        
+        // Check if the authenticated user is the beach owner
+        $owner = $beach->owner;
+        if (!$owner || $owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden: You can only delete beaches you own'], 403);
+        }
+        
         $beach->delete();
         return response()->json(null, 204);
     }

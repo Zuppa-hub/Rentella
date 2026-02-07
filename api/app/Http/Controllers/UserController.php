@@ -41,7 +41,12 @@ class UserController extends Controller
     public function index()
     {
         try {
-            return response()->json(User::all());
+            // Return only the authenticated user's profile
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+            return response()->json($user);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -62,8 +67,17 @@ class UserController extends Controller
     public function show($uuid)
     {
         try {
+            $authUser = auth()->user();
+            if (!$authUser) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+            
+            // Users can only view their own profile
+            if ($authUser->uuid !== $uuid) {
+                return response()->json(['error' => 'Forbidden: You can only view your own profile'], 403);
+            }
+            
             $user = User::where('uuid', $uuid)->first();
-
             if ($user) {
                 return response()->json($user);
             } else {
@@ -112,9 +126,19 @@ class UserController extends Controller
     public function update(UserRequest $request, $id)
     {
         try {
-            $accessToken = $this->getKeycloakAccessToken();
+            $authUser = auth()->user();
+            if (!$authUser) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+            
             $user = User::findOrFail($id);
-            // Rest of the code for updating the user
+            
+            // Users can only update their own profile
+            if ($authUser->id !== $user->id) {
+                return response()->json(['error' => 'Forbidden: You can only update your own profile'], 403);
+            }
+            
+            $accessToken = $this->getKeycloakAccessToken();
             $updateUserUri = $this->config->get('app.keycloak.keycloak_user_update_url');
             // call keycloak server to update user 
             $response = Http::withHeaders([
@@ -139,9 +163,19 @@ class UserController extends Controller
     public function destroy($id)
     {
         try {
-            // delete user from database and from keycloak server
+            $authUser = auth()->user();
+            if (!$authUser) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+            
             // get user for database 
             $user = User::findOrFail($id);
+            
+            // Users can only delete their own account
+            if ($authUser->id !== $user->id) {
+                return response()->json(['error' => 'Forbidden: You can only delete your own account'], 403);
+            }
+            
             // get keycloak token 
             $accessToken = $this->getKeycloakAccessToken();
 

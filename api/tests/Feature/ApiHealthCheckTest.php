@@ -114,7 +114,9 @@ class ApiHealthCheckTest extends TestCase
         
         $response = $this->getJson('/api/users');
         $response->assertStatus(200);
-        $response->assertJsonIsArray();
+        // GET /api/users now returns only the authenticated user (not array)
+        $data = $response->json();
+        $this->assertEquals($this->testUser->email, $data['email']);
     }
 
     public function test_orders_endpoint(): void
