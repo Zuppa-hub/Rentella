@@ -8,7 +8,7 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
@@ -28,7 +28,7 @@
 
 **Rentella** is a secure beach service rental API where beach owners manage umbrella rentals and users browse/book services by location.
 
-### What's Working ✅
+### What's Working
 - Secure authentication (Keycloak)
 - Ownership-based access control
 - User data isolation (orders, profiles)
@@ -37,12 +37,12 @@
 - RESTful API for mobile/web clients
 
 ### Key Features
-- 🏖️ Beach browsing by location
-- ☂️ Umbrella inventory management
-- 🔐 Secure owner-only beach operations
-- 👥 User profiles with isolation
-- 💳 Order tracking (user-specific)
-- 🗺️ Geolocation support
+- Beach browsing by location
+- Umbrella inventory management
+- Secure owner-only beach operations
+- User profiles with isolation
+- Order tracking (user-specific)
+- Geolocation support
 
 ---
 
@@ -231,7 +231,7 @@ rentella/
 
 ## Features
 
-### Core Features ✅
+### Core Features
 - [x] Beach listing and search
 - [x] Geolocation-based beach discovery
 - [x] Beach detail pages with pictures
@@ -241,14 +241,14 @@ rentella/
 - [x] Order history
 - [x] Mobile-responsive design
 
-### In Progress 🔄
+### In Progress
 - [ ] Order placement system
 - [ ] Payment integration
 - [ ] Owner dashboard
 - [ ] Advanced filtering
 - [ ] Reviews and ratings
 
-### Planned 📋
+### Planned
 - [ ] Real-time availability
 - [ ] Calendar booking system
 - [ ] Seasonal pricing automation
@@ -327,7 +327,7 @@ docker-compose logs -f app
 
 ## Current Status
 
-### ✅ Phase 1 Complete: Security Hardening
+### Phase 1 Complete: Security Hardening
 - 40+ tests passing (all feature tests green)
 - **Ownership validation** implemented for beach operations (pictures, zones, umbrellas, prices, dates)
 - **Admin-only endpoints** restricted (owners, locations, beach types)
@@ -338,14 +338,14 @@ docker-compose logs -f app
 ### Code Quality Overview
 | Area | Score | Status |
 |------|-------|--------|
-| **Backend API** | 8/10 | ✅ Secure, tested |
-| **Security** | 9/10 | ✅ Auth, ownership checks |
-| **Frontend** | 4/10 | 🔄 Needs refactor (Phase 2) |
-| **Tests** | 10/10 | ✅ 40 tests passing |
+| **Backend API** | 8/10 | Secure, tested |
+| **Security** | 9/10 | Auth, ownership checks |
+| **Frontend** | 4/10 | Needs refactor (Phase 2) |
+| **Tests** | 10/10 | 40 tests passing |
 
 ### Improvement Roadmap
 
-**Phase 1 - Security** ✅ DONE
+**Phase 1 - Security** DONE
 - Input validation & auth
 - Ownership & admin checks
 - Comprehensive test suite
@@ -407,10 +407,10 @@ User → Keycloak → JWT Token → API (Bearer Auth)
 
 ## Support & Issues
 
-- 📖 Check [DEVELOPMENT.md](./DEVELOPMENT.md) for common tasks
-- 🐛 Found a bug? Open an issue with reproduction steps
-- 💡 Have a feature idea? Start a discussion
-- ❓ Need help? Check existing issues or contact maintainers
+- Check [DEVELOPMENT.md](./DEVELOPMENT.md) for common tasks
+- Found a bug? Open an issue with reproduction steps
+- Have a feature idea? Start a discussion
+- Need help? Check existing issues or contact maintainers
 
 ---
 
@@ -422,7 +422,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
-### v0.1.0 - Phase 1: Security ✅
+### v0.1.0 - Phase 1: Security
 - Ownership validation for beach operations
 - Admin-only endpoints (owners, locations, beach types)
 - User isolation enforced (orders, profiles)
@@ -453,6 +453,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Happy coding! 🚀**
+**Happy coding!**
 
 For questions or suggestions, open an issue or reach out to the maintainers.
