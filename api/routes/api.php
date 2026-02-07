@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BeachController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\BeachPictureController;
 use App\Http\Controllers\BeachTypeController;
 use App\Http\Controllers\BeachZonesController;
@@ -113,4 +114,5 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'umbrellas'], function () 
     Route::delete('/{id}', [UmbrellasController::class, 'destroy'])->name('umbrellas.destroy');
 });
 //unprotected enpoints 
+Route::get('/health', [HealthController::class, 'index'])->name('health');
 Route::post('/users', [UserController::class, 'store'])->name('users.store');

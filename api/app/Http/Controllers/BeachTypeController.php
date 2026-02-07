@@ -22,12 +22,30 @@ class BeachTypeController extends Controller
 
     public function store(BeachTypeRequest $request)
     {
-        return response()->json(BeachType::create($request->all()), 201);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $admins = config('app.admin_emails', []);
+        if (!in_array($authUser->email, $admins)) {
+            return response()->json(['error' => 'Forbidden: Admin only'], 403);
+        }
+        return response()->json(BeachType::create($request->validated()), 201);
     }
 
     public function update(BeachTypeRequest $request, $id)
     {
-        return response()->json(BeachType::findOrFail($id)->update($request->all()), 200);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $admins = config('app.admin_emails', []);
+        if (!in_array($authUser->email, $admins)) {
+            return response()->json(['error' => 'Forbidden: Admin only'], 403);
+        }
+        $type = BeachType::findOrFail($id);
+        $type->update($request->validated());
+        return response()->json($type, 200);
     }
 
     public function destroy($id)

@@ -25,11 +25,31 @@ class OpeningDatesController extends Controller
     
     public function update(OpeningDateRequest $request, $id)
     {
-        return response()->json( OpeningDate::findOrfail($id)->update($request->all()), 200);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $openingDate = OpeningDate::findOrFail($id);
+        $beach = $openingDate->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        $openingDate->update($request->validated());
+        return response()->json($openingDate, 200);
     }
     
     public function destroy($id)
     {   
-        return response()->json(OpeningDate::findOrFail($id)->delete(),200);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $openingDate = OpeningDate::findOrFail($id);
+        $beach = $openingDate->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        $openingDate->delete();
+        return response()->json(null, 204);
     }
 }

@@ -1,15 +1,19 @@
-// apiService.ts
+/**
+ * @deprecated Use services/api.ts instead. This file is kept for backwards compatibility.
+ * All new code should use the new API client with axios interceptors.
+ */
 import KeyCloakService from "./KeycloakService";
+
 /**
  * The `apiHelper` function is an async function that makes an API request with the specified URL and
  * method, including an authorization token in the headers, and returns the response as JSON if it is
  * successful, otherwise it throws an error.
+ * 
+ * @deprecated Use services/api.ts - apiGet, apiPost, etc. instead
+ * 
  * @param {string} url - The `url` parameter is a string that represents the URL of the API endpoint
- * that you want to make a request to. It should include the protocol (e.g., "http://" or "https://")
- * and the domain name or IP address.
- * @param {string} method - The `method` parameter in the `apiHelper` function is a string that
- * represents the HTTP method to be used in the API request. It can be one of the following values:
- * @returns a Promise that resolves to any type of value.
+ * @param {string} method - The HTTP method to be used
+ * @returns a Promise that resolves to any type of value
  */
 export async function apiHelper(url: string, method: string): Promise<any> {
     const token = KeyCloakService.GetAccesToken();
@@ -31,23 +35,50 @@ export async function apiHelper(url: string, method: string): Promise<any> {
         throw error;
     }
 }
-// The `Geolocate` method is using the browser's geolocation API to retrieve the user's current
-// latitude and longitude coordinates. It checks if the `navigator.geolocation` object is
-// available and then calls the `getCurrentPosition` method to get the user's position. Once
-// the position is obtained, the latitude and longitude values are stored in the component's
-// `myLatitude` and `myLongitude` data properties.
+
+/**
+ * The `Geolocate` method is using the browser's geolocation API to retrieve the user's current
+ * latitude and longitude coordinates.
+ * 
+ * @returns Promise with latitude and longitude
+ */
 export async function Geolocate(): Promise<{ latitude: number; longitude: number }> {
     return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const coordinates = {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                    };
-                    resolve(coordinates);
-                },
-                (error) => {
+        if (!navigator.geolocation) {
+            reject(new Error('Geolocation is not supported by this browser'));
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const coordinates = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                };
+                resolve(coordinates);
+            },
+            (error) => {
+                let errorMessage = 'Unknown geolocation error';
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = 'Geolocation permission denied';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = 'Geolocation position unavailable';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = 'Geolocation request timeout';
+                        break;
+                }
+                reject(new Error(errorMessage));
+            },
+            {
+                timeout: 10000,
+                enableHighAccuracy: true,
+            }
+        );
+    });
+}
                     reject(error);
                 }
             );

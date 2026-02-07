@@ -21,16 +21,47 @@ class UmbrellasController extends Controller
 
     public function store(UmbrellaRequest $request)
     {
-        return response()->json(Umbrella::create($request->all()), 201);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $zone = \App\Models\BeachZone::findOrFail($request->input('beach_zone_id'));
+        $beach = $zone->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        return response()->json(Umbrella::create($request->validated()), 201);
     }
 
     public function update(UmbrellaRequest $request, $id)
     {
-        return response()->json( Umbrella::findOrFail($id)->update($request->all()), 200);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $umbrella = Umbrella::findOrFail($id);
+        $zone = $umbrella->zone;
+        $beach = $zone->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        $umbrella->update($request->validated());
+        return response()->json($umbrella, 200);
     }
 
     public function destroy($id)
     {
-        return response()->json(Umbrella::findOrfail($id)->delete());
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $umbrella = Umbrella::findOrFail($id);
+        $zone = $umbrella->zone;
+        $beach = $zone->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        $umbrella->delete();
+        return response()->json(null, 204);
     }
 }

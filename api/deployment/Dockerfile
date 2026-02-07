@@ -1,5 +1,11 @@
-FROM php:8.1.0-apache
+FROM php:8.2-apache
 WORKDIR /var/www/html
+
+# Set DocumentRoot to Laravel's public directory
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
 # Mod Rewrite
 RUN a2enmod rewrite
 # Linux Library

@@ -8,7 +8,12 @@ class OwnerRequest extends FormRequest
 {
     public function authorize()
     {
-        return true;
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return false;
+        }
+        $admins = config('app.admin_emails', []);
+        return in_array($authUser->email, $admins);
     }
 
     public function rules()

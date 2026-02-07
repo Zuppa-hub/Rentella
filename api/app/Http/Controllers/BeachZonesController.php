@@ -25,25 +25,44 @@ class BeachZonesController extends Controller
 
     public function store(BeachZoneRequest $request)
     {
-        return response()->json(
-            BeachZone::create($request->all()),
-            201
-        );
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $beach = \App\Models\Beach::findOrFail($request->input('beach_id'));
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        return response()->json(BeachZone::create($request->validated()), 201);
     }
 
     public function update(BeachZoneRequest $request, $id)
     {
-        return response()->json(
-            BeachZone::findOrFail($id)->update($request->all()),
-            200
-        );
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $zone = BeachZone::findOrFail($id);
+        $beach = $zone->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        $zone->update($request->validated());
+        return response()->json($zone, 200);
     }
 
     public function destroy($id)
     {
-        return response()->json(
-            BeachZone::findOrFail($id)->delete(),
-            200
-        );
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $zone = BeachZone::findOrFail($id);
+        $beach = $zone->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        $zone->delete();
+        return response()->json(null, 204);
     }
 }
