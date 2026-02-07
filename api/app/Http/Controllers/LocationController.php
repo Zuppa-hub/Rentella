@@ -80,17 +80,42 @@ class LocationController extends Controller
     }
     public function store(LocationRequest $request)
     {
-        return response()->json(CityLocation::create($request->all()), 201);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $admins = config('app.admin_emails', []);
+        if (!in_array($authUser->email, $admins)) {
+            return response()->json(['error' => 'Forbidden: Admin only'], 403);
+        }
+        return response()->json(CityLocation::create($request->validated()), 201);
     }
     public function update(LocationRequest $request, $id)
     {
-        return response()->json(CityLocation::findOrFail($id)->update($request->all()), 200);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $admins = config('app.admin_emails', []);
+        if (!in_array($authUser->email, $admins)) {
+            return response()->json(['error' => 'Forbidden: Admin only'], 403);
+        }
+        $location = CityLocation::findOrFail($id);
+        $location->update($request->validated());
+        return response()->json($location, 200);
     }
     public function destroy($id)
     {
-        return response()->json(
-            CityLocation::findOrFail($id)->delete(),
-            200
-        );
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $admins = config('app.admin_emails', []);
+        if (!in_array($authUser->email, $admins)) {
+            return response()->json(['error' => 'Forbidden: Admin only'], 403);
+        }
+        $location = CityLocation::findOrFail($id);
+        $location->delete();
+        return response()->json(null, 204);
     }
 }

@@ -20,16 +20,42 @@ class BeachPictureController extends Controller
     }
     public function store(BeachPictureRequest $request)
     {
-        return response()->json(BeachPicture::create($request->all()), 201);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $beach = \App\Models\Beach::findOrFail($request->input('beach_id'));
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden: not beach owner'], 403);
+        }
+        return response()->json(BeachPicture::create($request->validated()), 201);
     }
     public function update(BeachPictureRequest $request, $id)
     {
-        BeachPicture::findOrFail($id)->update($request->all());
-        return response()->json(BeachPicture::findOrFail($id), 200);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $picture = BeachPicture::findOrFail($id);
+        $beach = $picture->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden: not beach owner'], 403);
+        }
+        $picture->update($request->validated());
+        return response()->json($picture, 200);
     }
     public function destroy($id)
     {
-        BeachPicture::findOrFail($id)->delete();
-        return response()->json($id);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $picture = BeachPicture::findOrFail($id);
+        $beach = $picture->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden: not beach owner'], 403);
+        }
+        $picture->delete();
+        return response()->json(null, 204);
     }
 }

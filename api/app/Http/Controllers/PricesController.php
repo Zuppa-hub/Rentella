@@ -29,7 +29,18 @@ class PricesController extends Controller
 
     public function update(PriceRequest $request, $id)
     {
-        return response()->json(Price::findOrFail($id)->update($request->all()), 200);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $price = Price::findOrFail($id);
+        $zone = $price->zone;
+        $beach = $zone->beach;
+        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        $price->update($request->validated());
+        return response()->json($price, 200);
     }
 
     public function destroy($id)
