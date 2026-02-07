@@ -23,6 +23,7 @@ class BeachesApiTest extends TestCase
             ['email' => 'test@rentella.com'],
             [
                 'name' => 'Test User',
+                'surname' => 'Test',
                 'email' => 'test@rentella.com',
                 'password' => bcrypt('test123'),
                 'uuid' => \Illuminate\Support\Str::uuid()->toString(),
@@ -57,7 +58,7 @@ class BeachesApiTest extends TestCase
         
         $response = $this->getJson('/api/beaches');
         $response->assertStatus(200);
-        $response->assertIsArray();
+        $response->assertJsonIsArray();
     }
 
     /**
@@ -67,10 +68,16 @@ class BeachesApiTest extends TestCase
     {
         $this->actAsAuthenticatedUser();
         
-        $owner = Owner::firstOrCreate(['name' => 'Test Owner', 'fiscal_code' => 'OWNERRR11111111']);
-        $location = CityLocation::firstOrCreate(['city_name' => 'Test City', 'country' => 'Italy']);
-        $openingDate = OpeningDate::firstOrCreate(['opening_date' => '2024-01-01', 'closing_date' => '2024-12-31']);
-        $beachType = BeachType::firstOrCreate(['type_name' => 'Sandy']);
+        $owner = Owner::firstOrCreate(
+            ['name' => 'Test Owner', 'surname' => 'Test'],
+            ['email' => 'test.owner@test.com', 'adress' => 'Via Test 1', 'phone_number' => '1234567890']
+        );
+        $location = CityLocation::firstOrCreate(
+            ['city_name' => 'Test City'],
+            ['latitude' => 0.0, 'longitude' => 0.0, 'description' => 'Test City']
+        );
+        $openingDate = OpeningDate::firstOrCreate(['start_date' => '2024-01-01', 'end_date' => '2024-12-31']);
+        $beachType = BeachType::firstOrCreate(['type' => 'Sandy']);
 
         $beachData = [
             'owner_id' => $owner->id,
@@ -123,13 +130,15 @@ class BeachesApiTest extends TestCase
         $beach = Beach::firstOrCreate(
             ['name' => 'Existing Beach'],
             [
-                'owner_id' => Owner::firstOrCreate(['name' => 'Owner', 'fiscal_code' => 'OWNER11111111'])->id,
-                'location_id' => CityLocation::firstOrCreate(['city_name' => 'City', 'country' => 'Italy'])->id,
-                'opening_date_id' => OpeningDate::firstOrCreate(['opening_date' => '2024-01-01', 'closing_date' => '2024-12-31'])->id,
+                'owner_id' => Owner::firstOrCreate(['name' => 'Owner', 'surname' => 'Test'], ['email' => 'owner@test.com', 'adress' => 'Via Test', 'phone_number' => '1234567890'])->id,
+                'location_id' => CityLocation::firstOrCreate(['city_name' => 'City'], ['latitude' => 0.0, 'longitude' => 0.0, 'description' => 'City'])->id,
+                'opening_date_id' => OpeningDate::firstOrCreate(['start_date' => '2024-01-01', 'end_date' => '2024-12-31'])->id,
+                'description' => 'Test beach description',
+                'special_note' => 'Test special note',
                 'latitude' => 45.5,
                 'longitude' => 12.5,
                 'allowed_animals' => false,
-                'type_id' => BeachType::firstOrCreate(['type_name' => 'Rocky'])->id,
+                'type_id' => BeachType::firstOrCreate(['type' => 'Rocky'])->id,
             ]
         );
 
@@ -150,13 +159,15 @@ class BeachesApiTest extends TestCase
         $beach = Beach::firstOrCreate(
             ['name' => 'Beach to Update'],
             [
-                'owner_id' => Owner::firstOrCreate(['name' => 'Owner', 'fiscal_code' => 'OWNER11111111'])->id,
-                'location_id' => CityLocation::firstOrCreate(['city_name' => 'City', 'country' => 'Italy'])->id,
-                'opening_date_id' => OpeningDate::firstOrCreate(['opening_date' => '2024-01-01', 'closing_date' => '2024-12-31'])->id,
+                'owner_id' => Owner::firstOrCreate(['name' => 'Owner', 'surname' => 'Test'], ['email' => 'owner@test.com', 'adress' => 'Via Test', 'phone_number' => '1234567890'])->id,
+                'location_id' => CityLocation::firstOrCreate(['city_name' => 'City'], ['latitude' => 0.0, 'longitude' => 0.0, 'description' => 'City'])->id,
+                'opening_date_id' => OpeningDate::firstOrCreate(['start_date' => '2024-01-01', 'end_date' => '2024-12-31'])->id,
+                'description' => 'Test beach description',
+                'special_note' => 'Test special note',
                 'latitude' => 45.5,
                 'longitude' => 12.5,
                 'allowed_animals' => false,
-                'type_id' => BeachType::firstOrCreate(['type_name' => 'Rocky'])->id,
+                'type_id' => BeachType::firstOrCreate(['type' => 'Rocky'])->id,
             ]
         );
 
@@ -181,14 +192,16 @@ class BeachesApiTest extends TestCase
         $this->actAsAuthenticatedUser();
         
         $beach = Beach::create([
-            'owner_id' => Owner::firstOrCreate(['name' => 'Owner', 'fiscal_code' => 'OWNER11111111'])->id,
-            'location_id' => CityLocation::firstOrCreate(['city_name' => 'City', 'country' => 'Italy'])->id,
-            'opening_date_id' => OpeningDate::firstOrCreate(['opening_date' => '2024-01-01', 'closing_date' => '2024-12-31'])->id,
+            'owner_id' => Owner::firstOrCreate(['name' => 'Owner', 'surname' => 'Test'], ['email' => 'owner@test.com', 'adress' => 'Via Test', 'phone_number' => '1234567890'])->id,
+            'location_id' => CityLocation::firstOrCreate(['city_name' => 'City'], ['latitude' => 0.0, 'longitude' => 0.0, 'description' => 'City'])->id,
+            'opening_date_id' => OpeningDate::firstOrCreate(['start_date' => '2024-01-01', 'end_date' => '2024-12-31'])->id,
             'name' => 'Beach to Delete',
+            'description' => 'Test beach description',
+            'special_note' => 'Test special note',
             'latitude' => 45.5,
             'longitude' => 12.5,
             'allowed_animals' => false,
-            'type_id' => BeachType::firstOrCreate(['type_name' => 'Rocky'])->id,
+            'type_id' => BeachType::firstOrCreate(['type' => 'Rocky'])->id,
         ]);
 
         $response = $this->deleteJson("/api/beaches/{$beach->id}");

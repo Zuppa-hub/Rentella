@@ -22,7 +22,7 @@ class UpdateBeachRequest extends FormRequest
         return [
             'owner_id' => 'sometimes|required|integer|exists:owners,id',
             'name' => 'sometimes|required|string|min:3|max:255',
-            'location_id' => 'sometimes|required|integer|exists:city_locations,id',
+            'location_id' => 'sometimes|required|integer|exists:cities_location,id',
             'description' => 'nullable|string|max:1000',
             'opening_date_id' => 'sometimes|required|integer|exists:opening_dates,id',
             'special_note' => 'nullable|string|max:500',
