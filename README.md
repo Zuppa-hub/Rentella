@@ -2,7 +2,7 @@
 
 > An Airbnb-like platform for renting beach umbrellas and ancillary services, built with Laravel, Vue 3, and Docker.
 
-![Version](https://img.shields.io/badge/version-0.0.0-blue)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
 ![Status](https://img.shields.io/badge/status-In%20Development-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
