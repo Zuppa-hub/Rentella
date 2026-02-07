@@ -197,4 +197,12 @@ return [
         'get_token_realm_uri' => env('KEYCLOAK_GET_TOKEN_OF_REALM_URI'),
         'keycloak_user_update_url' => env('KEYCLOAK_USER_UPDATE_URL'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Emails
+    |--------------------------------------------------------------------------
+    | List of email addresses that have admin access to specific endpoints
+    */
+    'admin_emails' => explode(',', env('ADMIN_EMAILS', 'admin@rentella.com')),
 ];

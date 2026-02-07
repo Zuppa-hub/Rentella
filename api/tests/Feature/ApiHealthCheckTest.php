@@ -14,6 +14,7 @@ use App\Models\Owner;
 class ApiHealthCheckTest extends TestCase
 {
     private ?User $testUser = null;
+    private ?User $adminUser = null;
 
     protected function setUp(): void
     {
@@ -29,6 +30,18 @@ class ApiHealthCheckTest extends TestCase
                 'uuid' => \Illuminate\Support\Str::uuid()->toString(),
             ]
         );
+        
+        // Create admin user for admin-only endpoints
+        $this->adminUser = User::firstOrCreate(
+            ['email' => 'admin@rentella.com'],
+            [
+                'name' => 'Admin',
+                'surname' => 'User',
+                'email' => 'admin@rentella.com',
+                'password' => bcrypt('admin123'),
+                'uuid' => \Illuminate\Support\Str::uuid()->toString(),
+            ]
+        );
     }
 
     private function actAsAuthenticatedUser(): void
@@ -38,7 +51,7 @@ class ApiHealthCheckTest extends TestCase
 
     public function test_beach_types_endpoint(): void
     {
-        $this->actAsAuthenticatedUser();
+        $this->actingAs($this->adminUser, 'api');
         
         // Create a sample beach type
         BeachType::firstOrCreate(['type' => 'Sandy']);
@@ -50,7 +63,7 @@ class ApiHealthCheckTest extends TestCase
 
     public function test_locations_endpoint(): void
     {
-        $this->actAsAuthenticatedUser();
+        $this->actingAs($this->adminUser, 'api');
         
         // Create a sample location
         CityLocation::firstOrCreate(
@@ -95,7 +108,7 @@ class ApiHealthCheckTest extends TestCase
 
     public function test_owners_endpoint(): void
     {
-        $this->actAsAuthenticatedUser();
+        $this->actingAs($this->adminUser, 'api');
         
         // Create a sample owner
         Owner::firstOrCreate(
