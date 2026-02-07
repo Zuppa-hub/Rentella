@@ -1,62 +1,62 @@
 <template>
-    <body class="h-screen ">
-        <TopBar />
-        <div class="flex md:flex-row flex-col map-container">
-            <div class=" md:hidden flex-1 h-2/5 -ml-8 z-0">
-                <Map :apiData="beachData" />
-            </div>
-            <Sidebar :apiData="beachData" :title="cityName" :subtitle="'Number of beaches:'" :componentType="'beachCard'"
-                :searchBarTitle="'beaches'" :-modal-content-component="''" />
-            <div class="hidden md:block md:h-4/5 md:w-4/5 md:bg-cover md:bg-center md:-ml-8 z-0">
-                <Map :apiData="beachData" />
-            </div>
+  <div class="flex flex-col h-screen">
+    <TopBar />
+    <div class="flex flex-1 flex-col md:flex-row overflow-hidden">
+      <div class="md:hidden flex-none h-2/5 -ml-8 z-0">
+        <Map v-if="beaches.length" :locations="beaches" />
+        <div v-else class="flex items-center justify-center h-full bg-gray-100">
+          <span class="text-gray-500">No beaches found</span>
         </div>
-        <NavBar />
-    </body>
+      </div>
+      <Sidebar
+        :locations="beaches"
+        :loading="loading"
+        :total-count="beaches.length"
+        @select="handleBeachSelect"
+      />
+      <div class="hidden md:block flex-1 bg-gray-100 -ml-8 z-0">
+        <Map v-if="beaches.length" :locations="beaches" />
+        <div v-else class="flex items-center justify-center h-full">
+          <span class="text-gray-500">No beaches found</span>
+        </div>
+      </div>
+    </div>
+    <NavBar />
+  </div>
 </template>
 
-<script lang="ts">
-import TopBar from '../components/TopBar.vue';
-import NavBar from '../components/NavBar.vue';
-import Map from '../components/Map.vue';
-import Sidebar from '../components/Sidebar.vue';
-import { apiHelper } from '../apiService';
-import Modal from '../components/Modal.vue';
-export default {
-    name: "BeachSelection",
-    components: {
-        TopBar,
-        NavBar,
-        Modal,
-        Map,
-        Sidebar,
-    },
-    data() {
-        return {
-            beachData: [],
-            beachId: this.$route.params.id,
-            cityName: this.$route.query.cityName.toString() ?? "",
-            distance: this.$route.query.distance,
-            toggleModal: false, // Imposta questa variabile su true per aprire la modal
-            beachSpecificDataForMap: [],
-        };
-    },
-    methods: {
-        manageModal() {
-            this.toggleModal = !this.toggleModal; // Chiude la modal impostando la variabile su false
-        },
-        async fetchData() {
-            const apiUrl = `http://localhost:9000/public/api/beaches?cityId=${this.beachId}`;
-            try {
-                this.beachData = await apiHelper(apiUrl, "GET");
-            } catch (error) {
-                console.error(error);
-            }
-        },
-    },
-    created() {
-        this.fetchData();
-    },
+<script setup lang="ts">
+import { onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useBeachStore } from '@/stores/useBeachStore'
+import TopBar from '@/components/TopBar.vue'
+import NavBar from '@/components/NavBar.vue'
+import Map from '@/components/Map.vue'
+import Sidebar from '@/components/Sidebar.vue'
+
+const beachStore = useBeachStore()
+const route = useRoute()
+
+const locationId = computed(() => Number(route.params.id))
+const beaches = computed(() => beachStore.beaches)
+const loading = computed(() => beachStore.loading)
+
+onMounted(async () => {
+  if (locationId.value) {
+    await beachStore.searchBeaches(`location:${locationId.value}`)
+  }
+})
+
+function handleBeachSelect(beachId: number) {
+  console.log('Selected beach:', beachId)
 }
+</script>
+
+<style scoped>
+.map-container {
+  flex: 1;
+  overflow: hidden;
+}
+</style>
 
 </script>

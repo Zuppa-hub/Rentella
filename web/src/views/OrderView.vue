@@ -1,82 +1,65 @@
 <template>
-    <body class="h-screen">
-        <TopBar />
-        <div class="md:flex h-full map-container ">
-            <div class="hidden md:block md:flex-auto md:basis-1/4 h-full">
-                <leftPagePanel :title="'Orders'" :total="OrderData.length"
-                    :bottomButtonTitle="'Looking for Previous Orders?'" :bottomButtonText="'History'"
-                    :favouriteBeach="favourite.name" :favouriteLocation="FavouriteCity" />
-            </div>
-            <div class="md:basis-3/4 h-full">
-                <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'"
-                    :roundedCornerFlag="true" :searchBarTitle="'orders'" :ModalContentComponent="'OrderModalDetail'" />
-            </div>
+  <div class="h-screen flex flex-col">
+    <TopBar />
+    <div class="flex flex-1 overflow-hidden">
+      <div class="hidden md:flex md:w-1/4 flex-col border-r border-gray-200">
+        <div class="p-4 border-b border-gray-200">
+          <h2 class="text-xl font-bold">Your Orders</h2>
+          <p class="text-sm text-gray-500">{{ activeOrders.length }} active</p>
         </div>
-        <NavBar />
-    </body>
+        <div v-if="favoriteBeach" class="p-4 border-b border-gray-200">
+          <p class="text-sm text-gray-500">Favorite Location</p>
+          <p class="font-semibold">{{ favoriteBeach }}</p>
+        </div>
+      </div>
+      <div class="flex-1 w-full md:w-3/4">
+        <Sidebar
+          :locations="orders"
+          :loading="loading"
+          :total-count="orders.length"
+          title="Your Orders"
+          @select="handleOrderSelect"
+        />
+      </div>
+    </div>
+    <NavBar />
+  </div>
 </template>
-<script lang="ts">
-import KeyCloakService from "../KeycloakService";
-import TopBar from '../components/TopBar.vue';
-import Sidebar from '../components/Sidebar.vue';
-import { apiHelper, findMostFrequentElement } from '../apiService';
-import Modal from '../components/Modal.vue';
-import NavBar from "../components/NavBar.vue";
-import leftPagePanel from "../components/leftPagePanel.vue";
-// The `interface UserData` is defining the structure of an object that represents user data. It
-// specifies that the object should have a property called `id` of type `number`. This interface is
-// used to ensure that the `UserData` object has the required properties and types when it is used in
-// the component.
-interface UserData {
-    id: number;
-}
-export default {
-    name: "Order",
-    components: {
-        Sidebar,
-        TopBar,
-        Modal,
-        NavBar,
-        leftPagePanel,
-    },
-    data() {
-        return {
-            OrderData: [],
-            // The line `UserData: {} as UserData` is initializing the `UserData` property as an empty object and
-            // asserting its type to be `UserData`. This is done to ensure that the `UserData` object has the
-            // required properties and types specified in the `UserData` interface.
-            UserData: {} as UserData,
-            token: "",
-            title: "List of orders",
-            subtitle: "Number of orders: ",
-            favourite: [],
-            FavouriteCity: "",
-        };
-    },
-    methods: {
-        async fetchUserId() {
-            const uid = KeyCloakService.GetUid();
-            const apiUrl = `http://localhost:9000/public/api/users/${uid}`;
-            try {
-                this.UserData = await apiHelper(apiUrl, "GET");
-                this.fetchOrderData(this.UserData.id);
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        async fetchOrderData(userId: Number) {
-            const apiUrl = `http://localhost:9000/public/api/orders?userId=${userId}&active=true`;
-            try {
-                this.OrderData = await apiHelper(apiUrl, "GET");
-                this.favourite = findMostFrequentElement(this.OrderData);
-                this.FavouriteCity = this.favourite.orders.umbrella.beachzone.beach.location.city_name;
-            } catch (error) {
-                console.error(error);
-            }
-        },
-    },
-    created() {
-        this.fetchUserId();
-    },
+
+<script setup lang="ts">
+import { onMounted, computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useOrderStore } from '@/stores/useOrderStore'
+import TopBar from '@/components/TopBar.vue'
+import NavBar from '@/components/NavBar.vue'
+import Sidebar from '@/components/Sidebar.vue'
+
+const orderStore = useOrderStore()
+const router = useRouter()
+const favoriteBeach = ref<string | null>(null)
+
+const orders = computed(() => orderStore.orders)
+const activeOrders = computed(() => orderStore.activeOrders)
+const loading = computed(() => orderStore.loading)
+
+onMounted(async () => {
+  await orderStore.fetchOrders()
+  if (activeOrders.value.length > 0) {
+    favoriteBeach.value = 'Most Visited Location'
+  }
+})
+
+function handleOrderSelect(orderId: number) {
+  router.push({
+    name: 'OrderDetail',
+    params: { id: orderId },
+  })
 }
 </script>
+
+<style scoped>
+.map-container {
+  flex: 1;
+  overflow: hidden;
+}
+</style>

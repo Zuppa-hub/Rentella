@@ -1,73 +1,56 @@
 <template>
-    <body class="h-screen">
-        <TopBar />
-        <div class="md:flex h-full map-container">
-            <div class="hidden md:block md:flex-auto md:basis-1/4 h-full">
-                <leftPagePanel :title="'Orders history'" :total="OrderData.length"
-                    :bottomButtonTitle="'Looking for Previous Orders?'" :bottomButtonText="'History'" />
-            </div>
-            <div class="md:basis-3/4 h-full">
-                <Sidebar :apiData="OrderData" :title="title" :subtitle="subtitle" :componentType="'OrderCard'"
-                    :roundedCornerFlag="true" :searchBarTitle="'in the history of orders'"
-                    :ModalContentComponent="'OrderModalDetail'" />
-            </div>
+  <div class="h-screen flex flex-col">
+    <TopBar />
+    <div class="flex flex-1 overflow-hidden">
+      <div class="hidden md:flex md:w-1/4 flex-col border-r border-gray-200">
+        <div class="p-4">
+          <h2 class="text-xl font-bold">Order History</h2>
+          <p class="text-sm text-gray-500">{{ orders.length }} total orders</p>
         </div>
-        <NavBar />
-    </body>
+      </div>
+      <div class="flex-1 w-full md:w-3/4">
+        <Sidebar
+          :locations="orders"
+          :loading="loading"
+          :total-count="orders.length"
+          title="Your Order History"
+          @select="handleOrderSelect"
+        />
+      </div>
+    </div>
+    <NavBar />
+  </div>
 </template>
-<script lang="ts">
-import KeyCloakService from "../KeycloakService";
-import TopBar from '../components/TopBar.vue';
-import Sidebar from '../components/Sidebar.vue';
-import { apiHelper } from '../apiService';
-import NavBar from "../components/NavBar.vue";
-import leftPagePanel from "../components/leftPagePanel.vue";
-// The `interface UserData` is defining the structure of an object that represents user data. It
-// specifies that the object should have a property called `id` of type `number`. This interface is
-// used to ensure that the `UserData` object has the required properties and types when it is used in
-// the component.
-interface UserData {
-    id: number;
-}
-export default {
-    name: "History",
-    components: {
-        Sidebar,
-        TopBar,
-        NavBar,
-        leftPagePanel,
-    },
-    data() {
-        return {
-            OrderData: [],
-            UserData: {} as UserData,
-            token: "",
-            title: "History of orders",
-            subtitle: "Number of orders: ",
-        };
-    },
-    methods: {
-        async fetchUserId() {
-            const uid = KeyCloakService.GetUid();
-            const apiUrl = `http://localhost:9000/public/api/users/${uid}`;
-            try {
-                this.UserData = await apiHelper(apiUrl, "GET");
-                this.fetchOrderData(this.UserData.id);
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        async fetchOrderData(userId: Number) {
-            const apiUrl = `http://localhost:9000/public/api/orders?userId=${userId}`;
-            try {
-                this.OrderData = await apiHelper(apiUrl, "GET");
-            } catch (error) {
-                console.error(error);
-            }
-        },
-    },
-    created() {
-        this.fetchUserId();
-    },
+
+<script setup lang="ts">
+import { onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useOrderStore } from '@/stores/useOrderStore'
+import TopBar from '@/components/TopBar.vue'
+import NavBar from '@/components/NavBar.vue'
+import Sidebar from '@/components/Sidebar.vue'
+
+const orderStore = useOrderStore()
+const router = useRouter()
+
+const orders = computed(() => orderStore.orders)
+const loading = computed(() => orderStore.loading)
+
+onMounted(async () => {
+  await orderStore.fetchOrders()
+})
+
+function handleOrderSelect(orderId: number) {
+  router.push({
+    name: 'OrderDetail',
+    params: { id: orderId },
+  })
 }
 </script>
+
+<style scoped>
+.map-container {
+  flex: 1;
+  overflow: hidden;
+}
+</style>
