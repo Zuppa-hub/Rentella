@@ -24,7 +24,12 @@ class PricesController extends Controller
 
     public function store(PriceRequest $request)
     {
-        return response()->json(Price::create($request->all()), 201);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return response()->json(Price::create($request->validated()), 201);
     }
 
     public function update(PriceRequest $request, $id)
@@ -34,10 +39,12 @@ class PricesController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $price = Price::findOrFail($id);
-        $zone = $price->zone;
-        $beach = $zone->beach;
-        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
-            return response()->json(['error' => 'Forbidden'], 403);
+        $zone = $price->zones()->first();
+        if ($zone) {
+            $beach = $zone->beach;
+            if (!$beach || !$beach->owner || $beach->owner->email !== $authUser->email) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
         }
         $price->update($request->validated());
         return response()->json($price, 200);
@@ -45,6 +52,21 @@ class PricesController extends Controller
 
     public function destroy($id)
     {
-        return response()->json(Price::findOrFail($id)->delete());
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $price = Price::findOrFail($id);
+        $zone = $price->zones()->first();
+        if ($zone) {
+            $beach = $zone->beach;
+            if (!$beach || !$beach->owner || $beach->owner->email !== $authUser->email) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
+        }
+
+        $price->delete();
+        return response()->json(null, 204);
     }
 }

@@ -14,11 +14,11 @@ class OrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'umbrella_id' => 'required|numeric',
+            'umbrella_id' => 'required|exists:umbrellas,id',
             'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'user_id' => 'required|numeric',
-            'price_id' => 'required|numeric',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'user_id' => 'nullable|exists:users,id',
+            'price_id' => 'required|exists:prices,id',
         ];
     }
 }

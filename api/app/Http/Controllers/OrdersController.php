@@ -17,13 +17,16 @@ class OrdersController extends Controller
         
         $result = [];
         $now = now();
-        $active = boolval($request->input('active'));
+        $active = null;
+        if ($request->has('active')) {
+            $active = filter_var($request->input('active'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        }
         
         // Always filter by authenticated user's ID
         $orders = Order::with(['price', 'umbrella', 'umbrella.beachzone.beach', 'umbrella.beachzone.beach.location'])
             ->where('user_id', $authUser->id);
 
-        if ($request->has('active')) {
+        if ($request->has('active') && $active !== null) {
             if ($active === true) {
                 // active orders
                 $orders->where('end_date', '>', $now);
@@ -62,16 +65,49 @@ class OrdersController extends Controller
 
     public function store(OrderRequest $request)
     {
-        return response()->json(Order::create($request->all()), 201);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $data = $request->validated();
+        $data['user_id'] = $authUser->id;
+
+        return response()->json(Order::create($data), 201);
     }
 
     public function update(OrderRequest $request, $id)
     {
-        return response()->json(Order::findOrFail($id)->update($request->all()), 200);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $order = Order::findOrFail($id);
+        if ($authUser->id !== $order->user_id) {
+            return response()->json(['error' => 'Forbidden: You can only update your own orders'], 403);
+        }
+
+        $data = $request->validated();
+        $data['user_id'] = $authUser->id;
+
+        $order->update($data);
+        return response()->json($order, 200);
     }
 
     public function destroy($id)
     {
-        return response()->json(Order::findOrFail($id)->delete());
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $order = Order::findOrFail($id);
+        if ($authUser->id !== $order->user_id) {
+            return response()->json(['error' => 'Forbidden: You can only delete your own orders'], 403);
+        }
+
+        $order->delete();
+        return response()->json(null, 204);
     }
 }
