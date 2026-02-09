@@ -9,6 +9,7 @@ use App\Models\Owner;
 use App\Models\CityLocation;
 use App\Models\OpeningDate;
 use App\Models\BeachType;
+use Illuminate\Support\Str;
 
 class SecurityAuditTest extends TestCase
 {
@@ -39,6 +40,16 @@ class SecurityAuditTest extends TestCase
                 'uuid' => \Illuminate\Support\Str::uuid()->toString(),
             ]
         );
+
+        if (!$this->user1->uuid) {
+            $this->user1->uuid = Str::uuid()->toString();
+            $this->user1->save();
+        }
+
+        if (!$this->user2->uuid) {
+            $this->user2->uuid = Str::uuid()->toString();
+            $this->user2->save();
+        }
         
         // Create a beach owned by user1
         $owner1 = Owner::firstOrCreate(

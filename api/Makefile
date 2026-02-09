@@ -13,7 +13,7 @@ up:
 	docker-compose -f ./deployment/docker-compose.yml up -d
 
 composer-update:
-	docker exec Rentella_app bash -c "../composer update"
+	docker exec Rentella_app bash -c "composer update"
 
 data: 
 	docker exec Rentella_app bash -c "php artisan migrate"

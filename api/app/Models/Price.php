@@ -9,4 +9,9 @@ class Price extends Model
 {
     use HasFactory;
     protected $fillable = ['price'];
+
+    public function zones()
+    {
+        return $this->hasMany(BeachZone::class, 'price_id');
+    }
 }

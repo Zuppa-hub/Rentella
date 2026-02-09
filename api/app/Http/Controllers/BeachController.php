@@ -14,7 +14,7 @@ class BeachController extends Controller
     {
         $beachesQuery = Beach::query();
 
-        foreach ($request->all() as $param => $value) {
+        foreach ($request->validated() as $param => $value) {
             switch ($param) {
                 case 'cityId':
                     $beachesQuery->where('location_id', $value);
@@ -65,6 +65,16 @@ class BeachController extends Controller
 
     public function store(StoreBeachRequest $request)
     {
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $owner = \App\Models\Owner::findOrFail($request->input('owner_id'));
+        if ($owner->email !== $authUser->email) {
+            return response()->json(['error' => 'Forbidden: You can only create beaches you own'], 403);
+        }
+
         $beach = Beach::create($request->validated());
         return response()->json($beach->load(['owner', 'location', 'openingDate', 'beachType']), 201);
     }

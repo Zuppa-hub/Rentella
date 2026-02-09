@@ -20,7 +20,7 @@ class BeachFilterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cityId' => 'nullable|integer|exists:city_locations,id',
+            'cityId' => 'nullable|integer|exists:cities_location,id',
             'allowed_animals' => 'nullable|in:yes,no',
             'minPrice' => 'nullable|numeric|min:0',
             'maxPrice' => 'nullable|numeric|min:0|gte:minPrice',

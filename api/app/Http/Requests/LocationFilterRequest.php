@@ -18,9 +18,9 @@ class LocationFilterRequest extends FormRequest
     {
         return [
             'minLatitude' => 'numeric',
-            'maxLatitude' => 'numeric',  'gt:minLatitude',
+            'maxLatitude' => 'numeric|gt:minLatitude',
             'minLongitude' => 'numeric',
-            'maxLongitude' => 'numeric', 'gt:minLongitude',
+            'maxLongitude' => 'numeric|gt:minLongitude',
             'myLatitude' => 'numeric',
             'myLongitude' => 'numeric',
         ];

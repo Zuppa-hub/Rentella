@@ -65,11 +65,15 @@ class LocationController extends Controller
         $earthRadius = 6371;
 
         // difference bethween the two points and conversion from degrees to radians 
-        $latDiff = deg2rad($lat2) - deg2rad($lat1);
-        $lonDiff = deg2rad($lon2) - deg2rad($lon1);
+        $lat1Rad = deg2rad($lat1);
+        $lat2Rad = deg2rad($lat2);
+        $lon1Rad = deg2rad($lon1);
+        $lon2Rad = deg2rad($lon2);
+        $latDiff = $lat2Rad - $lat1Rad;
+        $lonDiff = $lon2Rad - $lon1Rad;
 
         // distance using the Heversine formula 
-        $a = sin($latDiff / 2) ** 2 + cos($lat1) * cos($lat2) * sin($lonDiff / 2) ** 2;
+        $a = sin($latDiff / 2) ** 2 + cos($lat1Rad) * cos($lat2Rad) * sin($lonDiff / 2) ** 2;
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
         return number_format($earthRadius * $c, 2); //formatted distance using 2 decimal numbers
     }

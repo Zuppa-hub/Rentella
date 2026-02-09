@@ -68,9 +68,9 @@ class BeachesApiTest extends TestCase
     {
         $this->actAsAuthenticatedUser();
         
-        $owner = Owner::firstOrCreate(
-            ['name' => 'Test Owner', 'surname' => 'Test'],
-            ['email' => 'test.owner@test.com', 'adress' => 'Via Test 1', 'phone_number' => '1234567890']
+        $owner = Owner::updateOrCreate(
+            ['email' => $this->testUser->email],
+            ['name' => 'Test Owner', 'surname' => 'Test', 'adress' => 'Via Test 1', 'phone_number' => '1234567890']
         );
         $location = CityLocation::firstOrCreate(
             ['city_name' => 'Test City'],

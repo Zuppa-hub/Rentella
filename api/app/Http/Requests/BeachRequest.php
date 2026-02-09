@@ -22,7 +22,7 @@ class BeachRequest extends FormRequest
         return [
             'owner_id' => 'required|integer|exists:owners,id',
             'name' => 'required|string|min:3|max:255',
-            'location_id' => 'required|integer|exists:city_locations,id',
+            'location_id' => 'required|integer|exists:cities_location,id',
             'description' => 'nullable|string|max:1000',
             'opening_date_id' => 'required|integer|exists:opening_dates,id',
             'special_note' => 'nullable|string|max:500',

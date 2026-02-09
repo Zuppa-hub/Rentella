@@ -19,7 +19,7 @@ class BeachZonesController extends Controller
     public function show($id)
     {
         return response()->json(
-            BeachZone::findOfFail($id)
+            BeachZone::findOrFail($id)
         );
     }
 

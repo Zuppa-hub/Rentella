@@ -25,6 +25,14 @@ class OwnersController extends Controller
 
     public function show($id)
     {
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $admins = config('app.admin_emails', []);
+        if (!in_array($authUser->email, $admins)) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
         return response()->json(Owner::findOrFail($id));
     }
 
