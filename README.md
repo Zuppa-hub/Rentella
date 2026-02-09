@@ -2,7 +2,9 @@
 
 Rentella is a beach umbrella rental platform. Think Airbnb for umbrellas: beach owners list availability, users search by location and book.
 
-## Highlights
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Status](https://img.shields.io/badge/status-In%20Development-yellow)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 - Role-based access: admin, owners, users
 - Secure API with Keycloak (OAuth2)
