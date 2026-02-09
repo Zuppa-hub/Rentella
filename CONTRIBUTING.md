@@ -6,8 +6,8 @@ Want to help? Great! Here's how.
 
 - Fork the repository
 - Clone your fork locally
-- Set up the dev environment (see [DEVELOPMENT.md](./DEVELOPMENT.md))
-- Make sure tests pass: `make test`
+- Set up the dev environment (see the main README)
+- Make sure tests pass: `docker exec Rentella_app php artisan test tests/Feature/`
 
 ## Making changes
 
@@ -192,7 +192,7 @@ ADMIN_EMAILS=yourname@example.com,another@example.com
 
 Then restart:
 ```bash
-make down && make up
+make -C api stop && make -C api up
 ```
 
 ## Need help?

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Http\Requests\UserRequest;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 
 
 /* The `class UserController extends Controller` is defining a PHP class called `UserController` that
@@ -64,7 +65,7 @@ class UserController extends Controller
      * response with a status code of 404. If an exception occurs during the execution of the function,
      * it will be caught and handled by the `handleException` method.
      */
-    public function show($uuid)
+    public function show($identifier)
     {
         try {
             $authUser = auth()->user();
@@ -73,11 +74,20 @@ class UserController extends Controller
             }
             
             // Users can only view their own profile
-            if ($authUser->uuid !== $uuid) {
-                return response()->json(['error' => 'Forbidden: You can only view your own profile'], 403);
+            $isNumericId = ctype_digit((string) $identifier);
+            if ($isNumericId) {
+                if ($authUser->id !== (int) $identifier) {
+                    return response()->json(['error' => 'Forbidden: You can only view your own profile'], 403);
+                }
+            } else {
+                if ($authUser->uuid !== $identifier) {
+                    return response()->json(['error' => 'Forbidden: You can only view your own profile'], 403);
+                }
             }
             
-            $user = User::where('uuid', $uuid)->first();
+            $user = $isNumericId
+                ? User::find($identifier)
+                : User::where('uuid', $identifier)->first();
             if ($user) {
                 return response()->json($user);
             } else {
@@ -115,6 +125,7 @@ class UserController extends Controller
                 'name' => $request->input('firstName'),
                 'surname' => $request->input('lastName'),
                 'uuid' => $uuid,
+                'password' => bcrypt(Str::random(32)),
             ]);
             return response()->json(['message' => 'User data saved successfully', 'data' => User::findOrFail($user->id)], 201);
         } catch (\Exception $e) {

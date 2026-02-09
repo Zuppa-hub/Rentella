@@ -20,7 +20,12 @@ class OpeningDatesController extends Controller
     
     public function store(OpeningDateRequest $request)
     {
-        return response()->json(OpeningDate::create($request->all()), 201);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return response()->json(OpeningDate::create($request->validated()), 201);
     }
     
     public function update(OpeningDateRequest $request, $id)
@@ -30,8 +35,8 @@ class OpeningDatesController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $openingDate = OpeningDate::findOrFail($id);
-        $beach = $openingDate->beach;
-        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+        $beach = $openingDate->beaches()->first();
+        if ($beach && (!$beach->owner || $beach->owner->email !== $authUser->email)) {
             return response()->json(['error' => 'Forbidden'], 403);
         }
         $openingDate->update($request->validated());
@@ -45,8 +50,8 @@ class OpeningDatesController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $openingDate = OpeningDate::findOrFail($id);
-        $beach = $openingDate->beach;
-        if (!$beach->owner || $beach->owner->email !== $authUser->email) {
+        $beach = $openingDate->beaches()->first();
+        if ($beach && (!$beach->owner || $beach->owner->email !== $authUser->email)) {
             return response()->json(['error' => 'Forbidden'], 403);
         }
         $openingDate->delete();

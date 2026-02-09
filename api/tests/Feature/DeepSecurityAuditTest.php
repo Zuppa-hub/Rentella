@@ -20,6 +20,7 @@ class DeepSecurityAuditTest extends TestCase
             'name' => 'Owner',
             'surname' => 'One',
             'uuid' => 'uuid-owner-1',
+            'password' => bcrypt('test123'),
         ]);
 
         $this->user2 = User::create([
@@ -27,6 +28,7 @@ class DeepSecurityAuditTest extends TestCase
             'name' => 'Attacker',
             'surname' => 'User',
             'uuid' => 'uuid-attacker-1',
+            'password' => bcrypt('test123'),
         ]);
     }
 

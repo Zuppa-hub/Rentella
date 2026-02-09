@@ -25,7 +25,7 @@ class UmbrellasController extends Controller
         if (!$authUser) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        $zone = \App\Models\BeachZone::findOrFail($request->input('beach_zone_id'));
+        $zone = \App\Models\BeachZone::findOrFail($request->input('zone_id'));
         $beach = $zone->beach;
         if (!$beach->owner || $beach->owner->email !== $authUser->email) {
             return response()->json(['error' => 'Forbidden'], 403);
@@ -40,7 +40,7 @@ class UmbrellasController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $umbrella = Umbrella::findOrFail($id);
-        $zone = $umbrella->zone;
+        $zone = $umbrella->beachzone;
         $beach = $zone->beach;
         if (!$beach->owner || $beach->owner->email !== $authUser->email) {
             return response()->json(['error' => 'Forbidden'], 403);
@@ -56,7 +56,7 @@ class UmbrellasController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $umbrella = Umbrella::findOrFail($id);
-        $zone = $umbrella->zone;
+        $zone = $umbrella->beachzone;
         $beach = $zone->beach;
         if (!$beach->owner || $beach->owner->email !== $authUser->email) {
             return response()->json(['error' => 'Forbidden'], 403);

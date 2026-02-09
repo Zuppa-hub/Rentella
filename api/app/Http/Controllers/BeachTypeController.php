@@ -50,7 +50,16 @@ class BeachTypeController extends Controller
 
     public function destroy($id)
     {
-        $beachType = BeachType::findOrFail($id)->delete();
-        return response()->json($id);
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $admins = config('app.admin_emails', []);
+        if (!in_array($authUser->email, $admins)) {
+            return response()->json(['error' => 'Forbidden: Admin only'], 403);
+        }
+
+        BeachType::findOrFail($id)->delete();
+        return response()->json(null, 204);
     }
 }
