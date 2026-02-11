@@ -7,5 +7,5 @@ initKeycloak()
     console.error('Keycloak init failed', error)
   })
   .finally(() => {
-    createApp(App).mount('#app')
+    return createApp(App).mount('#app')
   })
