@@ -19,9 +19,10 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 
-    'allowed_origins' => [
-        env('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://localhost:3000'),
-    ],
+    'allowed_origins' => array_filter(array_map(
+        'trim',
+        explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://localhost:3000'))
+    )),
 
     'allowed_origins_patterns' => [],
 

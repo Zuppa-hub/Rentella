@@ -20,19 +20,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { getUser, isAuthenticated, login, logout, updateToken } from './keycloak'
 import TopBar from './components/TopBar.vue'
 import MapSection, { type MapLocation } from './components/MapSection.vue'
 import BottomSheet from './components/BottomSheet.vue'
 import BottomNav from './components/BottomNav.vue'
 import type { LocationItem } from './components/LocationCard.vue'
+import { getBeaches, type Beach } from './services/api'
 
 const authenticated = ref(false)
 const error = ref<string | null>(null)
 const user = ref<Record<string, unknown> | undefined>(undefined)
 const searchTerm = ref('')
 const isSheetCollapsed = ref(false)
+const isLoadingBeaches = ref(false)
 let refreshTimer: number | undefined
 
 const locations = ref<(LocationItem & MapLocation)[]>([
@@ -107,15 +109,52 @@ const handleLogout = async () => {
   }
 }
 
+const loadBeaches = async () => {
+  if (!isAuthenticated()) return
+  
+  isLoadingBeaches.value = true
+  error.value = null
+  
+  try {
+    const beaches = await getBeaches()
+    if (Array.isArray(beaches) && beaches.length > 0) {
+      locations.value = beaches
+        .map((beach: any) => ({
+          id: beach.id,
+          name: beach.name || `Beach ${beach.id}`,
+          distance: 23,
+          priceRange: beach.min_price && beach.max_price 
+            ? `${beach.min_price}-${beach.max_price}EUR` 
+            : 'N/A',
+          lat: beach.latitude,
+          lng: beach.longitude,
+        }))
+        .filter((loc) => loc.lat && loc.lng) // Filter out invalid locations
+    }
+  } catch (err) {
+    console.warn('Failed to load beaches from API, using defaults', err)
+    // Keep default beaches if API fails
+  } finally {
+    isLoadingBeaches.value = false
+  }
+}
+
 onMounted(() => {
   syncState()
   if (isAuthenticated()) {
     startTokenRefresh()
+    loadBeaches()
   }
 })
 
 onBeforeUnmount(() => {
   stopTokenRefresh()
+})
+
+watch(authenticated, (isAuth) => {
+  if (isAuth) {
+    loadBeaches()
+  }
 })
 </script>
 
