@@ -34,16 +34,9 @@ const error = ref<string | null>(null)
 const user = ref<Record<string, unknown> | undefined>(undefined)
 const searchTerm = ref('')
 const isSheetCollapsed = ref(false)
-const isLoadingBeaches = ref(false)
 let refreshTimer: number | undefined
 
-const locations = ref<(LocationItem & MapLocation)[]>([
-  { id: 1, name: 'Rimini', distance: 23, priceRange: '37-92EUR', lat: 44.0678, lng: 12.5695 },
-  { id: 2, name: 'Pesaro', distance: 23, priceRange: '37-92EUR', lat: 43.9102, lng: 12.9139 },
-  { id: 3, name: 'Fano', distance: 23, priceRange: '37-92EUR', lat: 43.843, lng: 13.0172 },
-  { id: 4, name: 'Senigallia', distance: 23, priceRange: '37-92EUR', lat: 43.7167, lng: 13.2167 },
-  { id: 5, name: 'Cattolica', distance: 23, priceRange: '37-92EUR', lat: 43.9628, lng: 12.7362 },
-])
+const locations = ref<(LocationItem & MapLocation)[]>([])
 
 const filteredLocations = computed(() => {
   if (!searchTerm.value) return locations.value
@@ -112,30 +105,25 @@ const handleLogout = async () => {
 const loadBeaches = async () => {
   if (!isAuthenticated()) return
   
-  isLoadingBeaches.value = true
   error.value = null
   
   try {
     const beaches = await getBeaches()
-    if (Array.isArray(beaches) && beaches.length > 0) {
-      locations.value = beaches
-        .map((beach: any) => ({
-          id: beach.id,
-          name: beach.name || `Beach ${beach.id}`,
-          distance: 23,
-          priceRange: beach.min_price && beach.max_price 
-            ? `${beach.min_price}-${beach.max_price}EUR` 
-            : 'N/A',
-          lat: beach.latitude,
-          lng: beach.longitude,
-        }))
-        .filter((loc) => loc.lat && loc.lng) // Filter out invalid locations
-    }
+    locations.value = (beaches || [])
+      .map((beach: any) => ({
+        id: beach.id,
+        name: beach.name,
+        distance: 23,
+        priceRange: beach.min_price && beach.max_price 
+          ? `${beach.min_price}-${beach.max_price}EUR` 
+          : 'N/A',
+        lat: beach.latitude,
+        lng: beach.longitude,
+      }))
+      .filter((loc) => loc.lat && loc.lng)
   } catch (err) {
-    console.warn('Failed to load beaches from API, using defaults', err)
-    // Keep default beaches if API fails
-  } finally {
-    isLoadingBeaches.value = false
+    console.error('Failed to load beaches:', err)
+    error.value = 'Failed to load beaches'
   }
 }
 
@@ -151,10 +139,9 @@ onBeforeUnmount(() => {
   stopTokenRefresh()
 })
 
+// Auto-load beaches when user authenticates
 watch(authenticated, (isAuth) => {
-  if (isAuth) {
-    loadBeaches()
-  }
+  if (isAuth) loadBeaches()
 })
 </script>
 
