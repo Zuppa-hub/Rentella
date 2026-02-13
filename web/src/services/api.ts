@@ -1,169 +1,117 @@
-/// <reference types="../../vite-env.d.ts" />
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios'
-import KeyCloakService from '../KeycloakService'
+import { getToken } from '../keycloak'
 
-/**
- * API Response interface
- */
-export interface ApiResponse<T = any> {
+const API_BASE_URL = 'http://localhost:9000/api'
+
+export interface ApiResponse<T> {
   data: T
-  status: number
-  statusText?: string
+  message?: string
 }
 
-/**
- * API Error interface
- */
-export interface ApiError {
-  message: string
-  status?: number
-  data?: any
+export interface Beach {
+  id: number
+  name: string
+  latitude: number
+  longitude: number
+  allowed_animals: boolean
+  owner_id: number
+  location_id: number
+  opening_date_id: number
+  type_id: number
+  city_location?: {
+    id: number
+    name: string
+    latitude: number
+    longitude: number
+  }
+  prices?: Array<{
+    id: number
+    price: number
+    umbrella_count: number
+  }>
 }
 
-/**
- * Create and configure axios instance
- */
-const createApiClient = (): AxiosInstance => {
-  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:9000'
-  const apiPrefix = import.meta.env.VITE_API_PREFIX || '/api'
+interface FetchOptions extends RequestInit {
+  authenticated?: boolean
+}
 
-  const instance = axios.create({
-    baseURL: `${baseURL}${apiPrefix}`,
-    timeout: 30000,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+async function fetchApi<T>(
+  endpoint: string,
+  options: FetchOptions = {}
+): Promise<T> {
+  const { authenticated = true, ...fetchOptions } = options
+
+  const url = `${API_BASE_URL}${endpoint}`
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(fetchOptions.headers as Record<string, string>),
+  }
+
+  if (authenticated) {
+    const token = getToken()
+    if (!token) {
+      throw new Error('No authentication token available')
+    }
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  const response = await fetch(url, {
+    ...fetchOptions,
+    headers,
   })
 
-  // Request interceptor - Add auth token
-  instance.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-      const token = KeyCloakService.GetAccesToken()
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-      return config
-    },
-    (error: AxiosError) => {
-      console.error('Request interceptor error:', error)
-      return Promise.reject(error)
-    }
-  )
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`API Error: ${response.status} - ${error}`)
+  }
 
-  // Response interceptor - Handle errors
-  instance.interceptors.response.use(
-    (response: any) => response,
-    (error: AxiosError) => {
-      // Handle 401 - Unauthorized (token expired)
-      if (error.response?.status === 401) {
-        console.warn('Authentication expired, redirecting to login')
-        KeyCloakService.CallLogOut()
-        // Could navigate to login here if needed
-        return Promise.reject({
-          message: 'Authentication expired. Please login again.',
-          status: 401,
-          data: error.response?.data,
-        } as ApiError)
-      }
-
-      // Handle 403 - Forbidden
-      if (error.response?.status === 403) {
-        return Promise.reject({
-          message: 'You do not have permission to access this resource',
-          status: 403,
-          data: error.response?.data,
-        } as ApiError)
-      }
-
-      // Handle 404 - Not Found
-      if (error.response?.status === 404) {
-        return Promise.reject({
-          message: 'Resource not found',
-          status: 404,
-          data: error.response?.data,
-        } as ApiError)
-      }
-
-      // Handle 422 - Validation errors
-      if (error.response?.status === 422) {
-        return Promise.reject({
-          message: 'Validation failed',
-          status: 422,
-          data: error.response?.data,
-        } as ApiError)
-      }
-
-      // Handle 500+ - Server errors
-      if (error.response?.status && error.response.status >= 500) {
-        return Promise.reject({
-          message: 'Server error. Please try again later.',
-          status: error.response.status,
-          data: error.response?.data,
-        } as ApiError)
-      }
-
-      // Handle network errors
-      if (!error.response) {
-        return Promise.reject({
-          message: 'Network error. Please check your connection.',
-          data: error,
-        } as ApiError)
-      }
-
-      return Promise.reject({
-        message: error.message || 'An error occurred',
-        status: error.response?.status,
-        data: error.response?.data,
-      } as ApiError)
-    }
-  )
-
-  return instance
+  return response.json()
 }
 
-/**
- * API Client instance
- */
-export const apiClient = createApiClient()
-
-/**
- * Generic GET request
- */
-export const apiGet = async <T = any>(url: string, params?: any): Promise<T> => {
-  const response = await apiClient.get<T>(url, { params })
-  return response.data
+// Location endpoints
+export async function getLocations() {
+  return fetchApi<Beach[]>('/locations')
 }
 
-/**
- * Generic POST request
- */
-export const apiPost = async <T = any>(url: string, data?: any): Promise<T> => {
-  const response = await apiClient.post<T>(url, data)
-  return response.data
+// Beach endpoints
+export async function getBeaches(filters?: { cityId?: number; allowed_animals?: string }) {
+  const params = new URLSearchParams()
+  if (filters?.cityId) params.append('cityId', String(filters.cityId))
+  if (filters?.allowed_animals) params.append('allowed_animals', filters.allowed_animals)
+
+  const query = params.toString() ? `?${params.toString()}` : ''
+  const response = await fetchApi<Beach[]>(`/beaches${query}`)
+  return response
 }
 
-/**
- * Generic PUT request
- */
-export const apiPut = async <T = any>(url: string, data?: any): Promise<T> => {
-  const response = await apiClient.put<T>(url, data)
-  return response.data
+export async function getBeachesByLocationId(locationId: number) {
+  return fetchApi<Beach[]>(`/beaches?cityId=${locationId}`)
 }
 
-/**
- * Generic DELETE request
- */
-export const apiDelete = async <T = any>(url: string): Promise<T> => {
-  const response = await apiClient.delete<T>(url)
-  return response.data
+export async function getBeach(id: number) {
+  return fetchApi<Beach>(`/beaches/${id}`)
 }
 
-/**
- * Generic PATCH request
- */
-export const apiPatch = async <T = any>(url: string, data?: any): Promise<T> => {
-  const response = await apiClient.patch<T>(url, data)
-  return response.data
+export async function createBeach(beach: Omit<Beach, 'id'>) {
+  return fetchApi<Beach>('/beaches', {
+    method: 'POST',
+    body: JSON.stringify(beach),
+  })
 }
 
-export default apiClient
+export async function updateBeach(id: number, beach: Partial<Beach>) {
+  return fetchApi<Beach>(`/beaches/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(beach),
+  })
+}
+
+export async function deleteBeach(id: number) {
+  return fetchApi<void>(`/beaches/${id}`, {
+    method: 'DELETE',
+  })
+}
+
+// Health check
+export async function healthCheck() {
+  return fetchApi('/health', { authenticated: false })
+}

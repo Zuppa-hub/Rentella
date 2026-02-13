@@ -26,6 +26,7 @@ class BeachController extends Controller
             }
         }
 
+        // Load beaches with their zones and prices
         $beaches = $beachesQuery->with([
             'zones.prices',
             'zones' => function ($query) {
@@ -33,26 +34,27 @@ class BeachController extends Controller
             },
         ])->get();
 
-        $results = $beaches->transform(function ($beach) {
+        // Transform to include min/max prices for display
+        $results = $beaches->map(function ($beach) {
             $minPrice = $beach->zones->pluck('prices.price')->flatten()->min();
             $maxPrice = $beach->zones->pluck('prices.price')->flatten()->max();
 
-            $beach->allowed_animals = ($beach->allowed_animals == 1) ? 'yes' : 'no';
-
             return [
-                'beach' => $beach,
-                'beach_min_price' => $minPrice,
-                'beach_max_price' => $maxPrice,
+                'id' => $beach->id,
+                'name' => $beach->name,
+                'latitude' => (float) $beach->latitude,
+                'longitude' => (float) $beach->longitude,
+                'description' => $beach->description,
+                'allowed_animals' => $beach->allowed_animals == 1 ? 'yes' : 'no',
+                'type_id' => $beach->type_id,
+                'location_id' => $beach->location_id,
+                'owner_id' => $beach->owner_id,
+                'min_price' => $minPrice,
+                'max_price' => $maxPrice,
                 'total_umbrellas' => $beach->zones->sum('umbrellas_count'),
             ];
         });
 
-        // Rimove umbrellas relation to avoid umbrellas list 
-        $results->transform(function ($result) {
-            return $result;
-        });
-
-        // Restituisce le spiagge filtrate
         return response()->json($results);
     }
 

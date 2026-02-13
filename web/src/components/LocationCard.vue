@@ -1,51 +1,110 @@
 <template>
-    <a
-        class="flex items-center justify-center p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 content-center">
-        <!-- Titolo a sinistra -->
-        <div class="flex-1 "> <!-- Aggiunto "items-center" per allineamento verticale -->
-            <div class="flex items-baseline">
-                <div class="w-10 h-10 mr-2 bg-white rounded-full flex items-center justify-center">
-                    <span class="text-black text-xl font-semibold">{{ index }}</span>
-                </div>
-                <p class="mb-2 text-l font-bold tracking-tight text-gray-900 dark:text-white">{{
-                    item.name }}</p>
-            </div>
-        </div>
-        <div class="flex-1 "> <!-- Aggiunto "items-center" per allineamento verticale -->
-            <div class="flex justify-center items-center">
-                <svg height="16" width="24" class="bg-MoneyIcon stroke-black" style="background-repeat: no-repeat;"></svg>
-                <p class="flex font-normal text-gray-700 dark:text-gray-400">{{ item.min_price }} - {{
-                    item.max_price }}</p>
-            </div>
-        </div>
-        <!-- Km a destra -->
-        <div class="flex-1"> <!-- Aggiunto "items-center" per allineamento verticale -->
-            <div class="flex justify-center items-center">
-                <svg height="16" width="24" class="bg-DistanceIcon" style="background-repeat: no-repeat;"></svg>
-                <p class="text-right font-normal text-gray-700 dark:text-gray-400">{{ item.distance }}.</p>
-            </div>
-        </div>
-        <div class="flex-none"> <!-- Aggiunto "items-center" per allineamento verticale -->
-            <svg height="24" width="24" class="fill-black bg-ArrowIcon dark:bg-ArrowIconDark "
-                style="background-repeat: no-repeat;"></svg>
-        </div>
-    </a>
+  <button class="card" @click="handleClick" type="button">
+    <div class="badge">{{ index }}</div>
+    <div class="card-body">
+      <h3>{{ location.name }}</h3>
+      <div class="meta">
+        <span>{{ location.distance }} km</span>
+        <span>{{ location.priceRange }}</span>
+      </div>
+    </div>
+  </button>
 </template>
-<script lang="ts">
-export default {
-    name: "LocationCard",
-    props: {
-        item: {
-            type: Object,
-            required: true,
-        },
-        index: {
-            type: Number,
-            required: true,
-        }
-    },
-    methods: {
-    }
+
+<script setup lang="ts">
+import iconDistance from '../assets/icons/Distance.svg'
+import iconMoney from '../assets/icons/Money.svg'
+
+export type LocationItem = {
+  id: number
+  name: string
+  distance: number
+  priceRange: string
+  lat: number
+  lng: number
 }
 
+const props = defineProps<{ location: LocationItem; index: number }>()
+const emit = defineEmits<{
+  click: []
+}>()
+
+const handleClick = () => {
+  emit('click')
+}
 </script>
+
+<style scoped>
+.card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+  min-height: 72px;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+}
+
+.card:hover {
+  border-color: #005f6f;
+  box-shadow: 0 8px 24px rgba(0, 95, 111, 0.12);
+}
+
+.card:active {
+  border-color: #005f6f;
+}
+
+.badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #0b0b0b;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  flex-shrink: 0;
+}
+
+.card-body h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.meta {
+  margin-top: 6px;
+  display: flex;
+  gap: 16px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta img {
+  width: 14px;
+  height: 14px;
+}
+
+.chevron {
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+}
+</style>

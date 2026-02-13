@@ -1,5 +1,12 @@
 /// <reference types="vite/client" />
-declare module "@vue-leaflet/vue-leaflet" {
-    import { LMap, LTileLayer, LMarker, LPopup,LControlZoom} from "@vue-leaflet/vue-leaflet";
-    export { LMap, LTileLayer,LMarker, LPopup,LControlZoom};
+
+interface ImportMetaEnv {
+  readonly VITE_KEYCLOAK_URL: string
+  readonly VITE_KEYCLOAK_REALM: string
+  readonly VITE_KEYCLOAK_CLIENT_ID: string
+  readonly VITE_KEYCLOAK_REDIRECT_URI?: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
 }

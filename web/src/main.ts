@@ -1,21 +1,13 @@
-import './assets/style.css'
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
-import KeyCloakService from "./KeycloakService";
+import { initKeycloak } from './keycloak'
+import { i18n } from './i18n'
+import 'leaflet/dist/leaflet.css'
 
-const app = createApp(App)
-
-// Usa il router
-app.use(router)
-
-// Funzione per il rendering dell'app
-const renderApp = () => {
-    app.mount('#app');
-};
-
-// Chiama il servizio KeyCloak per l'autenticazione
-KeyCloakService.CallLogin(renderApp);
-
-
-//app.mount('#app');
+initKeycloak()
+  .catch((error) => {
+    console.error('Keycloak init failed', error)
+  })
+  .finally(() => {
+    return createApp(App).use(i18n).mount('#app')
+  })
