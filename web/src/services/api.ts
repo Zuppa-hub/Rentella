@@ -41,9 +41,9 @@ async function fetchApi<T>(
   const { authenticated = true, ...fetchOptions } = options
 
   const url = `${API_BASE_URL}${endpoint}`
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...fetchOptions.headers,
+    ...(fetchOptions.headers as Record<string, string>),
   }
 
   if (authenticated) {
@@ -67,6 +67,11 @@ async function fetchApi<T>(
   return response.json()
 }
 
+// Location endpoints
+export async function getLocations() {
+  return fetchApi<Beach[]>('/locations')
+}
+
 // Beach endpoints
 export async function getBeaches(filters?: { cityId?: number; allowed_animals?: string }) {
   const params = new URLSearchParams()
@@ -76,6 +81,10 @@ export async function getBeaches(filters?: { cityId?: number; allowed_animals?: 
   const query = params.toString() ? `?${params.toString()}` : ''
   const response = await fetchApi<Beach[]>(`/beaches${query}`)
   return response
+}
+
+export async function getBeachesByLocationId(locationId: number) {
+  return fetchApi<Beach[]>(`/beaches?cityId=${locationId}`)
 }
 
 export async function getBeach(id: number) {
