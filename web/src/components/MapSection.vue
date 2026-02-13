@@ -1,9 +1,8 @@
 <template>
   <section class="map-section" :class="{ expanded: sheetCollapsed }">
     <div ref="mapEl" class="map"></div>
-    <button class="location-selector">
-      <span class="location-icon"></span>
-      {{ selectedLocation }}
+    <button class="location-indicator" :class="{ active: props.userLocation }" @click="centerMapOnUser" :disabled="!props.userLocation">
+      <span class="location-dot" :class="{ pulse: userLocation }"></span>
     </button>
   </section>
 </template>
@@ -19,23 +18,41 @@ export type MapLocation = {
   lng: number
 }
 
+export interface UserLocation {
+  lat: number
+  lng: number
+}
+
 const props = defineProps<{ 
   locations: MapLocation[]
   selectedLocation: string
   sheetCollapsed: boolean
+  userLocation?: UserLocation | null
 }>()
 
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: L.Map | undefined
 let markersLayer: L.LayerGroup | undefined
+let userLocationMarker: L.Marker | undefined
 
 const initMap = () => {
   if (!mapEl.value || map) return
 
+  // Default to Rimini, or user location if available
+  let initialLat = 44.0678
+  let initialLng = 12.5695
+  let initialZoom = 9
+
+  if (props.userLocation) {
+    initialLat = props.userLocation.lat
+    initialLng = props.userLocation.lng
+    initialZoom = 13
+  }
+
   map = L.map(mapEl.value, {
     zoomControl: false,
     attributionControl: false,
-  }).setView([44.0678, 12.5695], 9)
+  }).setView([initialLat, initialLng], initialZoom)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
@@ -43,6 +60,7 @@ const initMap = () => {
 
   markersLayer = L.layerGroup().addTo(map)
   renderMarkers()
+  renderUserLocation()
 }
 
 const renderMarkers = () => {
@@ -57,6 +75,39 @@ const renderMarkers = () => {
     })
     L.marker([location.lat, location.lng], { icon: marker }).addTo(markersLayer as L.LayerGroup)
   })
+}
+
+const renderUserLocation = () => {
+  if (!map) return
+
+  // Remove old user location marker
+  if (userLocationMarker) {
+    map.removeLayer(userLocationMarker)
+  }
+
+  // Add new user location marker if available
+  if (props.userLocation) {
+    const userIcon = L.divIcon({
+      className: 'user-location-marker',
+      html: '<div class="user-dot"></div>',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+    })
+
+    userLocationMarker = L.marker(
+      [props.userLocation.lat, props.userLocation.lng],
+      { icon: userIcon }
+    ).addTo(map)
+  }
+}
+
+const centerMapOnUser = () => {
+  if (map && props.userLocation) {
+    map.setView([props.userLocation.lat, props.userLocation.lng], 13, {
+      animate: true,
+      duration: 0.5,
+    })
+  }
 }
 
 const destroyMap = () => {
@@ -74,6 +125,20 @@ watch(
   () => props.locations,
   () => {
     renderMarkers()
+  }
+)
+
+watch(
+  () => props.userLocation,
+  () => {
+    renderUserLocation()
+    // Center map on user location if changed
+    if (map && props.userLocation) {
+      map.setView([props.userLocation.lat, props.userLocation.lng], 13, {
+        animate: true,
+        duration: 0.5,
+      })
+    }
   }
 )
 
@@ -108,36 +173,72 @@ onBeforeUnmount(() => {
   height: calc(100vh - 64px - 80px);
 }
 
-.location-selector {
+.location-indicator {
   position: absolute;
   top: 12px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.92);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
   border: none;
-  border-radius: 12px;
-  padding: 8px 12px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: #32424b;
+  justify-content: center;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
   z-index: 999;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.location-icon {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid #0b5f6f;
-  position: relative;
+.location-indicator:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  transform: scale(1.05);
 }
 
-.location-icon::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  background: #0b5f6f;
+.location-indicator:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.location-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
+  background: #6b7280;
+  transition: all 0.3s ease;
+}
+
+.location-dot.pulse {
+  background: #00a8cc;
+  box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.2);
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.2);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 168, 204, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(0, 168, 204, 0);
+  }
+}
+
+/* User Location Marker */
+:deep(.user-location-marker) {
+  z-index: 400;
+}
+
+.user-dot {
+  width: 14px;
+  height: 14px;
+  background: #00a8cc;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px #00a8cc;
 }
 </style>

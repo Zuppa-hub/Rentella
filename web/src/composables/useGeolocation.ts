@@ -5,111 +5,144 @@ export interface UserLocation {
   lng: number
 }
 
+interface GeolocationOptions {
+  timeout?: number
+  enableHighAccuracy?: boolean
+  maximumAge?: number
+}
+
+const isDevelopment = import.meta.env.DEV
+
+// Validate coordinates
+const validateCoordinates = (lat: number, lng: number): boolean => {
+  return lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180
+}
+
 export const useGeolocation = () => {
   const userLocation = ref<UserLocation | null>(null)
   const error = ref<string | null>(null)
+  const isLoading = ref(false)
 
-  // Calculate distance between two coordinates (Haversine formula)
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371 // Earth radius in km
+  // Deduplicate concurrent requests
+  let currentRequest: Promise<UserLocation> | null = null
+
+  // Haversine distance (km)
+  const calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): number => {
+    if (!validateCoordinates(lat1, lon1) || !validateCoordinates(lat2, lon2)) {
+      console.warn('Invalid coordinates provided to calculateDistance')
+      return 0
+    }
+
+    const R = 6371
     const dLat = ((lat2 - lat1) * Math.PI) / 180
     const dLon = ((lon2 - lon1) * Math.PI) / 180
+
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos((lat1 * Math.PI) / 180) *
         Math.cos((lat2 * Math.PI) / 180) *
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2)
+
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    return Math.round(R * c * 10) / 10 // Round to 1 decimal place
+
+    return Math.round(R * c * 10) / 10
   }
 
-  // Request user location
-  const requestLocation = async () => {
-    console.log('Requesting location...')
-    error.value = null
+  const requestLocation = async (
+    options: GeolocationOptions = {}
+  ): Promise<UserLocation> => {
+    if (currentRequest) return currentRequest
 
     if (!navigator.geolocation) {
-      error.value = 'Geolocation not supported'
-      console.error('Geolocation not supported')
-      throw new Error('Geolocation not supported')
+      const message = 'Geolocation API not supported'
+      error.value = message
+      throw new Error(message)
     }
 
-    // If on localhost, use mock location immediately
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      console.warn('Development environment detected - using mock location')
-      const mockLocation = { lat: 44.0678, lng: 12.5695 } // Rimini
-      userLocation.value = mockLocation
-      error.value = null
-      return mockLocation
-    }
+    isLoading.value = true
+    error.value = null
 
-    return new Promise<UserLocation>((resolve, reject) => {
-      console.log('Calling getCurrentPosition...')
-      
-      let completed = false
+    currentRequest = new Promise<UserLocation>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
 
-      const onSuccess = (position: GeolocationPosition) => {
-        if (completed) return
-        completed = true
-        
-        const location: UserLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        }
-        console.log('✓ Location acquired:', location)
-        userLocation.value = location
-        error.value = null
-        resolve(location)
-      }
-
-      const onError = (err: GeolocationPositionError) => {
-        if (completed) return
-        completed = true
-        
-        console.error('✗ Geolocation error code:', err.code, 'message:', err.message)
-        
-        // For any error (PERMISSION_DENIED=1, POSITION_UNAVAILABLE=2, TIMEOUT=3), use mock location
-        console.warn(`Geolocation unavailable (code ${err.code}) - using mock location for development`)
-        const mockLocation = { lat: 44.0678, lng: 12.5695 } // Rimini
-        userLocation.value = mockLocation
-        error.value = null
-        resolve(mockLocation)
-      }
-
-      // Call getCurrentPosition with short timeout
-      try {
-        navigator.geolocation.getCurrentPosition(
-          onSuccess,
-          onError,
-          {
-            enableHighAccuracy: false,
-            timeout: 3000, // Short timeout - 3 seconds
-            maximumAge: 0,
+          if (!validateCoordinates(latitude, longitude)) {
+            reject(new Error('Invalid coordinates returned'))
+            return
           }
-        )
-      } catch (e) {
-        console.error('Exception calling getCurrentPosition:', e)
-        reject(e)
-      }
+
+          const location: UserLocation = {
+            lat: latitude,
+            lng: longitude,
+          }
+
+          userLocation.value = location
+          resolve(location)
+        },
+        (err) => {
+          const errorMessages: Record<number, string> = {
+            1: 'Permission denied',
+            2: 'Position unavailable',
+            3: 'Timeout',
+          }
+
+          const message = errorMessages[err.code] || 'Unknown error'
+          error.value = `Geolocation: ${message}`
+
+          if (isDevelopment) {
+            const mockLocation = { lat: 44.0678, lng: 12.5695 } // Rimini
+            userLocation.value = mockLocation
+            resolve(mockLocation)
+          } else {
+            reject(err)
+          }
+        },
+        {
+          enableHighAccuracy: options.enableHighAccuracy ?? false,
+          timeout: options.timeout ?? 5000,
+          maximumAge: options.maximumAge ?? 60000, // 1 min cache
+        }
+      )
     })
+      .finally(() => {
+        isLoading.value = false
+        currentRequest = null
+      })
+
+    return currentRequest
   }
 
-  // Get distance from user to a location
-  const getDistanceToLocation = (lat: number, lng: number): number | null => {
+  const getDistanceToLocation = (
+    lat: number,
+    lng: number
+  ): number | null => {
     if (!userLocation.value) return null
-    return calculateDistance(userLocation.value.lat, userLocation.value.lng, lat, lng)
+    return calculateDistance(
+      userLocation.value.lat,
+      userLocation.value.lng,
+      lat,
+      lng
+    )
   }
 
-  // Check if user location is available
-  const isLocationAvailable = computed(() => userLocation.value !== null)
+  const isLocationAvailable = computed(
+    () => userLocation.value !== null
+  )
 
   return {
     userLocation,
     error,
+    isLoading,
+    isLocationAvailable,
     requestLocation,
     calculateDistance,
     getDistanceToLocation,
-    isLocationAvailable,
   }
 }

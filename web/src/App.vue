@@ -8,7 +8,7 @@
   <div v-else class="home">
     <TopBar :authenticated="authenticated" :initials="initials" @login="handleLogin" @logout="handleLogout" />
 
-    <MapSection :locations="locations" selected-location="Rimini" :sheet-collapsed="isSheetCollapsed" />
+    <MapSection :locations="locations" :user-location="userLocation" selected-location="Rimini" :sheet-collapsed="isSheetCollapsed" />
 
     <BottomSheet
       :locations="filteredLocations"

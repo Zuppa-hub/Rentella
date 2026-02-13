@@ -35,12 +35,12 @@
       <!-- Map Section -->
       <div class="map-wrapper">
         <div ref="mapEl" class="map"></div>
-        <div class="map-location-indicator" :class="{ active: props.userLocation }">
+        <button class="map-location-indicator" :class="{ active: props.userLocation }" @click="centerMapOnUser" :disabled="!props.userLocation">
           <span class="location-dot" :class="{ pulse: props.userLocation }"></span>
           <span class="location-text">
             {{ props.userLocation ? t('desktop.map.myLocation') : t('desktop.map.loading') }}
           </span>
-        </div>
+        </button>
       </div>
 
       <!-- Sidebar -->
@@ -180,6 +180,15 @@ const renderUserLocation = () => {
       [props.userLocation.lat, props.userLocation.lng],
       { icon: userIcon }
     ).addTo(map)
+  }
+}
+
+const centerMapOnUser = () => {
+  if (map && props.userLocation) {
+    map.setView([props.userLocation.lat, props.userLocation.lng], 13, {
+      animate: true,
+      duration: 0.5,
+    })
   }
 }
 
@@ -389,6 +398,7 @@ onBeforeUnmount(() => {
   top: 16px;
   right: 16px;
   background: rgba(255, 255, 255, 0.95);
+  border: none;
   border-radius: 12px;
   padding: 8px 14px;
   display: flex;
@@ -402,6 +412,18 @@ onBeforeUnmount(() => {
   font-family: 'Inter', sans-serif;
   backdrop-filter: blur(4px);
   transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.map-location-indicator:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  transform: translateY(-1px);
+}
+
+.map-location-indicator:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .location-dot {
