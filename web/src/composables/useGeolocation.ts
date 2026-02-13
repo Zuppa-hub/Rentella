@@ -1,4 +1,8 @@
 import { ref, computed } from 'vue'
+import { GEOLOCATION_TIMEOUT, DEFAULT_MAP_CENTER } from '../constants/index'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('useGeolocation')
 
 export interface UserLocation {
   lat: number
@@ -57,11 +61,17 @@ export const useGeolocation = () => {
   const requestLocation = async (
     options: GeolocationOptions = {}
   ): Promise<UserLocation> => {
-    if (currentRequest) return currentRequest
+    logger.debug('Requesting location', { options })
+    
+    if (currentRequest) {
+      logger.debug('Location request already in progress, returning cached result')
+      return currentRequest
+    }
 
     if (!navigator.geolocation) {
       const message = 'Geolocation API not supported'
       error.value = message
+      logger.error(message)
       throw new Error(message)
     }
 
@@ -74,7 +84,9 @@ export const useGeolocation = () => {
           const { latitude, longitude } = position.coords
 
           if (!validateCoordinates(latitude, longitude)) {
-            reject(new Error('Invalid coordinates returned'))
+            const message = 'Invalid coordinates returned from geolocation'
+            logger.error(message, { latitude, longitude })
+            reject(new Error(message))
             return
           }
 
@@ -84,6 +96,7 @@ export const useGeolocation = () => {
           }
 
           userLocation.value = location
+          logger.info('Location acquired successfully', { location })
           resolve(location)
         },
         (err) => {
@@ -95,9 +108,11 @@ export const useGeolocation = () => {
 
           const message = errorMessages[err.code] || 'Unknown error'
           error.value = `Geolocation: ${message}`
+          logger.warn(`Geolocation error (code ${err.code}):`, {'message': message})
 
           if (isDevelopment) {
-            const mockLocation = { lat: 44.0678, lng: 12.5695 } // Rimini
+            logger.debug('Using mock location for development')
+            const mockLocation = DEFAULT_MAP_CENTER
             userLocation.value = mockLocation
             resolve(mockLocation)
           } else {
@@ -106,7 +121,7 @@ export const useGeolocation = () => {
         },
         {
           enableHighAccuracy: options.enableHighAccuracy ?? false,
-          timeout: options.timeout ?? 5000,
+          timeout: options.timeout ?? GEOLOCATION_TIMEOUT,
           maximumAge: options.maximumAge ?? 60000, // 1 min cache
         }
       )
