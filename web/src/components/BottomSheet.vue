@@ -29,6 +29,7 @@
         :key="location.id"
         :location="location"
         :index="index + 1"
+        @click="emit('location-click', location.id)"
       />
     </div>
   </section>
@@ -48,6 +49,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:searchTerm', value: string): void
   (event: 'update:isCollapsed', value: boolean): void
+  (event: 'location-click', locationId: number): void
 }>()
 
 const toggleCollapsed = () => {

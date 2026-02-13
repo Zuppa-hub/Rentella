@@ -2,6 +2,11 @@ import { createI18n } from 'vue-i18n'
 
 export const messages = {
   en: {
+    common: {
+      close: 'Close',
+      cancel: 'Cancel',
+      continue: 'Continue',
+    },
     welcome: {
       title: 'Rentella',
       subtitle: 'Discover the best beaches near you',
@@ -31,9 +36,28 @@ export const messages = {
         myLocation: 'Your location',
         loading: 'Loading position...',
       },
+      location: {
+        prices: 'Price Range',
+        beaches: 'Available Beaches',
+        distance: 'Distance',
+        beachCount: 'Beach Count',
+        noBeaches: 'No beaches available',
+        exploreBeaches: 'Explore Beaches',
+      },
+      common: {
+        close: 'Close',
+        select: 'Select',
+        cancel: 'Cancel',
+        continue: 'Continue',
+      },
     },
   },
   it: {
+    common: {
+      close: 'Chiudi',
+      cancel: 'Annulla',
+      continue: 'Continua',
+    },
     welcome: {
       title: 'Rentella',
       subtitle: 'Scopri le migliori spiagge vicino a te',
@@ -62,6 +86,20 @@ export const messages = {
       map: {
         myLocation: 'La tua posizione',
         loading: 'Caricamento posizione...',
+      },
+      location: {
+        prices: 'Fascia Prezzo',
+        beaches: 'Spiagge Disponibili',
+        distance: 'Distanza',
+        beachCount: 'Numero Spiagge',
+        noBeaches: 'Nessuna spiaggia disponibile',
+        exploreBeaches: 'Esplora Spiagge',
+      },
+      common: {
+        close: 'Chiudi',
+        select: 'Seleziona',
+        cancel: 'Annulla',
+        continue: 'Continua',
       },
     },
   },

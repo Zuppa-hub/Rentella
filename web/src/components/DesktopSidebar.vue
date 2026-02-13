@@ -27,6 +27,7 @@
         v-for="(location, idx) in filteredLocations"
         :key="location.id"
         class="location-card"
+        @click="emit('location-click', location.id)"
       >
         <div class="card-content">
           <div class="location-name">
@@ -72,6 +73,10 @@ export type DesktopLocation = {
 const props = defineProps<{
   locations: DesktopLocation[]
   userLocation?: { lat: number; lng: number } | null
+}>()
+
+const emit = defineEmits<{
+  (event: 'location-click', locationId: number): void
 }>()
 
 const { t } = useI18n()

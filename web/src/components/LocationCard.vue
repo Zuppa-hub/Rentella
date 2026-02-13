@@ -1,25 +1,17 @@
 <template>
-  <article class="card">
+  <button class="card" @click="handleClick" type="button">
     <div class="badge">{{ index }}</div>
     <div class="card-body">
       <h3>{{ location.name }}</h3>
       <div class="meta">
-        <span>
-          <img :src="icons.distance" alt="" />
-          {{ location.distance }} km
-        </span>
-        <span>
-          <img :src="icons.money" alt="" />
-          {{ location.priceRange }}
-        </span>
+        <span>{{ location.distance }} km</span>
+        <span>{{ location.priceRange }}</span>
       </div>
     </div>
-    <img :src="icons.arrow" alt="" class="chevron" />
-  </article>
+  </button>
 </template>
 
 <script setup lang="ts">
-import iconArrow from '../assets/icons/Arrow.svg'
 import iconDistance from '../assets/icons/Distance.svg'
 import iconMoney from '../assets/icons/Money.svg'
 
@@ -28,14 +20,17 @@ export type LocationItem = {
   name: string
   distance: number
   priceRange: string
+  lat: number
+  lng: number
 }
 
-defineProps<{ location: LocationItem; index: number }>()
+const props = defineProps<{ location: LocationItem; index: number }>()
+const emit = defineEmits<{
+  click: []
+}>()
 
-const icons = {
-  arrow: iconArrow,
-  distance: iconDistance,
-  money: iconMoney,
+const handleClick = () => {
+  emit('click')
 }
 </script>
 
@@ -51,17 +46,36 @@ const icons = {
   border: 1px solid #e2e8f0;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
   min-height: 72px;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+}
+
+.card:hover {
+  border-color: #005f6f;
+  box-shadow: 0 8px 24px rgba(0, 95, 111, 0.12);
+}
+
+.card:active {
+  border-color: #005f6f;
 }
 
 .badge {
   width: 32px;
   height: 32px;
-  border-radius: 999px 999px 999px 6px;
-  background: #1f2937;
-  color: #ffffff;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #0b0b0b;
   display: grid;
   place-items: center;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  flex-shrink: 0;
 }
 
 .card-body h3 {

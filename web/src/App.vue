@@ -3,7 +3,14 @@
     <WelcomeScreen @login="handleLogin" />
   </div>
   <div v-else-if="isDesktop" class="app-desktop">
-    <DesktopHome :locations="locations" :initials="initials" :user-location="userLocation" />
+    <DesktopHome :locations="locations" :initials="initials" :user-location="userLocation" @location-click="openLocationModal" />
+    <LocationModal
+      :is-open="isModalOpen"
+      :location="selectedLocation || { id: 0, name: '', lat: 0, lng: 0, distance: 0, priceRange: 'N/A' }"
+      :beaches="modalBeaches"
+      @close="closeLocationModal"
+      @select-beach="handleBeachSelect"
+    />
   </div>
   <div v-else class="home">
     <TopBar :authenticated="authenticated" :initials="initials" @login="handleLogin" @logout="handleLogout" />
@@ -17,6 +24,15 @@
       :is-collapsed="isSheetCollapsed"
       @update:searchTerm="searchTerm = $event"
       @update:isCollapsed="isSheetCollapsed = $event"
+      @location-click="openLocationModal"
+    />
+
+    <LocationModal
+      :is-open="isModalOpen"
+      :location="selectedLocation || { id: 0, name: '', lat: 0, lng: 0, distance: 0, priceRange: 'N/A' }"
+      :beaches="modalBeaches"
+      @close="closeLocationModal"
+      @select-beach="handleBeachSelect"
     />
 
     <BottomNav />
@@ -35,6 +51,7 @@ import MapSection, { type MapLocation } from './components/MapSection.vue'
 import BottomSheet from './components/BottomSheet.vue'
 import BottomNav from './components/BottomNav.vue'
 import DesktopHome from './components/DesktopHome.vue'
+import LocationModal from './components/LocationModal.vue'
 import type { LocationItem } from './components/LocationCard.vue'
 import { getLocations, getBeaches, type Beach } from './services/api'
 
@@ -52,8 +69,12 @@ let locationDebounceTimer: number | undefined
 
 // Cache for beaches data (loaded once at login)
 const beachesCache = ref<Map<number, any[]>>(new Map())
-
 const locations = ref<(LocationItem & MapLocation)[]>([])
+
+// Modal state
+const isModalOpen = ref(false)
+const selectedLocation = ref<(LocationItem & MapLocation) | null>(null)
+const modalBeaches = ref<Beach[]>([])
 
 const filteredLocations = computed(() => {
   if (!searchTerm.value) return locations.value
@@ -121,6 +142,27 @@ const handleLogout = async () => {
     error.value = 'Logout failed'
     console.error(err)
   }
+}
+
+const openLocationModal = (locationId: number) => {
+  const location = locations.value.find((loc) => loc.id === locationId)
+  if (location) {
+    selectedLocation.value = location
+    modalBeaches.value = beachesCache.value.get(locationId) || []
+    isModalOpen.value = true
+  }
+}
+
+const closeLocationModal = () => {
+  isModalOpen.value = false
+  selectedLocation.value = null
+  modalBeaches.value = []
+}
+
+const handleBeachSelect = (beach: Beach) => {
+  console.log('Beach selected:', beach)
+  // TODO: Navigate to beach detail or booking page
+  closeLocationModal()
 }
 
 const loadBeaches = async () => {

@@ -44,7 +44,7 @@
       </div>
 
       <!-- Sidebar -->
-      <DesktopSidebar :locations="desktopLocations" :user-location="props.userLocation" />
+      <DesktopSidebar :locations="desktopLocations" :user-location="props.userLocation" @location-click="emit('location-click', $event)" />
     </div>
   </div>
 </template>
@@ -78,6 +78,10 @@ const props = defineProps<{
   locations: LocationWithMeta[]
   initials: string
   userLocation?: { lat: number; lng: number } | null
+}>()
+
+const emit = defineEmits<{
+  (event: 'location-click', locationId: number): void
 }>()
 
 const { t } = useI18n()
