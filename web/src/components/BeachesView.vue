@@ -37,7 +37,14 @@
       >
         <!-- Beach Image -->
         <div class="beach-image">
-          <div class="image-placeholder">🏖️</div>
+          <img
+            v-if="beach.photo_url"
+            :src="beach.photo_url"
+            :alt="beach.name"
+            class="beach-photo"
+            loading="lazy"
+          />
+          <div v-else class="image-placeholder">🏖️</div>
           <div class="beach-badge">{{ idx + 1 }}</div>
         </div>
 
@@ -296,6 +303,12 @@ const icons = {
   align-items: center;
   justify-content: center;
   font-size: 32px;
+}
+
+.beach-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .beach-badge {

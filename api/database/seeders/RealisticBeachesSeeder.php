@@ -173,6 +173,9 @@ class RealisticBeachesSeeder extends Seeder
                 $typeArray = array_values($typeIds);
                 $selectedTypeId = $typeArray[array_rand($typeArray)];
 
+                // Generate unique photo URL for each beach
+                $photoUrl = 'https://picsum.photos/800/600?random=' . rand(1000, 9999);
+
                 $beachId = DB::table('beaches')->insertGetId([
                     'owner_id' => $ownerId,
                     'name' => $beachData['name'],
@@ -182,6 +185,7 @@ class RealisticBeachesSeeder extends Seeder
                     'special_note' => '',
                     'latitude' => $beachLat,
                     'longitude' => $beachLng,
+                    'photo_url' => $photoUrl,
                     'allowed_animals' => rand(0, 1), // 0 = no, 1 = yes
                     'type_id' => $selectedTypeId,
                     'created_at' => $now,
