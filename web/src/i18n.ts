@@ -125,7 +125,7 @@ export const messages = {
 
 export const i18n = createI18n({
   legacy: false,
-  locale: 'it',
-  fallbackLocale: 'en',
+  locale: 'en',
+  fallbackLocale: 'it',
   messages,
 })
