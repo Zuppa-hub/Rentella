@@ -8,6 +8,7 @@
       v-if="isBeachesViewOpen && beachesViewLocation"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
+      :beach-types="beachTypesMap"
       :initials="initials"
       :user-location="userLocation"
       @back="closeBeachesView"
@@ -48,6 +49,7 @@
       v-if="isBeachesViewOpen && beachesViewLocation"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
+      :beach-types="beachTypesMap"
       @back="closeBeachesView"
       @select-beach="handleBeachSelectFromView"
     />
@@ -80,7 +82,7 @@ import LocationModal from './components/LocationModal.vue'
 import BeachesView from './components/BeachesView.vue'
 import DesktopBeachesLayout from './components/DesktopBeachesLayout.vue'
 import type { LocationItem } from './components/LocationCard.vue'
-import { getLocations, getBeaches, type Beach } from './services/api'
+import { getLocations, getBeaches, getBeachTypes, type Beach, type Location } from './services/api'
 
 const geolocation = useGeolocation()
 const { userLocation, calculateDistance, requestLocation } = geolocation
@@ -108,6 +110,7 @@ const modalBeaches = ref<Beach[]>([])
 const isBeachesViewOpen = ref(false)
 const beachesViewLocation = ref<(LocationItem & MapLocation) | null>(null)
 const beachesViewBeaches = ref<Beach[]>([])
+const beachTypesMap = ref<Record<number, string>>({})
 
 const filteredLocations = computed(() => {
   if (!searchTerm.value) return locations.value
@@ -233,7 +236,25 @@ const loadBeaches = async () => {
   
   try {
     const locations_data = await getLocations()
+
+    const toNumber = (value: unknown) => {
+      if (typeof value === 'number' && Number.isFinite(value)) return value
+      const parsed = Number.parseFloat(String(value))
+      return Number.isFinite(parsed) ? parsed : null
+    }
     
+    if (Object.keys(beachTypesMap.value).length === 0) {
+      try {
+        const types = await getBeachTypes()
+        beachTypesMap.value = types.reduce<Record<number, string>>((acc, type) => {
+          acc[type.id] = type.type
+          return acc
+        }, {})
+      } catch (err) {
+        console.error('Failed to load beach types:', err)
+      }
+    }
+
     // Load ALL beaches ONCE if not in cache
     if (beachesCache.value.size === 0) {
       console.log('Loading all beaches into cache...')
@@ -255,19 +276,13 @@ const loadBeaches = async () => {
       }
     }
     
-    const uniqueLocations: any[] = []
+    const uniqueLocations: Location[] = []
     const seenLocationKeys = new Set<string>()
-
-    const toNumber = (value: unknown) => {
-      if (typeof value === 'number' && Number.isFinite(value)) return value
-      const parsed = Number.parseFloat(String(value))
-      return Number.isFinite(parsed) ? parsed : null
-    }
 
     for (const location of locations_data || []) {
       const lat = toNumber(location.latitude)
       const lng = toNumber(location.longitude)
-      const name = location.city_name ?? location.name ?? ''
+      const name = location.city_name ?? ''
       const key = `${name}|${lat ?? ''}|${lng ?? ''}`
 
       if (seenLocationKeys.has(key)) continue
@@ -276,8 +291,13 @@ const loadBeaches = async () => {
     }
 
     // Now process locations using cached data
-    const locationsWithPrices = uniqueLocations.map((location: any) => {
-      const beaches = beachesCache.value.get(location.id) || []
+    const locationsWithPrices = uniqueLocations
+      .map((location) => {
+        const beaches = beachesCache.value.get(location.id) || []
+        const lat = toNumber(location.latitude)
+        const lng = toNumber(location.longitude)
+
+        if (lat === null || lng === null) return null
       
       // Extract min and max prices from cached beaches
       const prices = beaches
@@ -288,20 +308,20 @@ const loadBeaches = async () => {
       const maxPrice = prices.length > 0 ? Math.max(...prices) : null
       const priceRange = minPrice && maxPrice ? `€${minPrice} - €${maxPrice}` : 'N/A'
       
-      return {
-        id: location.id,
-        name: location.city_name,
-        distance: userLocation.value
-          ? calculateDistance(userLocation.value.lat, userLocation.value.lng, location.latitude, location.longitude)
-          : Math.random() * 50,
-        priceRange,
-        lat: location.latitude,
-        lng: location.longitude,
-      }
-    })
-    
+        return {
+          id: location.id,
+          name: location.city_name,
+          distance: userLocation.value
+            ? calculateDistance(userLocation.value.lat, userLocation.value.lng, lat, lng)
+            : Math.random() * 50,
+          priceRange,
+          lat,
+          lng,
+        }
+      })
+      .filter((loc): loc is LocationItem & MapLocation => loc !== null)
+
     locations.value = locationsWithPrices
-      .filter((loc) => loc.lat && loc.lng)
       .sort((a, b) => a.distance - b.distance) // Sort by distance (closest first)
   } catch (err) {
     console.error('Failed to load locations:', err)

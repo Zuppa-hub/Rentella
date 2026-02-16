@@ -12,7 +12,7 @@ export interface Beach {
   name: string
   latitude: number
   longitude: number
-  allowed_animals: boolean
+  allowed_animals: boolean | string | number
   owner_id: number
   location_id: number
   opening_date_id: number
@@ -28,6 +28,19 @@ export interface Beach {
     price: number
     umbrella_count: number
   }>
+}
+
+export interface Location {
+  id: number
+  city_name: string
+  latitude: number
+  longitude: number
+  description?: string
+}
+
+export interface BeachType {
+  id: number
+  type: string
 }
 
 interface FetchOptions extends RequestInit {
@@ -69,7 +82,12 @@ async function fetchApi<T>(
 
 // Location endpoints
 export async function getLocations() {
-  return fetchApi<Beach[]>('/locations')
+  return fetchApi<Location[]>('/locations')
+}
+
+// Beach types endpoint
+export async function getBeachTypes() {
+  return fetchApi<BeachType[]>('/beach-types')
 }
 
 // Beach endpoints

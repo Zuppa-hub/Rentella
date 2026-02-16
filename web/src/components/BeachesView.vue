@@ -11,18 +11,7 @@
     </div>
 
     <!-- Search -->
-    <div class="search-box">
-      <svg viewBox="0 0 24 24" class="search-icon">
-        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none" />
-        <path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" fill="none" />
-      </svg>
-      <input
-        v-model="searchTerm"
-        type="text"
-        :placeholder="t('desktop.search.placeholder')"
-        class="search-input"
-      />
-    </div>
+    <SearchBox v-model="searchTerm" :placeholder="t('desktop.search.placeholder')" />
 
     <div class="divider"></div>
 
@@ -30,10 +19,11 @@
     <div class="beaches-header">
       <div class="header-title">
         <h2>{{ location.name }}</h2>
+        <span class="distance">
+          <img :src="icons.distance" alt="" class="meta-icon" />
+          {{ location.distance }} km
+        </span>
         <span class="count">{{ beaches.length }} {{ t('common.beaches') }}</span>
-      </div>
-      <div class="header-meta">
-        <span class="distance">📍 {{ location.distance }} km</span>
       </div>
     </div>
 
@@ -55,14 +45,17 @@
         <div class="beach-info">
           <h3 class="beach-name">{{ beach.name }}</h3>
           <div class="beach-details">
-            <span class="detail-item" :title="t('desktop.beach.sand')">🏜️ {{ t('desktop.beach.sand') }}</span>
-            <span class="detail-item" :title="t('desktop.beach.umbrella')">
-              ☂️ {{ beach.has_umbrella ? t('desktop.beach.yes') : t('desktop.beach.no') }}
+            <span class="detail-item" :title="t('desktop.beach.type')">
+              <img :src="icons.beachType" alt="" class="detail-icon" />
+              {{ getBeachTypeLabel(beach) }}
             </span>
-          </div>
-          <div class="beach-price">
-            <span v-if="beach.min_price && beach.max_price" class="price-range">
-              💰 €{{ beach.min_price }}-{{ beach.max_price }}
+            <span class="detail-item" :title="t('desktop.beach.animals')">
+              <img :src="icons.allowedAnimals" alt="" class="detail-icon" />
+              {{ isAnimalsAllowed(beach.allowed_animals) ? t('desktop.beach.yes') : t('desktop.beach.no') }}
+            </span>
+            <span class="detail-item" v-if="beach.min_price && beach.max_price" :title="t('common.price')">
+              <img :src="icons.money" alt="" class="detail-icon" />
+              €{{ beach.min_price }}-{{ beach.max_price }}
             </span>
           </div>
         </div>
@@ -82,6 +75,12 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Beach } from '../services/api'
+import SearchBox from './SearchBox.vue'
+import allowedAnimalsIcon from '../assets/icons/AllowedAnimals.svg'
+import beachTypeIcon from '../assets/icons/BeachType.svg'
+import distanceIcon from '../assets/icons/Distance.svg'
+import moneyIcon from '../assets/icons/Money.svg'
+import { isAnimalsAllowed, parseBeachTypeId } from '../utils/helpers'
 
 const { t } = useI18n()
 
@@ -103,6 +102,7 @@ type BeachViewModel = Beach & {
 const props = defineProps<{
   location: Location
   beaches: BeachViewModel[]
+  beachTypes?: Record<number, string>
 }>()
 
 const emit = defineEmits<{
@@ -118,12 +118,28 @@ const filteredBeaches = computed(() => {
   return props.beaches.filter((beach) => beach.name.toLowerCase().includes(query))
 })
 
+const getBeachTypeLabel = (beach: BeachViewModel) => {
+  const parsedId = parseBeachTypeId(beach.type_id)
+  if (parsedId === null) {
+    return t('desktop.beach.typeUnknown')
+  }
+
+  return props.beachTypes?.[parsedId] || t('desktop.beach.typeUnknown')
+}
+
 const handleBack = () => {
   emit('back')
 }
 
 const handleSelectBeach = (beach: BeachViewModel) => {
   emit('select-beach', beach)
+}
+
+const icons = {
+  beachType: beachTypeIcon,
+  allowedAnimals: allowedAnimalsIcon,
+  distance: distanceIcon,
+  money: moneyIcon,
 }
 </script>
 
@@ -171,25 +187,6 @@ const handleSelectBeach = (beach: BeachViewModel) => {
 }
 
 /* Search */
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 16px;
-  padding: 8px;
-  background: #f2f4f6;
-  border: 1px solid #dae2e3;
-  border-radius: 8px;
-  box-shadow: 0px 2px 2px rgba(136, 136, 153, 0.08);
-}
-
-.search-icon {
-  width: 20px;
-  height: 20px;
-  color: #78898c;
-  flex-shrink: 0;
-}
-
 .search-input {
   flex: 1;
   border: none;
@@ -204,7 +201,7 @@ const handleSelectBeach = (beach: BeachViewModel) => {
 }
 
 .divider {
-  height: 8px;
+  height: 4px;
 }
 
 /* Beaches Header */
@@ -216,7 +213,8 @@ const handleSelectBeach = (beach: BeachViewModel) => {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .header-title h2 {
@@ -242,6 +240,16 @@ const handleSelectBeach = (beach: BeachViewModel) => {
 .distance {
   font-size: 12px;
   color: #78898c;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  opacity: 0.7;
 }
 
 /* Beaches List */
@@ -335,6 +343,14 @@ const handleSelectBeach = (beach: BeachViewModel) => {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  margin-right: 12px;
+}
+
+.detail-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.7;
 }
 
 .beach-price {
@@ -374,7 +390,7 @@ const handleSelectBeach = (beach: BeachViewModel) => {
     padding: 32px 0;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 4px;
     margin: 0;
     margin-top: 0;
     overflow: hidden;
@@ -390,7 +406,7 @@ const handleSelectBeach = (beach: BeachViewModel) => {
   }
 
   .search-box {
-    margin: 0 16px;
+    margin: 0 16px 16px 16px;
   }
 
   .beaches-header {

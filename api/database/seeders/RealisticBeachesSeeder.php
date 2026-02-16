@@ -31,12 +31,24 @@ class RealisticBeachesSeeder extends Seeder
             'updated_at' => $now,
         ]);
 
-        // Create beach type
-        $typeId = DB::table('beach_types')->insertGetId([
-            'type' => 'Privata',
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+        // Create beach types
+        $typeIds = [
+            'sand' => DB::table('beach_types')->insertGetId([
+                'type' => 'sand',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]),
+            'mix' => DB::table('beach_types')->insertGetId([
+                'type' => 'mix',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]),
+            'stone' => DB::table('beach_types')->insertGetId([
+                'type' => 'stone',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]),
+        ];
 
         // Locations on the Adriatic Coast of Italy
         $locations = [
@@ -157,6 +169,10 @@ class RealisticBeachesSeeder extends Seeder
                 $minPrice = rand(10, 25);
                 $maxPrice = rand($minPrice + 5, 40);
 
+                // Random beach type
+                $typeArray = array_values($typeIds);
+                $selectedTypeId = $typeArray[array_rand($typeArray)];
+
                 $beachId = DB::table('beaches')->insertGetId([
                     'owner_id' => $ownerId,
                     'name' => $beachData['name'],
@@ -167,7 +183,7 @@ class RealisticBeachesSeeder extends Seeder
                     'latitude' => $beachLat,
                     'longitude' => $beachLng,
                     'allowed_animals' => rand(0, 1), // 0 = no, 1 = yes
-                    'type_id' => $typeId,
+                    'type_id' => $selectedTypeId,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]);

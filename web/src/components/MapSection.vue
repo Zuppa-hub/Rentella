@@ -24,6 +24,13 @@ export interface UserLocation {
   lng: number
 }
 
+type MarkerPoint = {
+  id: number
+  name: string
+  lat: number
+  lng: number
+}
+
 const props = defineProps<{ 
   locations: MapLocation[]
   beaches?: Beach[]
@@ -72,7 +79,7 @@ const toNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : null
 }
 
-const markerItems = computed(() => {
+const markerItems = computed<MarkerPoint[]>(() => {
   if (props.useBeachMarkers && props.beaches) {
     return props.beaches
       .map((beach) => ({
@@ -81,7 +88,7 @@ const markerItems = computed(() => {
         lat: toNumber(beach.latitude),
         lng: toNumber(beach.longitude),
       }))
-      .filter((beach) => beach.lat !== null && beach.lng !== null)
+      .filter((beach): beach is MarkerPoint => beach.lat !== null && beach.lng !== null)
   }
 
   return props.locations
@@ -94,8 +101,7 @@ const renderMarkers = () => {
   const applyJitter = Boolean(props.useBeachMarkers)
 
   markerItems.value.forEach((location, index) => {
-    let lat = location.lat
-    let lng = location.lng
+    let { lat, lng } = location
 
     if (applyJitter && index > 0) {
       const angle = index * 1.25
@@ -105,9 +111,10 @@ const renderMarkers = () => {
     }
 
     const marker = L.divIcon({
-      className: 'map-pin',
-      html: `<span>${index + 1}</span>`,
-      iconSize: [34, 34],
+      className: 'map-pin leaflet-div-icon',
+      html: `<span class="map-pin__label">${index + 1}</span>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
     })
     L.marker([lat, lng], { icon: marker }).addTo(markersLayer as L.LayerGroup)
   })
@@ -277,7 +284,6 @@ watch(
   }
 }
 
-/* User Location Marker */
 :deep(.user-location-marker) {
   z-index: 400;
 }
@@ -289,5 +295,31 @@ watch(
   border-radius: 50%;
   border: 3px solid white;
   box-shadow: 0 0 0 2px #00a8cc;
+}
+
+/* Beach Markers - Same style as desktop */
+:deep(.map-pin) {
+  width: 28px;
+  height: 28px;
+  background: #1f2937;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+:deep(.map-pin__label) {
+  display: inline-block;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transform: rotate(45deg);
+}
+
+:deep(.leaflet-marker-icon.map-pin) {
+  z-index: 500;
 }
 </style>

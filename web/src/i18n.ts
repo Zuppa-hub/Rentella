@@ -47,8 +47,9 @@ export const messages = {
         exploreBeaches: 'Explore Beaches',
       },
       beach: {
-        sand: 'Sand',
-        umbrella: 'Umbrella',
+        type: 'Type',
+        animals: 'Allowed animals',
+        typeUnknown: 'Unknown type',
         yes: 'Yes',
         no: 'No',
       },
@@ -106,8 +107,9 @@ export const messages = {
         exploreBeaches: 'Esplora Spiagge',
       },
       beach: {
-        sand: 'Sabbia',
-        umbrella: 'Ombrellone',
+        type: 'Tipo',
+        animals: 'Animali ammessi',
+        typeUnknown: 'Tipo sconosciuto',
         yes: 'Sì',
         no: 'No',
       },
