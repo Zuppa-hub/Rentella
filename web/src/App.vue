@@ -3,10 +3,19 @@
     <WelcomeScreen @login="handleLogin" />
   </div>
   <div v-else-if="isDesktop" class="app-desktop">
-    <DesktopHome :locations="locations" :initials="initials" :user-location="userLocation" @location-click="openLocationModal" />
+    <DesktopHome v-if="!isBeachesViewOpen" :locations="locations" :initials="initials" :user-location="userLocation" :selected-location="selectedLocation" @location-click="openLocationModal" />
+    <DesktopBeachesLayout
+      v-if="isBeachesViewOpen && beachesViewLocation"
+      :location="beachesViewLocation"
+      :beaches="beachesViewBeaches"
+      :initials="initials"
+      :user-location="userLocation"
+      @back="closeBeachesView"
+      @select-beach="handleBeachSelectFromView"
+    />
     <LocationModal
       :is-open="isModalOpen"
-      :location="selectedLocation || { id: 0, name: '', lat: 0, lng: 0, distance: 0, priceRange: 'N/A' }"
+      :location="modalLocation || { id: 0, name: '', lat: 0, lng: 0, distance: 0, priceRange: 'N/A' }"
       :beaches="modalBeaches"
       @close="closeLocationModal"
       @select-beach="handleBeachSelect"
@@ -15,9 +24,10 @@
   <div v-else class="home">
     <TopBar :authenticated="authenticated" :initials="initials" @login="handleLogin" @logout="handleLogout" />
 
-    <MapSection :locations="locations" :user-location="userLocation" selected-location="Rimini" :sheet-collapsed="isSheetCollapsed" />
+    <MapSection :locations="locations" :user-location="userLocation" :selected-location="selectedLocation" :sheet-collapsed="isSheetCollapsed" />
 
     <BottomSheet
+      v-if="!isBeachesViewOpen"
       :locations="filteredLocations"
       :total-count="filteredLocations.length"
       :search-term="searchTerm"
@@ -27,9 +37,17 @@
       @location-click="openLocationModal"
     />
 
+    <BeachesView
+      v-if="isBeachesViewOpen && beachesViewLocation"
+      :location="beachesViewLocation"
+      :beaches="beachesViewBeaches"
+      @back="closeBeachesView"
+      @select-beach="handleBeachSelectFromView"
+    />
+
     <LocationModal
       :is-open="isModalOpen"
-      :location="selectedLocation || { id: 0, name: '', lat: 0, lng: 0, distance: 0, priceRange: 'N/A' }"
+      :location="modalLocation || { id: 0, name: '', lat: 0, lng: 0, distance: 0, priceRange: 'N/A' }"
       :beaches="modalBeaches"
       @close="closeLocationModal"
       @select-beach="handleBeachSelect"
@@ -52,6 +70,8 @@ import BottomSheet from './components/BottomSheet.vue'
 import BottomNav from './components/BottomNav.vue'
 import DesktopHome from './components/DesktopHome.vue'
 import LocationModal from './components/LocationModal.vue'
+import BeachesView from './components/BeachesView.vue'
+import DesktopBeachesLayout from './components/DesktopBeachesLayout.vue'
 import type { LocationItem } from './components/LocationCard.vue'
 import { getLocations, getBeaches, type Beach } from './services/api'
 
@@ -73,8 +93,14 @@ const locations = ref<(LocationItem & MapLocation)[]>([])
 
 // Modal state
 const isModalOpen = ref(false)
-const selectedLocation = ref<(LocationItem & MapLocation) | null>(null)
+const modalLocation = ref<(LocationItem & MapLocation) | null>(null) // Data for modal display
+const selectedLocation = ref<(LocationItem & MapLocation) | null>(null) // Map centering only
 const modalBeaches = ref<Beach[]>([])
+
+// Beaches View state
+const isBeachesViewOpen = ref(false)
+const beachesViewLocation = ref<(LocationItem & MapLocation) | null>(null)
+const beachesViewBeaches = ref<Beach[]>([])
 
 const filteredLocations = computed(() => {
   if (!searchTerm.value) return locations.value
@@ -147,7 +173,8 @@ const handleLogout = async () => {
 const openLocationModal = (locationId: number) => {
   const location = locations.value.find((loc) => loc.id === locationId)
   if (location) {
-    selectedLocation.value = location
+    // Store location for modal display, don't change map yet
+    modalLocation.value = location
     modalBeaches.value = beachesCache.value.get(locationId) || []
     isModalOpen.value = true
   }
@@ -155,14 +182,41 @@ const openLocationModal = (locationId: number) => {
 
 const closeLocationModal = () => {
   isModalOpen.value = false
-  selectedLocation.value = null
+  modalLocation.value = null
   modalBeaches.value = []
 }
 
 const handleBeachSelect = (beach: Beach) => {
   console.log('Beach selected:', beach)
   // TODO: Navigate to beach detail or booking page
-  closeLocationModal()
+  closeModalAndOpenBeaches()
+}
+
+const closeModalAndOpenBeaches = () => {
+  if (modalLocation.value) {
+    beachesViewLocation.value = modalLocation.value
+    beachesViewBeaches.value = modalBeaches.value
+    // NOW center the map when user clicks 'Continue'
+    selectedLocation.value = modalLocation.value
+    isBeachesViewOpen.value = true
+    isModalOpen.value = false
+    modalLocation.value = null
+  }
+}
+
+const closeBeachesView = () => {
+  isBeachesViewOpen.value = false
+  beachesViewLocation.value = null
+  beachesViewBeaches.value = []
+  // Reset selected location to return to initial map view
+  selectedLocation.value = null
+  modalBeaches.value = []
+}
+
+const handleBeachSelectFromView = (beach: Beach) => {
+  console.log('Beach selected from view:', beach)
+  // TODO: Navigate to beach detail or booking page
+  closeBeachesView()
 }
 
 const loadBeaches = async () => {
@@ -180,7 +234,8 @@ const loadBeaches = async () => {
         const allBeaches = await getBeaches() // Load ALL beaches without filters
         console.log(`Loaded ${allBeaches.length} beaches total`)
         
-        // Group beaches by location_id
+        // Group beaches by location_id (clear and rebuild to avoid duplicates)
+        beachesCache.value.clear()
         for (const beach of allBeaches) {
           if (!beachesCache.value.has(beach.location_id)) {
             beachesCache.value.set(beach.location_id, [])

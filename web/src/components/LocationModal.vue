@@ -52,10 +52,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import L from 'leaflet'
 import { createLogger } from '../utils/logger'
+import type { Beach } from '../services/api'
 
 const logger = createLogger('LocationModal')
 const { t } = useI18n()
@@ -69,16 +68,6 @@ interface Location {
   priceRange: string
 }
 
-interface Beach {
-  id: number
-  name: string
-  location_id: number
-  min_price?: number
-  max_price?: number
-  latitude?: number
-  longitude?: number
-}
-
 const props = defineProps<{
   isOpen: boolean
   location: Location
@@ -87,7 +76,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
-  selectBeach: [beach: Beach]
+  'select-beach': [beach: Beach]
 }>()
 
 const handleOverlayClick = () => {
@@ -96,7 +85,9 @@ const handleOverlayClick = () => {
 
 const handleContinue = () => {
   logger.debug('Location confirmed', { locationId: props.location.id, locationName: props.location.name })
-  emit('selectBeach', props.beaches[0] || { id: 0, name: '', location_id: props.location.id })
+  if (props.beaches.length > 0) {
+    emit('select-beach', props.beaches[0])
+  }
   close()
 }
 
