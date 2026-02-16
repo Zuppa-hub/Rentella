@@ -78,6 +78,7 @@ const props = defineProps<{
   locations: LocationWithMeta[]
   initials: string
   userLocation?: { lat: number; lng: number } | null
+  selectedLocation?: LocationWithMeta | null
 }>()
 
 const emit = defineEmits<{
@@ -226,6 +227,18 @@ onBeforeUnmount(() => {
     map = undefined
   }
 })
+
+// Watch for selected location changes and center map
+watch(
+  () => props.selectedLocation,
+  (newLocation) => {
+    if (map && newLocation) {
+      map.setView([newLocation.lat, newLocation.lng], 13, {
+        animate: true,
+      })
+    }
+  }
+)
 </script>
 
 <style scoped>

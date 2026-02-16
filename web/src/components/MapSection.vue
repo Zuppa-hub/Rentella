@@ -25,7 +25,7 @@ export interface UserLocation {
 
 const props = defineProps<{ 
   locations: MapLocation[]
-  selectedLocation: string
+  selectedLocation: MapLocation | null
   sheetCollapsed: boolean
   userLocation?: UserLocation | null
 }>()
@@ -145,6 +145,18 @@ watch(
 onBeforeUnmount(() => {
   destroyMap()
 })
+
+// Watch for selected location changes and center map
+watch(
+  () => props.selectedLocation,
+  (newLocation) => {
+    if (map && newLocation) {
+      map.setView([newLocation.lat, newLocation.lng], 13, {
+        animate: true,
+      })
+    }
+  }
+)
 </script>
 
 <style scoped>

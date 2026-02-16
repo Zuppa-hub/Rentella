@@ -6,6 +6,8 @@ export const messages = {
       close: 'Close',
       cancel: 'Cancel',
       continue: 'Continue',
+      back: 'Back',
+      beaches: 'Beaches',
     },
     welcome: {
       title: 'Rentella',
@@ -44,6 +46,12 @@ export const messages = {
         noBeaches: 'No beaches available',
         exploreBeaches: 'Explore Beaches',
       },
+      beach: {
+        sand: 'Sand',
+        umbrella: 'Umbrella',
+        yes: 'Yes',
+        no: 'No',
+      },
       common: {
         close: 'Close',
         select: 'Select',
@@ -57,6 +65,8 @@ export const messages = {
       close: 'Chiudi',
       cancel: 'Annulla',
       continue: 'Continua',
+      back: 'Indietro',
+      beaches: 'Spiagge',
     },
     welcome: {
       title: 'Rentella',
@@ -94,6 +104,12 @@ export const messages = {
         beachCount: 'Numero Spiagge',
         noBeaches: 'Nessuna spiaggia disponibile',
         exploreBeaches: 'Esplora Spiagge',
+      },
+      beach: {
+        sand: 'Sabbia',
+        umbrella: 'Ombrellone',
+        yes: 'Sì',
+        no: 'No',
       },
       common: {
         close: 'Chiudi',
