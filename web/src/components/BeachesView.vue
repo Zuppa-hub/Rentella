@@ -130,17 +130,26 @@ const handleSelectBeach = (beach: BeachViewModel) => {
 <style scoped>
 .beaches-view {
   width: 100%;
-  height: 100%;
+  flex: 1;
+  margin-top: -67px;
   display: flex;
   flex-direction: column;
   background: #ffffff;
+  font-family: 'Inter', sans-serif;
+  border-radius: 32px 32px 0 0;
+  padding: 20px clamp(12px, 4vw, 32px) calc(100px + env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 8px rgba(85, 85, 102, 0.18);
+  min-height: calc(100vh - 80px - (64px + 204px - 67px));
+  max-height: calc(100vh - 80px - (64px + 204px - 67px));
+  box-sizing: border-box;
   position: relative;
   z-index: 99;
+  overflow: hidden;
 }
 
 /* Back Section */
 .back-section {
-  padding: 16px;
+  padding: 0 0 12px;
 }
 
 .back-button {
@@ -155,7 +164,6 @@ const handleSelectBeach = (beach: BeachViewModel) => {
   font-weight: 500;
   padding: 8px;
   transition: color 0.2s ease;
-  font-family: 'Inter', sans-serif;
 }
 
 .back-button:hover {
@@ -167,7 +175,7 @@ const handleSelectBeach = (beach: BeachViewModel) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 16px;
+  margin: 0 0 16px;
   padding: 8px;
   background: #f2f4f6;
   border: 1px solid #dae2e3;
@@ -187,7 +195,6 @@ const handleSelectBeach = (beach: BeachViewModel) => {
   border: none;
   background: transparent;
   font-size: 14px;
-  font-family: 'Inter', sans-serif;
   color: #414d4f;
   outline: none;
 }
@@ -197,12 +204,12 @@ const handleSelectBeach = (beach: BeachViewModel) => {
 }
 
 .divider {
-  height: 16px;
+  height: 8px;
 }
 
 /* Beaches Header */
 .beaches-header {
-  padding: 0 16px;
+  padding: 0;
 }
 
 .header-title {
@@ -218,13 +225,11 @@ const handleSelectBeach = (beach: BeachViewModel) => {
   font-size: 20px;
   font-weight: 600;
   color: #414d4f;
-  font-family: 'Inter', sans-serif;
 }
 
 .count {
   font-size: 12px;
   color: #78898c;
-  font-family: 'Inter', sans-serif;
   font-weight: 400;
 }
 
@@ -237,14 +242,13 @@ const handleSelectBeach = (beach: BeachViewModel) => {
 .distance {
   font-size: 12px;
   color: #78898c;
-  font-family: 'Inter', sans-serif;
 }
 
 /* Beaches List */
 .beaches-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0 16px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -292,14 +296,16 @@ const handleSelectBeach = (beach: BeachViewModel) => {
   left: 4px;
   width: 28px;
   height: 28px;
-  background: #1f2937;
-  color: white;
-  border-radius: 50%;
+  background: #ffffff;
+  color: #0b0b0b;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
   font-weight: 700;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
 }
 
 /* Beach Info */
@@ -315,14 +321,13 @@ const handleSelectBeach = (beach: BeachViewModel) => {
   font-weight: 700;
   color: #242b2c;
   margin: 0 0 6px 0;
-  font-family: 'Inter', sans-serif;
   letter-spacing: 0.3px;
 }
 
 .beach-details {
   display: flex;
   gap: 8px;
-  font-size: 12px;
+  font-size: 13px;
   color: #6b7280;
 }
 
@@ -359,19 +364,36 @@ const handleSelectBeach = (beach: BeachViewModel) => {
 /* Desktop styling - sidebar layout */
 @media (min-width: 1024px) {
   .beaches-view {
-    width: 427px;
+    width: 500px;
+    min-width: 500px;
+    max-width: 500px;
+    flex: 0 0 500px;
     background: #fafafc;
     border-radius: 0 32px 32px 0;
     box-shadow: 8px 0px 8px rgba(136, 136, 136, 0.16);
     padding: 32px 0;
+    display: flex;
+    flex-direction: column;
     gap: 16px;
-    margin-left: 0;
+    margin: 0;
+    margin-top: 0;
     overflow: hidden;
     z-index: 2;
     order: 1;
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   .back-section {
+    padding: 0 16px;
+  }
+
+  .search-box {
+    margin: 0 16px;
+  }
+
+  .beaches-header {
     padding: 0 16px;
   }
 

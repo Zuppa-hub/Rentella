@@ -148,6 +148,11 @@ class RealisticBeachesSeeder extends Seeder
             ]);
 
             foreach ($locationData['beaches'] as $index => $beachData) {
+                $latJitter = (($index % 3) - 1) * 0.00025 + (mt_rand(-8, 8) / 100000);
+                $lngJitter = ((($index + 1) % 3) - 1) * 0.00025 + (mt_rand(-8, 8) / 100000);
+                $beachLat = $beachData['lat'] + $latJitter;
+                $beachLng = $beachData['lng'] + $lngJitter;
+
                 // Random prices between 10€ and 40€
                 $minPrice = rand(10, 25);
                 $maxPrice = rand($minPrice + 5, 40);
@@ -159,8 +164,8 @@ class RealisticBeachesSeeder extends Seeder
                     'description' => 'Stabilimento balneare attrezzato con servizi moderni e accoglienza familiare',
                     'opening_date_id' => $openingDateId,
                     'special_note' => '',
-                    'latitude' => $beachData['lat'],
-                    'longitude' => $beachData['lng'],
+                    'latitude' => $beachLat,
+                    'longitude' => $beachLng,
                     'allowed_animals' => rand(0, 1), // 0 = no, 1 = yes
                     'type_id' => $typeId,
                     'created_at' => $now,
@@ -179,8 +184,8 @@ class RealisticBeachesSeeder extends Seeder
                     'name' => 'Zona Standard',
                     'description' => 'Zona standard con ombrelloni e lettini',
                     'special_note' => '',
-                    'latitude' => $beachData['lat'],
-                    'longitude' => $beachData['lng'],
+                    'latitude' => $beachLat,
+                    'longitude' => $beachLng,
                     'beach_id' => $beachId,
                     'price_id' => $priceId,
                     'created_at' => $now,
@@ -199,8 +204,8 @@ class RealisticBeachesSeeder extends Seeder
                         'name' => 'Zona Premium',
                         'description' => 'Zona premium con servizi esclusivi',
                         'special_note' => '',
-                        'latitude' => $beachData['lat'],
-                        'longitude' => $beachData['lng'],
+                        'latitude' => $beachLat,
+                        'longitude' => $beachLng,
                         'beach_id' => $beachId,
                         'price_id' => $premiumPriceId,
                         'created_at' => $now,

@@ -8,8 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import L from 'leaflet'
+import type { Beach } from '../services/api'
 
 export type MapLocation = {
   id: number
@@ -25,6 +26,8 @@ export interface UserLocation {
 
 const props = defineProps<{ 
   locations: MapLocation[]
+  beaches?: Beach[]
+  useBeachMarkers?: boolean
   selectedLocation: MapLocation | null
   sheetCollapsed: boolean
   userLocation?: UserLocation | null
@@ -63,17 +66,50 @@ const initMap = () => {
   renderUserLocation()
 }
 
+const toNumber = (value: unknown) => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  const parsed = Number.parseFloat(String(value))
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+const markerItems = computed(() => {
+  if (props.useBeachMarkers && props.beaches) {
+    return props.beaches
+      .map((beach) => ({
+        id: beach.id,
+        name: beach.name,
+        lat: toNumber(beach.latitude),
+        lng: toNumber(beach.longitude),
+      }))
+      .filter((beach) => beach.lat !== null && beach.lng !== null)
+  }
+
+  return props.locations
+})
+
 const renderMarkers = () => {
   if (!map || !markersLayer) return
   markersLayer.clearLayers()
 
-  props.locations.forEach((location, index) => {
+  const applyJitter = Boolean(props.useBeachMarkers)
+
+  markerItems.value.forEach((location, index) => {
+    let lat = location.lat
+    let lng = location.lng
+
+    if (applyJitter && index > 0) {
+      const angle = index * 1.25
+      const radius = 0.00018 * Math.sqrt(index)
+      lat += Math.cos(angle) * radius
+      lng += Math.sin(angle) * radius
+    }
+
     const marker = L.divIcon({
       className: 'map-pin',
       html: `<span>${index + 1}</span>`,
       iconSize: [34, 34],
     })
-    L.marker([location.lat, location.lng], { icon: marker }).addTo(markersLayer as L.LayerGroup)
+    L.marker([lat, lng], { icon: marker }).addTo(markersLayer as L.LayerGroup)
   })
 }
 
@@ -122,10 +158,11 @@ onMounted(() => {
 })
 
 watch(
-  () => props.locations,
+  () => [props.locations, props.beaches, props.useBeachMarkers],
   () => {
     renderMarkers()
-  }
+  },
+  { deep: true }
 )
 
 watch(

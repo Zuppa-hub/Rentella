@@ -24,7 +24,14 @@
   <div v-else class="home">
     <TopBar :authenticated="authenticated" :initials="initials" @login="handleLogin" @logout="handleLogout" />
 
-    <MapSection :locations="locations" :user-location="userLocation" :selected-location="selectedLocation" :sheet-collapsed="isSheetCollapsed" />
+    <MapSection
+      :locations="locations"
+      :beaches="beachesViewBeaches"
+      :use-beach-markers="isBeachesViewOpen"
+      :user-location="userLocation"
+      :selected-location="selectedLocation"
+      :sheet-collapsed="isSheetCollapsed"
+    />
 
     <BottomSheet
       v-if="!isBeachesViewOpen"
@@ -248,8 +255,28 @@ const loadBeaches = async () => {
       }
     }
     
+    const uniqueLocations: any[] = []
+    const seenLocationKeys = new Set<string>()
+
+    const toNumber = (value: unknown) => {
+      if (typeof value === 'number' && Number.isFinite(value)) return value
+      const parsed = Number.parseFloat(String(value))
+      return Number.isFinite(parsed) ? parsed : null
+    }
+
+    for (const location of locations_data || []) {
+      const lat = toNumber(location.latitude)
+      const lng = toNumber(location.longitude)
+      const name = location.city_name ?? location.name ?? ''
+      const key = `${name}|${lat ?? ''}|${lng ?? ''}`
+
+      if (seenLocationKeys.has(key)) continue
+      seenLocationKeys.add(key)
+      uniqueLocations.push(location)
+    }
+
     // Now process locations using cached data
-    const locationsWithPrices = (locations_data || []).map((location: any) => {
+    const locationsWithPrices = uniqueLocations.map((location: any) => {
       const beaches = beachesCache.value.get(location.id) || []
       
       // Extract min and max prices from cached beaches

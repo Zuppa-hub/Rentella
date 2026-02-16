@@ -102,6 +102,12 @@ const icons = {
   settings: settingsIcon,
 }
 
+const toNumber = (value: unknown) => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  const parsed = Number.parseFloat(String(value))
+  return Number.isFinite(parsed) ? parsed : null
+}
+
 const initMap = () => {
   if (!mapEl.value || map) return
 
@@ -130,7 +136,20 @@ const renderMarkers = () => {
 
   // Only show beach markers (numbered dots), not location marker
   props.beaches.forEach((beach, idx) => {
-    if (beach.latitude && beach.longitude) {
+    const lat = toNumber(beach.latitude)
+    const lng = toNumber(beach.longitude)
+
+    if (lat !== null && lng !== null) {
+      let markerLat = lat
+      let markerLng = lng
+
+      if (idx > 0) {
+        const angle = idx * 1.25
+        const radius = 0.00018 * Math.sqrt(idx)
+        markerLat += Math.cos(angle) * radius
+        markerLng += Math.sin(angle) * radius
+      }
+
       const beachIcon = L.divIcon({
         className: 'map-pin leaflet-div-icon',
         html: `<span class="map-pin__label">${idx + 1}</span>`,
@@ -138,7 +157,7 @@ const renderMarkers = () => {
         iconAnchor: [14, 28],
       })
 
-      L.marker([beach.latitude, beach.longitude], {
+      L.marker([markerLat, markerLng], {
         icon: beachIcon,
         title: beach.name,
       }).addTo(markersLayer!)
@@ -188,7 +207,6 @@ onMounted(() => {
 watch(
   () => props.beaches,
   () => {
-    console.log('Beaches prop changed, re-rendering markers')
     renderMarkers()
   },
   { deep: true }
@@ -209,6 +227,17 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .desktop-beaches-layout {
+  --color-primary: #005f6f;
+  --color-primary-light: #d2eef1;
+  --color-primary-light-active: #ffffff;
+  --color-text-primary: #414d4f;
+  --color-text-secondary: #6b7280;
+  --color-bg-light: #f0f4f6;
+  --color-border: #e5e7eb;
+  --color-shadow: rgba(15, 23, 42, 0.08);
+  --color-marker: #0b0b0b;
+  --color-marker-label: #ffffff;
+
   width: 100%;
   height: 100vh;
   display: flex;
@@ -218,78 +247,88 @@ onBeforeUnmount(() => {
 
 /* Navbar */
 .navbar {
-  height: 64px;
-  background: #0b5f6f;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  height: 72px;
+  background: var(--color-primary);
+  box-shadow: 0px -4px 8px rgba(85, 85, 85, 0.08);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  flex-shrink: 0;
 }
 
 .navbar-container {
-  height: 100%;
   display: flex;
+  width: 100%;
   align-items: center;
-  padding: 0 24px;
-  gap: 24px;
+  gap: 16px;
 }
 
 .logo-section {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
 }
 
 .logo {
   height: 32px;
+  width: auto;
 }
 
 .nav-items {
-  flex: 1;
   display: flex;
-  gap: 8px;
+  gap: 0;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  margin-left: auto;
+  margin-right: 12px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 8px;
+  gap: 4px;
+  padding: 0 16px;
+  height: 100%;
   cursor: pointer;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background 0.2s ease;
+  color: var(--color-primary-light);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transition: opacity 0.3s ease;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+  opacity: 0.8;
 }
 
 .nav-item.active {
-  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-primary-light-active);
 }
 
 .nav-icon {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
 }
 
 .profile-section {
   display: flex;
   align-items: center;
+  gap: 16px;
 }
 
 .profile-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #ffffff;
-  color: #0b5f6f;
+  background: #1f2937;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
-  cursor: pointer;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Main Content */
@@ -304,6 +343,9 @@ onBeforeUnmount(() => {
   position: relative;
   overflow: hidden;
   order: 2;
+  margin-left: -24px;
+  background: #f0f4f6;
+  z-index: 1;
 }
 
 .map {

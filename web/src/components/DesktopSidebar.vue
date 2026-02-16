@@ -97,7 +97,10 @@ const icons = {
 
 <style scoped>
 .sidebar {
-  width: 427px;
+  width: 500px;
+  min-width: 500px;
+  max-width: 500px;
+  flex: 0 0 500px;
   background: #fafafc;
   border-radius: 0 32px 32px 0;
   box-shadow: 8px 0px 8px rgba(136, 136, 136, 0.16);
