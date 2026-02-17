@@ -1,0 +1,54 @@
+{
+  "realm": "rentella",
+  "enabled": true,
+  "displayName": "Rentella",
+  "loginTheme": "Rentella",
+  "clients": [
+    {
+      "clientId": "rentella-web",
+      "name": "Rentella Web",
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:8000/*",
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8000",
+        "http://localhost:5173"
+      ]
+    },
+    {
+      "clientId": "rentella-api",
+      "name": "Rentella API",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "secret": "H4sAFyPpmqHpc5tbPQhzT75cQK2IuOoW"
+    }
+  ],
+  "users": [
+    {
+      "username": "testuser",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Test",
+      "lastName": "User",
+      "email": "testuser@rentella.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test123",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
