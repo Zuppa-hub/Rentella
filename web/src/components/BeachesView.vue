@@ -104,6 +104,7 @@ type BeachViewModel = Beach & {
   min_price?: number
   max_price?: number
   has_umbrella?: boolean
+  photo_url?: string
 }
 
 const props = defineProps<{

@@ -1,6 +1,6 @@
 <template>
   <div v-if="!authenticated" class="app-container">
-    <WelcomeScreen @login="handleLogin" />
+    <p class="auth-redirect">Redirecting to login...</p>
   </div>
   <div v-else-if="isDesktop" class="app-desktop">
     <DesktopHome v-if="!isBeachesViewOpen" :locations="locations" :initials="initials" :user-location="userLocation" :selected-location="selectedLocation" @location-click="openLocationModal" />
@@ -72,7 +72,6 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { getUser, isAuthenticated, login, logout, updateToken } from './keycloak'
 import { useGeolocation } from './composables/useGeolocation'
-import WelcomeScreen from './components/WelcomeScreen.vue'
 import TopBar from './components/TopBar.vue'
 import MapSection, { type MapLocation } from './components/MapSection.vue'
 import BottomSheet from './components/BottomSheet.vue'
@@ -339,6 +338,8 @@ onMounted(() => {
       console.log('Geolocation not available on mount')
     })
     loadBeaches()
+  } else {
+    handleLogin()
   }
 })
 
@@ -407,6 +408,21 @@ watch(userLocation, () => {
 
 :global(.leaflet-container) {
   font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+.app-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f7f9;
+}
+
+.auth-redirect {
+  margin: 0;
+  color: #33515e;
+  font-size: 0.95rem;
 }
 
 </style>

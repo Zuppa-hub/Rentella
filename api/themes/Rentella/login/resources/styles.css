@@ -37,6 +37,12 @@ body {
   padding: 0;
 }
 
+.login-logo {
+  width: 75px;
+  height: auto;
+  display: block;
+}
+
 .login-content {
   display: flex;
   flex-direction: column;
@@ -123,6 +129,33 @@ body {
   border-color: #005f6f;
 }
 
+
+.login-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-ghost {
+  display: none;
+  width: 100%;
+  height: 48px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-ghost-text {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  color: #242b2c;
+}
+
 .btn-primary {
   width: 100%;
   height: 60px;
@@ -137,6 +170,16 @@ body {
   cursor: pointer;
   box-shadow: 0px 8px 8px 0px rgba(136, 136, 136, 0.08);
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary-text {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  color: #ffffff;
 }
 
 .btn-primary:hover {
@@ -145,6 +188,12 @@ body {
 
 .btn-primary:active {
   background: #003944;
+}
+
+@media (min-width: 1024px) {
+  .btn-ghost {
+    display: flex;
+  }
 }
 
 .register-section {
@@ -648,4 +697,339 @@ video {
   --tw-backdrop-opacity:  ;
   --tw-backdrop-saturate:  ;
   --tw-backdrop-sepia:  ;
+}
+
+/* Rentella login overrides */
+body {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f3f4f5;
+  color: #242b2c;
+  display: block;
+  overflow: hidden;
+}
+
+.auth-shell {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  overflow: hidden;
+}
+
+.auth-panel {
+  width: min(42%, 528px);
+  height: 100vh;
+  background: #f3f4f5;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-topbar {
+  height: 84px;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  border-bottom: 0;
+  background: transparent;
+  box-shadow: none;
+  position: relative;
+}
+
+.auth-topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: rgba(36, 43, 44, 0.08);
+}
+
+.auth-logo {
+  width: 108px;
+  height: auto;
+  display: block;
+  filter: brightness(0) saturate(100%);
+}
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.auth-main-inner {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #242b2c;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.auth-subtitle {
+  margin: 12px 0 32px;
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: #5d6b6e;
+  text-align: center;
+}
+
+.auth-message {
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #f6c8c2;
+  background: #fee9e7;
+  color: #9f2d24;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label {
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 600;
+  color: #414d4f;
+}
+
+.password-wrap {
+  position: relative;
+}
+
+.input-field {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #d0d9dd;
+  border-radius: 6px;
+  background: #e8ecef;
+  box-shadow: 0 2px 2px rgba(136, 136, 153, 0.08);
+  color: #374649;
+  font-size: 15px;
+  padding: 0 16px;
+  outline: 0;
+}
+
+.input-field::placeholder {
+  color: #78898c;
+}
+
+.input-field:focus {
+  border-color: #0b6f7d;
+}
+
+.input-field-password {
+  padding-right: 56px;
+}
+
+.password-eye {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #68787b;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.eye-icon {
+  display: block;
+}
+
+.eye-on {
+  display: none;
+}
+
+.password-eye.is-visible .eye-off {
+  display: none;
+}
+
+.password-eye.is-visible .eye-on {
+  display: block;
+}
+
+.forgot-wrap {
+  text-align: right;
+  margin-top: -2px;
+}
+
+.forgot-link {
+  color: #2f393c;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.forgot-link:hover {
+  color: #0b6f7d;
+}
+
+.btn-primary {
+  margin-top: 4px;
+  width: 100%;
+  height: 55px;
+  border: 0;
+  border-radius: 8px;
+  background: #005f6f;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 8px rgba(136, 136, 136, 0.08);
+}
+
+.btn-primary:hover {
+  background: #095d69;
+}
+
+.btn-primary:active {
+  background: #064f59;
+}
+
+.register-section {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.register-text {
+  margin: 0 0 8px;
+  color: #4b595c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.register-link {
+  color: #242b2c;
+  text-decoration: none;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.register-link:hover {
+  color: #0b6f7d;
+}
+
+.auth-visual {
+  display: none;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-visual-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (min-width: 992px) {
+  .auth-visual {
+    display: block;
+    height: 100vh;
+  }
+
+  .register-link {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 991px) {
+  .auth-shell {
+    max-width: none;
+  }
+
+  .auth-panel {
+    width: 100%;
+  }
+
+  .auth-topbar {
+    height: auto;
+    border-bottom: 0;
+    padding: 26px 30px 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .auth-logo {
+    width: 98px;
+  }
+
+  .auth-main {
+    padding: 52px 30px 42px;
+    align-items: flex-start;
+  }
+
+  .auth-main-inner {
+    max-width: none;
+  }
+
+  .auth-title {
+    font-size: 32px;
+  }
+
+  .auth-subtitle {
+    margin: 18px 0 36px;
+    font-size: 14px;
+  }
+
+  .input-label {
+    font-size: 14px;
+  }
+
+  .input-field {
+    height: 48px;
+    font-size: 15px;
+    border-radius: 8px;
+  }
+
+  .btn-primary {
+    height: 60px;
+    margin-top: 16px;
+    font-size: 20px;
+  }
+
+  .register-section {
+    margin-top: 70px;
+  }
+
+  .register-text {
+    font-size: 14px;
+  }
+
+  .register-link {
+    font-size: 16px;
+    font-weight: 700;
+  }
 }
