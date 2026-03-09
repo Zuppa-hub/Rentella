@@ -66,6 +66,28 @@
 
     <p v-if="error" class="error">{{ error }}</p>
   </div>
+
+  <div v-if="authenticated && showGeoPrompt" class="geo-auth-overlay" role="dialog" aria-modal="true" aria-labelledby="geo-auth-title" aria-describedby="geo-auth-text">
+    <div class="geo-auth-card">
+      <button type="button" class="geo-auth-close" aria-label="Close" @click="closeGeoPrompt" ref="geoCloseBtn">&times;</button>
+      <h2 id="geo-auth-title" class="geo-auth-title">Location is needed</h2>
+      <p id="geo-auth-text" class="geo-auth-text">In order to provide you with the best experience and accurate results, we need your location.</p>
+      <p v-if="geoPromptError" class="geo-auth-error">{{ geoPromptError }}</p>
+      <div class="geo-auth-actions">
+        <button type="button" class="geo-auth-secondary" @click="handleSetLocationClick">Set Location</button>
+        <button type="button" class="geo-auth-primary" :disabled="geoPromptLoading" @click="requestGeoFromPrompt">
+          {{ geoPromptLoading ? 'Loading...' : 'Use Current' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <SetLocationModal
+    :is-open="showSetLocationModal"
+    @close="handleLocationModalClose"
+    @location-set="handleLocationSet"
+    @use-current-location="handleUseCurrentLocationFromModal"
+  />
 </template>
 
 <script setup lang="ts">
@@ -80,11 +102,19 @@ import DesktopHome from './components/DesktopHome.vue'
 import LocationModal from './components/LocationModal.vue'
 import BeachesView from './components/BeachesView.vue'
 import DesktopBeachesLayout from './components/DesktopBeachesLayout.vue'
+import SetLocationModal from './components/SetLocationModal.vue'
 import type { LocationItem } from './components/LocationCard.vue'
-import { getLocations, getBeaches, getBeachTypes, type Beach, type Location } from './services/api'
+import { getLocations, getBeaches, getBeachTypes, type Beach, type Location, type CityLocation } from './services/api'
 
 const geolocation = useGeolocation()
 const { userLocation, calculateDistance, requestLocation } = geolocation
+
+// GEO-LOCATION CONSTANTS & CONFIGURATION
+const GEO_CONFIG = {
+  COOKIE_NAME: 'rentella_geo_after_auth',
+  COOKIE_MAX_AGE: 900, // 15 minutes
+  PERMISSIONS_TIMEOUT: 1000,
+} as const
 
 const authenticated = ref(false)
 const error = ref<string | null>(null)
@@ -94,6 +124,12 @@ const isSheetCollapsed = ref(false)
 const isDesktop = ref(false)
 let refreshTimer: number | undefined
 let locationDebounceTimer: number | undefined
+const showGeoPrompt = ref(false)
+const geoPromptLoading = ref(false)
+const geoPromptError = ref<string | null>(null)
+const geoCloseBtn = ref<HTMLButtonElement | null>(null)
+const showSetLocationModal = ref(false)
+let lastAuthCheckTime = 0
 
 // Cache for beaches data (loaded once at login)
 const beachesCache = ref<Map<number, any[]>>(new Map())
@@ -134,8 +170,129 @@ const syncState = () => {
   user.value = getUser()
 }
 
+const checkForAuthenticationCallback = () => {
+  // Check if URL contains Keycloak authentication parameters (code, state)
+  const searchParams = new URLSearchParams(window.location.search)
+  if (searchParams.has('code') || searchParams.has('state')) {
+    // Authentication callback detected, clean URL and reload to process token
+    window.history.replaceState({}, '', window.location.pathname)
+    window.location.reload()
+  }
+}
+
 const checkDesktop = () => {
   isDesktop.value = window.innerWidth >= 1024
+}
+
+const getCookieValue = (name: string): string | null => {
+  const prefix = `${name}=`
+  const cookie = document.cookie
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(prefix))
+  return cookie ? decodeURIComponent(cookie.slice(prefix.length)) : null
+}
+
+const clearCookieValue = (name: string) => {
+  document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`
+}
+
+const checkGeoPermissionStatus = async (): Promise<'granted' | 'denied' | 'unknown'> => {
+  if (!navigator.geolocation) return 'unknown'
+  if (!(navigator.permissions && navigator.permissions.query)) return 'unknown'
+
+  try {
+    const permissionStatus = await Promise.race([
+      navigator.permissions.query({ name: 'geolocation' }),
+      new Promise<PermissionStatus>((_, reject) =>
+        setTimeout(() => reject(new Error('Permission query timeout')), GEO_CONFIG.PERMISSIONS_TIMEOUT)
+      ),
+    ])
+    return permissionStatus.state === 'granted' ? 'granted' : 'denied'
+  } catch {
+    return 'unknown'
+  }
+}
+
+const closeGeoPrompt = () => {
+  showGeoPrompt.value = false
+  geoPromptError.value = null
+}
+
+const handleSetLocationClick = () => {
+  showSetLocationModal.value = true
+}
+
+const handleLocationModalClose = () => {
+  showSetLocationModal.value = false
+}
+
+const handleLocationSet = (location: CityLocation) => {
+  // Update user location with the selected city's coordinates
+  userLocation.value = {
+    lat: location.latitude,
+    lng: location.longitude
+  }
+  showGeoPrompt.value = false
+  showSetLocationModal.value = false
+  geoPromptError.value = null
+}
+
+const handleUseCurrentLocationFromModal = async () => {
+  showSetLocationModal.value = false
+  geoPromptLoading.value = true
+  geoPromptError.value = null
+  try {
+    await requestLocation()
+    showGeoPrompt.value = false
+  } catch {
+    geoPromptError.value = 'Unable to access location. Please check your browser permissions and try again.'
+    showGeoPrompt.value = true
+  } finally {
+    geoPromptLoading.value = false
+  }
+}
+
+const requestGeoFromPrompt = async () => {
+  geoPromptLoading.value = true
+  geoPromptError.value = null
+  try {
+    await requestLocation()
+    showGeoPrompt.value = false
+  } catch {
+    geoPromptError.value = 'Unable to access location. Please check your browser permissions and try again.'
+    showGeoPrompt.value = true
+  } finally {
+    geoPromptLoading.value = false
+  }
+}
+
+const hydrateGeoLocationAfterAuth = async () => {
+  const checkTime = Date.now()
+  lastAuthCheckTime = checkTime
+
+  const permissionState = await checkGeoPermissionStatus()
+  if (checkTime !== lastAuthCheckTime) return // Race condition guard
+
+  const shouldPrompt = getCookieValue(GEO_CONFIG.COOKIE_NAME) === '1'
+  if (!shouldPrompt) return
+
+  clearCookieValue(GEO_CONFIG.COOKIE_NAME)
+  
+  if (permissionState === 'granted') {
+    // Auto-fetch location if already authorized
+    try {
+      await requestLocation()
+    } catch {
+      // Silent fail on auto-hydrate
+    }
+  } else if (permissionState !== 'unknown') {
+    // Show prompt only if permission was explicitly denied or requested
+    showGeoPrompt.value = true
+    geoPromptError.value = null
+    // Move focus to close button for accessibility
+    setTimeout(() => geoCloseBtn.value?.focus(), 0)
+  }
 }
 
 const startTokenRefresh = () => {
@@ -172,6 +329,7 @@ const handleLogin = async () => {
 const handleLogout = async () => {
   error.value = null
   try {
+    clearCookieValue(GEO_CONFIG.COOKIE_NAME)
     await logout()
   } catch (err) {
     error.value = 'Logout failed'
@@ -329,14 +487,13 @@ const loadBeaches = async () => {
 }
 
 onMounted(() => {
+  checkForAuthenticationCallback()
   syncState()
   checkDesktop()
   window.addEventListener('resize', checkDesktop)
   if (isAuthenticated()) {
     startTokenRefresh()
-    requestLocation().catch(() => {
-      console.log('Geolocation not available on mount')
-    })
+    hydrateGeoLocationAfterAuth()
     loadBeaches()
   } else {
     handleLogin()
@@ -353,7 +510,17 @@ onBeforeUnmount(() => {
 
 // Auto-load beaches when user authenticates
 watch(authenticated, (isAuth) => {
-  if (isAuth) loadBeaches()
+  if (!isAuth) {
+    showGeoPrompt.value = false
+    geoPromptError.value = null
+    lastAuthCheckTime = 0
+    return
+  }
+
+  if (isAuth) {
+    loadBeaches()
+    hydrateGeoLocationAfterAuth()
+  }
 })
 
 // Recalculate distances when user location changes (debounced to avoid rate limiting)
@@ -417,6 +584,162 @@ watch(userLocation, () => {
   align-items: center;
   justify-content: center;
   background: #f4f7f9;
+}
+
+.geo-auth-error {
+  background: #fef3f2;
+  border: 1px solid #f97066;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 12px 0 0;
+  color: #d97706;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.geo-auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2200;
+  padding: 20px;
+}
+
+.geo-auth-card {
+  width: min(720px, 100%);
+  background: #f3f4f5;
+  border-radius: 20px;
+  padding: clamp(20px, 5vw, 28px);
+  position: relative;
+}
+
+.geo-auth-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: #4f5d61;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.geo-auth-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.geo-auth-close:focus {
+  outline: 2px solid #005f6f;
+  outline-offset: 2px;
+}
+
+.geo-auth-title {
+  margin: 0;
+  font-size: clamp(22px, 5.2vw, 26px);
+  font-weight: 700;
+  color: #242b2c;
+  line-height: 1.1;
+}
+
+.geo-auth-title::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: #cfd8dc;
+  margin-top: clamp(10px, 2.8vw, 14px);
+}
+
+.geo-auth-title::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: #cfd8dc;
+  margin-top: 14px;
+}
+
+.geo-auth-text {
+  margin: 16px 0 0;
+  color: #5d6b6e;
+  font-size: clamp(12px, 3vw, 15px);
+  line-height: 1.35;
+}
+
+.geo-auth-actions {
+  margin-top: clamp(16px, 4vw, 24px);
+  display: flex;
+  gap: clamp(8px, 2.5vw, 12px);
+}
+
+.geo-auth-secondary,
+.geo-auth-primary {
+  flex: 1;
+  height: clamp(44px, 11vw, 56px);
+  border: 0;
+  border-radius: 12px;
+  font-size: clamp(12px, 3vw, 15px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.geo-auth-secondary {
+  background: transparent;
+  color: #242b2c;
+}
+
+.geo-auth-secondary:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.geo-auth-secondary:focus {
+  outline: 2px solid #005f6f;
+  outline-offset: 2px;
+}
+
+.geo-auth-primary {
+  background: #005f6f;
+  color: #fff;
+}
+
+.geo-auth-primary:hover:not(:disabled) {
+  background: #095d69;
+}
+
+.geo-auth-primary:active:not(:disabled) {
+  background: #064f59;
+}
+
+.geo-auth-primary:focus {
+  outline: 2px solid #005f6f;
+  outline-offset: 2px;
+}
+
+.geo-auth-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 991px) {
+  .geo-auth-card {
+    max-width: 100%;
+  }
+
+  .geo-auth-close {
+    width: 36px;
+    height: 36px;
+    font-size: 28px;
+  }
 }
 
 .auth-redirect {

@@ -111,6 +111,20 @@
                     </form>
                 </div>
             </main>
+
+            <div id="geo-modal" class="geo-modal" role="dialog" aria-modal="true" aria-labelledby="geo-modal-title" aria-describedby="geo-modal-description">
+                <div class="geo-modal-card">
+                    <button type="button" class="geo-close" data-geo-close aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h2 id="geo-modal-title" class="geo-title">Location is needed</h2>
+                    <p id="geo-modal-description" class="geo-text">In order to provide you with the best experience and to ensure accurate results, we need to know your location. You can use your Current Location or set it Manually</p>
+                    <div class="geo-actions">
+                        <button type="button" class="geo-action-secondary" data-geo-close>Set Location</button>
+                        <button type="button" id="geo-use-current" class="geo-action-primary">Use Current</button>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <aside class="auth-visual" aria-hidden="true">
@@ -120,12 +134,29 @@
 
     <script>
         (function () {
+            var form = document.getElementById('kc-register-form');
             var fullNameInput = document.getElementById('fullName');
             var firstNameInput = document.getElementById('firstName');
             var lastNameInput = document.getElementById('lastName');
             var emailInput = document.getElementById('email');
             var usernameInput = document.getElementById('username');
             var toggleButtons = document.querySelectorAll('.password-eye');
+
+            // Configuration constants for geo-location cookie
+            var GEO_COOKIE_CONFIG = {
+                NAME: 'rentella_geo_after_auth',
+                VALUE: '1',
+                MAX_AGE: 900, // 15 minutes
+            };
+
+            function markGeoPromptAfterAuth() {
+                if (!form) return;
+                // Share flag across Keycloak/app ports via cookie on localhost
+                var cookieStr = GEO_COOKIE_CONFIG.NAME + '=' + GEO_COOKIE_CONFIG.VALUE + 
+                                '; Path=/; Max-Age=' + GEO_COOKIE_CONFIG.MAX_AGE + 
+                                '; SameSite=Lax';
+                document.cookie = cookieStr;
+            }
 
             function splitFullName() {
                 if (!fullNameInput || !firstNameInput || !lastNameInput) return;
@@ -162,6 +193,14 @@
                 syncUsernameFromEmail();
             }
 
+            if (form) {
+                form.addEventListener('submit', function () {
+                    splitFullName();
+                    syncUsernameFromEmail();
+                    markGeoPromptAfterAuth();
+                });
+            }
+
             toggleButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
                     var wrapper = button.closest('.password-wrap');
@@ -176,6 +215,7 @@
                     button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
                 });
             });
+
         })();
     </script>
 </body>

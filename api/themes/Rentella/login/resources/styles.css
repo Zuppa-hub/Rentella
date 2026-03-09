@@ -732,6 +732,7 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-gutter: stable;
+  position: relative;
 }
 
 .auth-topbar {
@@ -1072,5 +1073,158 @@ body {
   .register-link {
     font-size: 16px;
     font-weight: 700;
+  }
+}
+
+.geo-modal {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(36, 43, 44, 0.52);
+  z-index: 1200;
+  padding: 24px;
+}
+
+.geo-modal.is-visible {
+  display: flex;
+}
+
+.geo-modal-card {
+  width: min(100%, 720px);
+  background: #f9fafb;
+  border-radius: 20px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
+  padding: 34px 46px;
+  position: relative;
+}
+
+.geo-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #586669;
+  font-size: 40px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.geo-title {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: #242b2c;
+}
+
+.geo-title::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: #cfd8dc;
+  margin-top: 20px;
+}
+
+.geo-text {
+  margin: 22px 0 0;
+  color: #5d6b6e;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.geo-actions {
+  margin-top: 38px;
+  display: flex;
+  gap: 22px;
+}
+
+.geo-action-secondary,
+.geo-action-primary {
+  height: 64px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 24px;
+}
+
+.geo-action-secondary {
+  flex: 1;
+  background: transparent;
+  color: #242b2c;
+}
+
+.geo-action-primary {
+  flex: 1;
+  background: #005f6f;
+  color: #ffffff;
+  box-shadow: 0 8px 8px rgba(136, 136, 136, 0.08);
+}
+
+.geo-action-primary:hover {
+  background: #095d69;
+}
+
+.geo-action-primary:active {
+  background: #064f59;
+}
+
+@media (max-width: 991px) {
+  .geo-modal {
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .geo-modal-card {
+    width: 100%;
+    margin-top: min(34vh, 280px);
+    border-radius: 24px;
+    padding: 28px 24px 22px;
+  }
+
+  .geo-close {
+    top: 12px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 34px;
+  }
+
+  .geo-title {
+    font-size: clamp(18px, 5vw, 24px);
+  }
+
+  .geo-title::after {
+    margin-top: 14px;
+  }
+
+  .geo-text {
+    margin-top: 16px;
+    font-size: clamp(12px, 2.9vw, 15px);
+    line-height: 1.35;
+  }
+
+  .geo-actions {
+    margin-top: 24px;
+    gap: 12px;
+  }
+
+  .geo-action-secondary,
+  .geo-action-primary {
+    font-size: clamp(12px, 3vw, 15px);
+    height: clamp(52px, 13vw, 76px);
+    border-radius: 14px;
+    padding: 0 12px;
   }
 }

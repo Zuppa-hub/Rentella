@@ -8,6 +8,7 @@ use App\Http\Requests\UserRequest;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 
 
 /* The `class UserController extends Controller` is defining a PHP class called `UserController` that
@@ -38,6 +39,69 @@ class UserController extends Controller
     private function handleException(\Exception $e): JsonResponse
     {
         return response()->json(['error' => $e->getMessage()], 500);
+    }
+
+    /**
+     * Resolve current authenticated principal to a local User row.
+     * Works with Keycloak claims where id can be UUID/non-numeric.
+     */
+    private function resolveCurrentLocalUser(): ?User
+    {
+        $authUser = auth()->user();
+        if (!$authUser) {
+            return null;
+        }
+
+        // If the auth principal is already a persisted local model, use it directly.
+        if ($authUser instanceof User && $authUser->exists) {
+            return $authUser;
+        }
+
+        $authId = $authUser->id ?? null;
+        $uuid = $authUser->uuid ?? $authUser->sub ?? (!is_numeric((string) $authId) ? $authId : null);
+        $email = $authUser->email ?? null;
+        $name = $authUser->name ?? $authUser->given_name ?? 'User';
+        $surname = $authUser->surname ?? $authUser->family_name ?? 'Keycloak';
+
+        if (is_numeric((string) $authId)) {
+            $user = User::find((int) $authId);
+            if ($user) {
+                return $user;
+            }
+        }
+
+        if ($uuid) {
+            $user = User::where('uuid', $uuid)->first();
+            if ($user) {
+                return $user;
+            }
+        }
+
+        if ($email) {
+            $user = User::where('email', $email)->first();
+            if ($user) {
+                return $user;
+            }
+        }
+
+        if (!$email) {
+            $email = sprintf('kc_%s@local.invalid', Str::random(12));
+        }
+
+        if (!$uuid) {
+            do {
+                $uuid = (string) Str::uuid();
+            } while (User::where('uuid', $uuid)->exists());
+        }
+
+        // Create a valid local row with all required columns filled.
+        return User::create([
+            'email' => $email,
+            'name' => $name,
+            'surname' => $surname,
+            'uuid' => $uuid,
+            'password' => bcrypt(Str::random(32)),
+        ]);
     }
     public function index()
     {
@@ -205,4 +269,56 @@ class UserController extends Controller
             return $this->handleException($e);
         }
     }
+
+    /**
+     * Set the user's preferred location
+     */
+    public function setPreferredLocation(Request $request)
+    {
+        try {
+            $user = $this->resolveCurrentLocalUser();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $request->validate([
+                'location_id' => 'required|exists:cities_location,id'
+            ]);
+
+            $user->preferred_location_id = $request->input('location_id');
+            $user->save();
+
+            // Load the relationship to return full location data
+            $user->load('preferredLocation');
+
+            return response()->json([
+                'message' => 'Preferred location updated successfully',
+                'data' => $user
+            ]);
+        } catch (\Exception $e) {
+            return $this->handleException($e);
+        }
+    }
+
+    /**
+     * Get the user's preferred location
+     */
+    public function getPreferredLocation()
+    {
+        try {
+            $user = $this->resolveCurrentLocalUser();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $user->load('preferredLocation');
+
+            return response()->json([
+                'preferred_location' => $user->preferredLocation
+            ]);
+        } catch (\Exception $e) {
+            return $this->handleException($e);
+        }
+    }
 }
+

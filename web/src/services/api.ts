@@ -43,6 +43,13 @@ export interface BeachType {
   type: string
 }
 
+export interface CityLocation {
+  id: number
+  city_name: string
+  latitude: number
+  longitude: number
+}
+
 interface FetchOptions extends RequestInit {
   authenticated?: boolean
 }
@@ -133,3 +140,23 @@ export async function deleteBeach(id: number) {
 export async function healthCheck() {
   return fetchApi('/health', { authenticated: false })
 }
+
+// City search for autocomplete
+export async function searchCities(query: string, limit: number = 20): Promise<CityLocation[]> {
+  const params = new URLSearchParams({ q: query, limit: String(limit) })
+  return fetchApi<CityLocation[]>(`/locations/search?${params.toString()}`)
+}
+
+// User preferred location
+export async function setUserPreferredLocation(locationId: number): Promise<void> {
+  await fetchApi<void>('/users/preferred-location', {
+    method: 'POST',
+    body: JSON.stringify({ location_id: locationId }),
+  })
+}
+
+export async function getUserPreferredLocation(): Promise<CityLocation | null> {
+  const response = await fetchApi<{ preferred_location: CityLocation | null }>('/users/preferred-location')
+  return response.preferred_location
+}
+

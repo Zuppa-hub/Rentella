@@ -122,4 +122,33 @@ class LocationController extends Controller
         $location->delete();
         return response()->json(null, 204);
     }
+
+    /**
+     * Search cities by name for autocomplete
+     */
+    public function search(Request $request)
+    {
+        $query = $request->input('q', '');
+        $limit = (int) $request->input('limit', 20);
+
+        if (empty($query)) {
+            return response()->json([]);
+        }
+
+        $cities = CityLocation::select('id', 'city_name', 'latitude', 'longitude')
+            ->where('city_name', 'LIKE', '%' . $query . '%')
+            ->orderBy('city_name', 'asc')
+            ->get();
+
+        // Some datasets contain duplicate rows for the same city name.
+        // Return one suggestion per normalized city name.
+        $deduped = $cities
+            ->unique(function ($city) {
+                return mb_strtolower(trim((string) $city->city_name));
+            })
+            ->values()
+            ->take(max(1, min($limit, 50)));
+
+        return response()->json($deduped);
+    }
 }

@@ -78,26 +78,64 @@
                     </form>
                 </div>
             </main>
+
+            <div id="geo-modal" class="geo-modal" role="dialog" aria-modal="true" aria-labelledby="geo-modal-title" aria-describedby="geo-modal-description">
+                <div class="geo-modal-card">
+                    <button type="button" class="geo-close" data-geo-close aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h2 id="geo-modal-title" class="geo-title">Location is needed</h2>
+                    <p id="geo-modal-description" class="geo-text">In order to provide you with the best experience and to ensure accurate results, we need to know your location. You can use your Current Location or set it Manually</p>
+                    <div class="geo-actions">
+                        <button type="button" class="geo-action-secondary" data-geo-close>Set Location</button>
+                        <button type="button" id="geo-use-current" class="geo-action-primary">Use Current</button>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <aside class="auth-visual" aria-hidden="true">
             <img src="${url.resourcesPath}/assets/BeachFromAbove.jpeg" alt="" class="auth-visual-image" />
         </aside>
     </div>
-        <script>
-            (function () {
-                var passwordInput = document.getElementById('password');
-                var toggleButton = document.querySelector('.password-eye');
 
-                if (!passwordInput || !toggleButton) return;
+    <script>
+        (function () {
+            // Configuration constants for geo-location cookie
+            var GEO_COOKIE_CONFIG = {
+                NAME: 'rentella_geo_after_auth',
+                VALUE: '1',
+                MAX_AGE: 900, // 15 minutes
+            };
 
+            var form = document.getElementById('kc-form-login');
+            var passwordInput = document.getElementById('password');
+            var toggleButton = document.querySelector('.password-eye');
+
+            function markGeoPromptAfterAuth() {
+                if (!form) return;
+                // Share flag across Keycloak/app ports via cookie on localhost
+                var cookieStr = GEO_COOKIE_CONFIG.NAME + '=' + GEO_COOKIE_CONFIG.VALUE + 
+                                '; Path=/; Max-Age=' + GEO_COOKIE_CONFIG.MAX_AGE + 
+                                '; SameSite=Lax';
+                document.cookie = cookieStr;
+            }
+
+            if (passwordInput && toggleButton) {
                 toggleButton.addEventListener('click', function () {
                     var isPassword = passwordInput.getAttribute('type') === 'password';
                     passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
                     toggleButton.classList.toggle('is-visible', isPassword);
                     toggleButton.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
                 });
-            })();
-        </script>
+            }
+
+            if (form) {
+                form.addEventListener('submit', function () {
+                    markGeoPromptAfterAuth();
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
