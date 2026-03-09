@@ -765,6 +765,28 @@ body {
   filter: brightness(0) saturate(100%);
 }
 
+.auth-back-link {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  color: #242b2c;
+  text-decoration: none;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.auth-back-link:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.auth-back-link:focus {
+  outline: 2px solid #005f6f;
+  outline-offset: 2px;
+}
+
 .auth-main {
   flex: 1;
   display: flex;
@@ -795,6 +817,15 @@ body {
   line-height: 1.2;
   font-weight: 500;
   color: #5d6b6e;
+  text-align: center;
+}
+
+.auth-subtitle-secondary {
+  margin: 8px 0 32px;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 400;
+  color: #7a8588;
   text-align: center;
 }
 
