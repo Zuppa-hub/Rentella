@@ -1,17 +1,6 @@
 <template>
   <aside class="sidebar">
-    <div class="search-box">
-      <svg viewBox="0 0 24 24" class="search-icon">
-        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none" />
-        <path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" fill="none" />
-      </svg>
-      <input
-        v-model="searchTerm"
-        type="text"
-        :placeholder="t('desktop.search.placeholder')"
-        class="search-input"
-      />
-    </div>
+    <SearchBox v-model="searchTerm" :placeholder="t('desktop.search.placeholder')" />
 
     <div class="divider"></div>
 
@@ -60,6 +49,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SearchBox from './SearchBox.vue'
 import distanceIcon from '../assets/icons/Distance.svg'
 import moneyIcon from '../assets/icons/Money.svg'
 
@@ -97,37 +87,21 @@ const icons = {
 
 <style scoped>
 .sidebar {
-  width: 427px;
+  width: 500px;
+  min-width: 500px;
+  max-width: 500px;
+  flex: 0 0 500px;
   background: #fafafc;
   border-radius: 0 32px 32px 0;
   box-shadow: 8px 0px 8px rgba(136, 136, 136, 0.16);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   padding: 32px 0;
   margin-left: 0;
   overflow: hidden;
   z-index: 2;
   order: 1;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 16px;
-  padding: 8px;
-  background: #f2f4f6;
-  border: 1px solid #dae2e3;
-  border-radius: 8px;
-  box-shadow: 0px 2px 2px rgba(136, 136, 153, 0.08);
-}
-
-.search-icon {
-  width: 20px;
-  height: 20px;
-  color: #78898c;
-  flex-shrink: 0;
 }
 
 .search-input {
@@ -145,7 +119,7 @@ const icons = {
 }
 
 .divider {
-  height: 16px;
+  height: 4px;
 }
 
 .locations-header {

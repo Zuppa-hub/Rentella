@@ -6,17 +6,13 @@
         <img :src="icons.arrowDown" alt="" :class="{ rotated: isCollapsed }" />
       </button>
     </div>
-    <div class="search" @click="isCollapsed && toggleCollapsed()">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none" />
-        <path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" fill="none" />
-      </svg>
-      <input
-        :value="searchTerm"
-        placeholder="Search for a location..."
-        @input="onSearch"
-      />
-    </div>
+
+    <SearchBox
+      :model-value="searchTerm"
+      placeholder="Search for a location..."
+      class="mobile-search"
+      @update:model-value="emit('update:searchTerm', $event)"
+    />
 
     <div v-show="!isCollapsed" class="list-header">
       <h2>Available locations</h2>
@@ -37,6 +33,7 @@
 
 <script setup lang="ts">
 import iconArrowDown from '../assets/icons/ArrowDown.svg'
+import SearchBox from './SearchBox.vue'
 import LocationCard, { type LocationItem } from './LocationCard.vue'
 
 const props = defineProps<{
@@ -58,11 +55,6 @@ const toggleCollapsed = () => {
 
 const icons = {
   arrowDown: iconArrowDown,
-}
-
-const onSearch = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  emit('update:searchTerm', target.value)
 }
 </script>
 
@@ -127,38 +119,6 @@ const onSearch = (event: Event) => {
 
 .sheet-toggle img.rotated {
   transform: rotate(180deg);
-}
-
-.search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f3f4f6;
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 20px;
-  min-height: 48px;
-}
-
-.search svg {
-  width: 18px;
-  height: 18px;
-  color: #9ca3af;
-  flex-shrink: 0;
-}
-
-.search input {
-  border: none;
-  background: transparent;
-  width: 100%;
-  font-size: 16px;
-  font-family: inherit;
-  outline: none;
-  color: #111827;
-}
-
-.search input::placeholder {
-  color: #9ca3af;
 }
 
 .list-header {

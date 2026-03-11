@@ -9,16 +9,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-        //$this->call(OwnersSeeder::class);
-        //$this->call(UsersSeeder::class);        
-        //$this->call(CityLocationsSeeder::class);   
-        $this->call(OpeningDatesSeeder::class); 
-        //$this->call(BeachTypesSeeder::class);
-        //$this->call(BeachSeeder::class);
-        //$this->call(PricesSeeder::class);        
-        //$this->call(BeachZonesSeeder::class);
-        $this->call(UmbrellasSeeder::class);
-        $this->call(OrdersSeeder::class);
-        $this->call(BeachPictureSeeder::class);
+        // Use the new realistic beaches seeder with Italian coastal locations
+        $this->call(RealisticBeachesSeeder::class);
+        
+        // Keep these for pictures if needed
+        // $this->call(BeachPictureSeeder::class);
     }
 }

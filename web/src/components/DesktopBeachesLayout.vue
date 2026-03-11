@@ -1,5 +1,5 @@
 <template>
-  <div class="desktop-home">
+  <div class="desktop-beaches-layout">
     <!-- Navbar -->
     <nav class="navbar">
       <div class="navbar-container">
@@ -35,54 +35,59 @@
       <!-- Map Section -->
       <div class="map-wrapper">
         <div ref="mapEl" class="map"></div>
-        <button class="map-location-indicator" :class="{ active: props.userLocation }" @click="centerMapOnUser" :disabled="!props.userLocation">
-          <span class="location-dot" :class="{ pulse: props.userLocation }"></span>
+        <button class="map-location-indicator" :class="{ active: userLocation }" @click="centerMapOnUser" :disabled="!userLocation">
+          <span class="location-dot" :class="{ pulse: userLocation }"></span>
           <span class="location-text">
-            {{ props.userLocation ? t('desktop.map.myLocation') : t('desktop.map.loading') }}
+            {{ userLocation ? t('desktop.map.myLocation') : t('desktop.map.loading') }}
           </span>
         </button>
       </div>
 
-      <!-- Sidebar -->
-      <DesktopSidebar :locations="desktopLocations" :user-location="props.userLocation" @location-click="emit('location-click', $event)" />
+      <!-- Beaches View Sidebar -->
+      <BeachesView
+        :location="location"
+        :beaches="beaches"
+        :beach-types="beachTypes"
+        @back="emit('back')"
+        @select-beach="emit('select-beach', $event)"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import L from 'leaflet'
-import { useGeolocation } from '../composables/useGeolocation'
-import type { MapLocation } from './MapSection.vue'
-import DesktopSidebar from './DesktopSidebar.vue'
+import BeachesView from './BeachesView.vue'
+import type { Beach } from '../services/api'
+import { toNumber } from '../utils/helpers'
 import logoDark from '../assets/LogoDark.svg'
 import homeIcon from '../assets/icons/Home.svg'
 import activeIcon from '../assets/icons/Active.svg'
 import historyIcon from '../assets/icons/History.svg'
 import settingsIcon from '../assets/icons/Settings.svg'
-interface LocationWithMeta extends MapLocation {
-  name: string
-  distance: number
-  priceRange: string
-}
 
-interface DesktopLocationProp {
+interface Location {
   id: number
   name: string
-  distance: number
+  lat: number
+  lng: number
+  distance?: number
   priceRange: string
 }
 
 const props = defineProps<{
-  locations: LocationWithMeta[]
+  location: Location
+  beaches: Beach[]
+  beachTypes?: Record<number, string>
   initials: string
   userLocation?: { lat: number; lng: number } | null
-  selectedLocation?: LocationWithMeta | null
 }>()
 
 const emit = defineEmits<{
-  (event: 'location-click', locationId: number): void
+  back: []
+  'select-beach': [beach: Beach]
 }>()
 
 const { t } = useI18n()
@@ -91,15 +96,6 @@ const mapEl = ref<HTMLDivElement | null>(null)
 let map: L.Map | undefined
 let markersLayer: L.LayerGroup | undefined
 let userLocationMarker: L.Marker | undefined
-
-const desktopLocations = computed<DesktopLocationProp[]>(() => {
-  return props.locations.map((loc) => ({
-    id: loc.id,
-    name: loc.name,
-    distance: loc.distance,
-    priceRange: loc.priceRange,
-  }))
-})
 
 const icons = {
   logo: logoDark,
@@ -112,17 +108,10 @@ const icons = {
 const initMap = () => {
   if (!mapEl.value || map) return
 
-  // Default view (Rimini, Italy)
-  let initialLat = 44.0678
-  let initialLng = 12.5695
-  let initialZoom = 9
-
-  // If we have user location, use it
-  if (props.userLocation) {
-    initialLat = props.userLocation.lat
-    initialLng = props.userLocation.lng
-    initialZoom = 13
-  }
+  // Always center on the selected location, not user location
+  const initialLat = props.location.lat
+  const initialLng = props.location.lng
+  const initialZoom = 13
 
   map = L.map(mapEl.value, {
     zoomControl: false,
@@ -142,107 +131,99 @@ const renderMarkers = () => {
   if (!map || !markersLayer) return
   markersLayer.clearLayers()
 
-  props.locations.forEach((location, index) => {
-    const markerIcon = L.divIcon({
-      className: 'map-pin leaflet-div-icon',
-      html: `<span class="map-pin__label">${index + 1}</span>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 28],
-      popupAnchor: [0, -28],
-    })
+  // Only show beach markers (numbered dots), not location marker
+  props.beaches.forEach((beach, idx) => {
+    const lat = toNumber(beach.latitude)
+    const lng = toNumber(beach.longitude)
 
-    const marker = L.marker([location.lat, location.lng], {
-      title: location.name,
-      icon: markerIcon,
-    })
+    if (lat !== null && lng !== null) {
+      let markerLat = lat
+      let markerLng = lng
 
-    const popup = L.popup().setContent(
-      `<div style="font-family: Inter; text-align: center;"><strong>${location.name}</strong><br/>${location.priceRange}</div>`
-    )
-    marker.bindPopup(popup)
-    marker.addTo(markersLayer!)
+      if (idx > 0) {
+        const angle = idx * 1.25
+        const radius = 0.00018 * Math.sqrt(idx)
+        markerLat += Math.cos(angle) * radius
+        markerLng += Math.sin(angle) * radius
+      }
+
+      const beachIcon = L.divIcon({
+        className: 'map-pin leaflet-div-icon',
+        html: `<span class="map-pin__label">${idx + 1}</span>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
+      })
+
+      L.marker([markerLat, markerLng], {
+        icon: beachIcon,
+        title: beach.name,
+      }).addTo(markersLayer!)
+    }
   })
 }
 
 const renderUserLocation = () => {
-  if (!map) return
+  if (!map || !props.userLocation) return
 
-  // Remove old user location marker
   if (userLocationMarker) {
-    map.removeLayer(userLocationMarker)
+    userLocationMarker.remove()
   }
 
-  // Add new user location marker if available
-  if (props.userLocation) {
-    const userIcon = L.divIcon({
-      className: 'user-location-marker',
-      html: '<div class="user-dot"></div>',
-      iconSize: [16, 16],
-      iconAnchor: [8, 8],
-    })
+  const userIcon = L.divIcon({
+    className: 'user-location-marker',
+    html: '<div class="user-dot"></div>',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  })
 
-    userLocationMarker = L.marker(
-      [props.userLocation.lat, props.userLocation.lng],
-      { icon: userIcon }
-    ).addTo(map)
-  }
+  userLocationMarker = L.marker([props.userLocation.lat, props.userLocation.lng], {
+    icon: userIcon,
+    title: 'Your location',
+  }).addTo(map)
 }
 
 const centerMapOnUser = () => {
   if (map && props.userLocation) {
     map.setView([props.userLocation.lat, props.userLocation.lng], 13, {
       animate: true,
-      duration: 0.5,
     })
   }
 }
 
-
+const destroyMap = () => {
+  if (map) {
+    map.remove()
+    map = undefined
+  }
+}
 
 onMounted(() => {
-  initMap()
+  setTimeout(() => initMap(), 100)
 })
 
 watch(
-  () => props.locations,
+  () => props.beaches,
   () => {
     renderMarkers()
-  }
+  },
+  { deep: true }
 )
 
 watch(
   () => props.userLocation,
   () => {
     renderUserLocation()
-    // Center map on user location if changed
-    if (map && props.userLocation) {
-      map.setView([props.userLocation.lat, props.userLocation.lng], 13)
-    }
-  }
+  },
+  { deep: true }
 )
 
 onBeforeUnmount(() => {
-  if (map) {
-    map.remove()
-    map = undefined
-  }
+  destroyMap()
 })
-
-// Watch for selected location changes and center map
-watch(
-  () => props.selectedLocation,
-  (newLocation) => {
-    if (map && newLocation) {
-      map.setView([newLocation.lat, newLocation.lng], 13, {
-        animate: true,
-      })
-    }
-  }
-)
 </script>
 
 <style scoped>
-.desktop-home {
+.desktop-beaches-layout {
   --color-primary: #005f6f;
   --color-primary-light: #d2eef1;
   --color-primary-light-active: #ffffff;
@@ -254,14 +235,14 @@ watch(
   --color-marker: #0b0b0b;
   --color-marker-label: #ffffff;
 
-  display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: white;
 }
 
-/* Navbar Styles */
+/* Navbar */
 .navbar {
   height: 72px;
   background: var(--color-primary);
@@ -347,20 +328,20 @@ watch(
   font-family: 'Inter', sans-serif;
 }
 
-/* Main Content Layout */
+/* Main Content */
 .main-content {
-  display: flex;
   flex: 1;
-  gap: 0;
+  display: flex;
   overflow: hidden;
 }
 
 .map-wrapper {
   flex: 1;
   position: relative;
-  background: var(--color-bg-light);
+  overflow: hidden;
   order: 2;
   margin-left: -24px;
+  background: #f0f4f6;
   z-index: 1;
 }
 
@@ -369,11 +350,77 @@ watch(
   height: 100%;
 }
 
-/* Leaflet Map Marker Styling */
+.map-location-indicator {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.map-location-indicator:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.map-location-indicator:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.location-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #9ca3af;
+  transition: background 0.3s ease;
+}
+
+.location-dot.pulse {
+  background: #005f6f;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Map markers */
+:deep(.map-pin-location) {
+  z-index: 400;
+}
+
+:deep(.location-marker) {
+  width: 32px;
+  height: 32px;
+  background: #005f6f;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Beach Markers - Same style as homepage with numbered dots */
 :deep(.map-pin) {
   width: 28px;
   height: 28px;
-  background: var(--color-marker);
+  background: #1f2937;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
   display: flex;
@@ -384,7 +431,7 @@ watch(
 
 :deep(.map-pin__label) {
   display: inline-block;
-  color: var(--color-marker-label);
+  color: #ffffff;
   font-size: 13px;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
@@ -395,82 +442,16 @@ watch(
   z-index: 500;
 }
 
-/* User Location Marker */
 :deep(.user-location-marker) {
-  z-index: 400;
+  z-index: 401;
 }
 
-.user-dot {
-  width: 16px;
-  height: 16px;
-  background: #00a8cc;
-  border-radius: 50%;
+:deep(.user-dot) {
+  width: 20px;
+  height: 20px;
+  background: #3b82f6;
   border: 3px solid white;
-  box-shadow: 0 0 0 2px #00a8cc;
-}
-
-/* Map location indicator */
-.map-location-indicator {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
-  border-radius: 12px;
-  padding: 8px 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #414d4f;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
-  z-index: 999;
-  font-family: 'Inter', sans-serif;
-  backdrop-filter: blur(4px);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.map-location-indicator:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
-  transform: translateY(-1px);
-}
-
-.map-location-indicator:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.location-dot {
-  width: 8px;
-  height: 8px;
   border-radius: 50%;
-  background: #6b7280;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.location-dot.pulse {
-  background: #00a8cc;
-  box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.2);
-  animation: pulse-ring 2s infinite;
-}
-
-@keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.2);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(0, 168, 204, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 3px rgba(0, 168, 204, 0);
-  }
-}
-
-.location-text {
-  white-space: nowrap;
+  box-shadow: 0 0 0 2px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 </style>

@@ -5,10 +5,13 @@ services:
     build:
       context: ../
       dockerfile: ./deployment/Dockerfile
+    entrypoint: ["/bin/sh", "/var/www/html/deployment/entrypoint.sh"]
     volumes:
       - ../:/var/www/html
     ports:
       - 9000:80
+    depends_on:
+      - mysql_db
     networks:
       - keycloak-network
   vue:
@@ -66,13 +69,16 @@ services:
     image: quay.io/keycloak/keycloak:latest
     ports:
       - 8080:8080
-    command: start-dev --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
+    command: start-dev --import-realm --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     volumes:
       - ../themes/Rentella:/opt/keycloak/themes/Rentella
+      - ./keycloak/realm-rentella.json:/opt/keycloak/data/import/realm-rentella.json
       - keycloak_standalone_data:/opt/jboss/keycloak/standalone/data
       - keycloak_standalone_deployments:/opt/jboss/keycloak/standalone/deployments
     environment:
       KEYCLOAK_LOGLEVEL: DEBUG
+      KC_HOSTNAME_STRICT_HTTPS: 'false'
+      KC_HTTP_ENABLED: 'true'
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
       DB_DATABASE: keycloak

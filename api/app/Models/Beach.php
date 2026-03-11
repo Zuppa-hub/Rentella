@@ -22,6 +22,7 @@ class Beach extends Model
         'special_note',
         'latitude',
         'longitude',
+        'photo_url',
         'allowed_animals',
         'type_id',
     ];

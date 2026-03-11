@@ -6,6 +6,17 @@ export const messages = {
       close: 'Close',
       cancel: 'Cancel',
       continue: 'Continue',
+      back: 'Back',
+      beaches: 'Beaches',
+    },
+    setLocation: {
+      title: 'Location Sharing',
+      description: 'In order to provide you with the best experience and to ensure accurate results, we need to know your location. You can use your Current Location or set it Manually',
+      searchLabel: 'Set your Location',
+      searchPlaceholder: 'Choose your Location...',
+      back: 'Back',
+      done: 'Done',
+      saving: 'Saving...',
     },
     welcome: {
       title: 'Rentella',
@@ -44,6 +55,13 @@ export const messages = {
         noBeaches: 'No beaches available',
         exploreBeaches: 'Explore Beaches',
       },
+      beach: {
+        type: 'Type',
+        animals: 'Allowed animals',
+        typeUnknown: 'Unknown type',
+        yes: 'Yes',
+        no: 'No',
+      },
       common: {
         close: 'Close',
         select: 'Select',
@@ -57,6 +75,17 @@ export const messages = {
       close: 'Chiudi',
       cancel: 'Annulla',
       continue: 'Continua',
+      back: 'Indietro',
+      beaches: 'Spiagge',
+    },
+    setLocation: {
+      title: 'Condivisione Posizione',
+      description: 'Per offrirti la migliore esperienza e garantire risultati accurati, abbiamo bisogno di conoscere la tua posizione. Puoi usare la Posizione Attuale o impostarla Manualmente',
+      searchLabel: 'Imposta la tua Posizione',
+      searchPlaceholder: 'Scegli la tua Posizione...',
+      back: 'Indietro',
+      done: 'Fatto',
+      saving: 'Salvataggio...',
     },
     welcome: {
       title: 'Rentella',
@@ -95,6 +124,13 @@ export const messages = {
         noBeaches: 'Nessuna spiaggia disponibile',
         exploreBeaches: 'Esplora Spiagge',
       },
+      beach: {
+        type: 'Tipo',
+        animals: 'Animali ammessi',
+        typeUnknown: 'Tipo sconosciuto',
+        yes: 'Sì',
+        no: 'No',
+      },
       common: {
         close: 'Chiudi',
         select: 'Seleziona',
@@ -107,7 +143,7 @@ export const messages = {
 
 export const i18n = createI18n({
   legacy: false,
-  locale: 'it',
-  fallbackLocale: 'en',
+  locale: 'en',
+  fallbackLocale: 'it',
   messages,
 })
