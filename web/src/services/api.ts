@@ -12,6 +12,7 @@ export interface Beach {
   name: string
   latitude: number
   longitude: number
+  photo_url?: string
   allowed_animals: boolean | string | number
   owner_id: number
   location_id: number
