@@ -63,3 +63,9 @@ Admin emails:
 ```
 ADMIN_EMAILS=you@example.com,admin@example.com
 ```
+
+## Technical Debt
+
+- Password reset emails are not delivered in local/dev because Keycloak SMTP is not configured (`docker-compose` and realm import do not define an SMTP server).
+- Impact: forgot-password flow completes in UI, but no email is sent.
+- Suggested fix: add a local SMTP service (for example MailHog) and configure Keycloak realm SMTP settings.
