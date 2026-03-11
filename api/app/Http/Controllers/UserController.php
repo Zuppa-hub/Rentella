@@ -38,7 +38,10 @@ class UserController extends Controller
     }
     private function handleException(\Exception $e): JsonResponse
     {
-        return response()->json(['error' => $e->getMessage()], 500);
+        \Illuminate\Support\Facades\Log::error('UserController error: ' . $e->getMessage(), [
+            'exception' => $e,
+        ]);
+        return response()->json(['error' => 'An internal server error occurred.'], 500);
     }
 
     /**

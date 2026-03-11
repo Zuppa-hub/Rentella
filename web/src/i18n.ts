@@ -9,6 +9,15 @@ export const messages = {
       back: 'Back',
       beaches: 'Beaches',
     },
+    setLocation: {
+      title: 'Location Sharing',
+      description: 'In order to provide you with the best experience and to ensure accurate results, we need to know your location. You can use your Current Location or set it Manually',
+      searchLabel: 'Set your Location',
+      searchPlaceholder: 'Choose your Location...',
+      back: 'Back',
+      done: 'Done',
+      saving: 'Saving...',
+    },
     welcome: {
       title: 'Rentella',
       subtitle: 'Discover the best beaches near you',
@@ -68,6 +77,15 @@ export const messages = {
       continue: 'Continua',
       back: 'Indietro',
       beaches: 'Spiagge',
+    },
+    setLocation: {
+      title: 'Condivisione Posizione',
+      description: 'Per offrirti la migliore esperienza e garantire risultati accurati, abbiamo bisogno di conoscere la tua posizione. Puoi usare la Posizione Attuale o impostarla Manualmente',
+      searchLabel: 'Imposta la tua Posizione',
+      searchPlaceholder: 'Scegli la tua Posizione...',
+      back: 'Indietro',
+      done: 'Fatto',
+      saving: 'Salvataggio...',
     },
     welcome: {
       title: 'Rentella',

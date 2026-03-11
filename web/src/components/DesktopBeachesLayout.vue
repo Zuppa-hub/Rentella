@@ -61,6 +61,7 @@ import { useI18n } from 'vue-i18n'
 import L from 'leaflet'
 import BeachesView from './BeachesView.vue'
 import type { Beach } from '../services/api'
+import { toNumber } from '../utils/helpers'
 import logoDark from '../assets/LogoDark.svg'
 import homeIcon from '../assets/icons/Home.svg'
 import activeIcon from '../assets/icons/Active.svg'
@@ -102,12 +103,6 @@ const icons = {
   active: activeIcon,
   history: historyIcon,
   settings: settingsIcon,
-}
-
-const toNumber = (value: unknown) => {
-  if (typeof value === 'number' && Number.isFinite(value)) return value
-  const parsed = Number.parseFloat(String(value))
-  return Number.isFinite(parsed) ? parsed : null
 }
 
 const initMap = () => {

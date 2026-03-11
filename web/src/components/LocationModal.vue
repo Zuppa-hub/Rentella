@@ -77,6 +77,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
   'select-beach': [beach: Beach]
+  'confirm-location': []
 }>()
 
 const handleOverlayClick = () => {
@@ -87,6 +88,8 @@ const handleContinue = () => {
   logger.debug('Location confirmed', { locationId: props.location.id, locationName: props.location.name })
   if (props.beaches.length > 0) {
     emit('select-beach', props.beaches[0])
+  } else {
+    emit('confirm-location')
   }
   close()
 }

@@ -6,18 +6,18 @@
     @keydown.esc="handleClose"
   >
     <div class="location-modal-card">
-      <button type="button" class="location-modal-close" @click="handleClose" aria-label="Close">
+      <button type="button" class="location-modal-close" @click="handleClose" :aria-label="t('common.close')">
         &times;
       </button>
       
-      <h2 class="location-modal-title">Location Sharing</h2>
+      <h2 class="location-modal-title">{{ t('setLocation.title') }}</h2>
       
       <p class="location-modal-text">
-        In order to provide you with the best experience and to ensure accurate results, we need to know your location. You can use your Current Location or set it Manually
+        {{ t('setLocation.description') }}
       </p>
       
       <div class="location-search-section">
-        <h3 class="location-search-label">Set your Location</h3>
+        <h3 class="location-search-label">{{ t('setLocation.searchLabel') }}</h3>
         <div class="location-search-wrapper">
           <div class="location-input-container">
             <input
@@ -25,7 +25,7 @@
               v-model="searchQuery"
               type="text"
               class="location-search-input"
-              placeholder="Choose your Location..."
+              :placeholder="t('setLocation.searchPlaceholder')"
               @input="handleSearchInput"
               @keydown.down.prevent="navigateResults(1)"
               @keydown.up.prevent="navigateResults(-1)"
@@ -67,7 +67,7 @@
       
       <div class="location-modal-actions">
         <button type="button" class="location-btn-secondary" @click="handleClose">
-          Back
+          {{ t('setLocation.back') }}
         </button>
         <button
           type="button"
@@ -75,7 +75,7 @@
           @click="handleDone"
           :disabled="!selectedLocation || isSaving"
         >
-          {{ isSaving ? 'Saving...' : 'Done' }}
+          {{ isSaving ? t('setLocation.saving') : t('setLocation.done') }}
         </button>
       </div>
     </div>
@@ -84,15 +84,9 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
-import { searchCities, setUserPreferredLocation } from '../services/api'
+import { useI18n } from 'vue-i18n'
+import { searchCities, setUserPreferredLocation, type CityLocation } from '../services/api'
 import { useDebounce } from '../composables/useDebounce'
-
-interface CityLocation {
-  id: number
-  city_name: string
-  latitude: number
-  longitude: number
-}
 
 interface Props {
   isOpen: boolean
@@ -106,6 +100,8 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+
+const { t } = useI18n()
 
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const searchQuery = ref('')

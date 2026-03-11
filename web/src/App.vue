@@ -105,6 +105,7 @@ import DesktopBeachesLayout from './components/DesktopBeachesLayout.vue'
 import SetLocationModal from './components/SetLocationModal.vue'
 import type { LocationItem } from './components/LocationCard.vue'
 import { getLocations, getBeaches, getBeachTypes, type Beach, type Location, type CityLocation } from './services/api'
+import { toNumber } from './utils/helpers'
 
 const geolocation = useGeolocation()
 const { userLocation, calculateDistance, requestLocation } = geolocation
@@ -394,12 +395,6 @@ const loadBeaches = async () => {
   try {
     const locations_data = await getLocations()
 
-    const toNumber = (value: unknown) => {
-      if (typeof value === 'number' && Number.isFinite(value)) return value
-      const parsed = Number.parseFloat(String(value))
-      return Number.isFinite(parsed) ? parsed : null
-    }
-    
     if (Object.keys(beachTypesMap.value).length === 0) {
       try {
         const types = await getBeachTypes()
@@ -657,15 +652,6 @@ watch(userLocation, () => {
   height: 1px;
   background: #cfd8dc;
   margin-top: clamp(10px, 2.8vw, 14px);
-}
-
-.geo-auth-title::after {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: #cfd8dc;
-  margin-top: 14px;
 }
 
 .geo-auth-text {

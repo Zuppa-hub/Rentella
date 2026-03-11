@@ -30,8 +30,7 @@
       "standardFlowEnabled": false,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
-      "secret": "H4sAFyPpmqHpc5tbPQhzT75cQK2IuOoW"
+      "serviceAccountsEnabled": false
     }
   ],
   "users": [

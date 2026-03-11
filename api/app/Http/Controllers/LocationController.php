@@ -130,14 +130,16 @@ class LocationController extends Controller
     {
         $query = $request->input('q', '');
         $limit = (int) $request->input('limit', 20);
+        $limit = max(1, min($limit, 50));
 
-        if (empty($query)) {
+        if (trim((string) $query) === '') {
             return response()->json([]);
         }
 
         $cities = CityLocation::select('id', 'city_name', 'latitude', 'longitude')
             ->where('city_name', 'LIKE', '%' . $query . '%')
             ->orderBy('city_name', 'asc')
+            ->limit($limit * 3)
             ->get();
 
         // Some datasets contain duplicate rows for the same city name.
@@ -147,7 +149,7 @@ class LocationController extends Controller
                 return mb_strtolower(trim((string) $city->city_name));
             })
             ->values()
-            ->take(max(1, min($limit, 50)));
+            ->take($limit);
 
         return response()->json($deduped);
     }
