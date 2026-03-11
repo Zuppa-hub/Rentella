@@ -32,6 +32,7 @@ class BeachController extends Controller
             'zones' => function ($query) {
                 $query->withCount('umbrellas');
             },
+            'pictures',
         ])->get();
 
         // Transform to include min/max prices for display
@@ -45,6 +46,7 @@ class BeachController extends Controller
                 'latitude' => (float) $beach->latitude,
                 'longitude' => (float) $beach->longitude,
                 'description' => $beach->description,
+                'photo_url' => $beach->photo_url ?: optional($beach->pictures->first())->photo,
                 'allowed_animals' => $beach->allowed_animals == 1 ? 'yes' : 'no',
                 'type_id' => $beach->type_id,
                 'location_id' => $beach->location_id,

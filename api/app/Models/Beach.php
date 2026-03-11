@@ -49,4 +49,9 @@ class Beach extends Model
     {
         return $this->belongsTo(BeachType::class, 'type_id');
     }
+
+    public function pictures()
+    {
+        return $this->hasMany(BeachPicture::class, 'beach_id');
+    }
 }

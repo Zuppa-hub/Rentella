@@ -431,6 +431,8 @@ const loadBeaches = async () => {
     const uniqueLocations: Location[] = []
     const seenLocationKeys = new Set<string>()
 
+    const roundDistance = (value: number) => Math.round(value * 10) / 10
+
     for (const location of locations_data || []) {
       const lat = toNumber(location.latitude)
       const lng = toNumber(location.longitude)
@@ -464,8 +466,8 @@ const loadBeaches = async () => {
           id: location.id,
           name: location.city_name,
           distance: userLocation.value
-            ? calculateDistance(userLocation.value.lat, userLocation.value.lng, lat, lng)
-            : Math.random() * 50,
+            ? roundDistance(calculateDistance(userLocation.value.lat, userLocation.value.lng, lat, lng))
+            : roundDistance(Math.random() * 50),
           priceRange,
           lat,
           lng,
