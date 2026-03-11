@@ -13,6 +13,8 @@ class User extends Authenticatable implements AuthenticatableContract
     
     protected $fillable = ['name', 'surname', 'email', 'uuid', 'password', 'preferred_location_id'];
 
+    protected $hidden = ['password', 'remember_token'];
+
     /**
      * Get the preferred location for the user.
      */

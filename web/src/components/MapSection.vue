@@ -11,6 +11,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import L from 'leaflet'
 import type { Beach } from '../services/api'
+import { toNumber } from '../utils/helpers'
 
 export type MapLocation = {
   id: number
@@ -71,12 +72,6 @@ const initMap = () => {
   markersLayer = L.layerGroup().addTo(map)
   renderMarkers()
   renderUserLocation()
-}
-
-const toNumber = (value: unknown) => {
-  if (typeof value === 'number' && Number.isFinite(value)) return value
-  const parsed = Number.parseFloat(String(value))
-  return Number.isFinite(parsed) ? parsed : null
 }
 
 const markerItems = computed<MarkerPoint[]>(() => {
