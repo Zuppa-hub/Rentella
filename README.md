@@ -1,8 +1,10 @@
 # Rentella
 
+![Rentella Logo](web/src/assets/LogoLight.svg)
+
 Rentella is a beach umbrella rental platform. Think Airbnb for umbrellas: beach owners list availability, users search by location and book.
 
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Version](https://img.shields.io/badge/version-1.2.0-blue)
 ![Status](https://img.shields.io/badge/status-In%20Development-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -10,6 +12,10 @@ Rentella is a beach umbrella rental platform. Think Airbnb for umbrellas: beach 
 - Secure API with Keycloak (OAuth2)
 - Fully dockerized stack
 - Feature tests for core endpoints
+
+## Design
+
+🎨 **Figma Design**: [View on Figma](https://www.figma.com/design/yAW6er4mw2SGyWjvUOUgJG/Rentella?node-id=1542-19194&t=QtE33frejJYOoWbq-1)
 
 ## Tech stack
 
