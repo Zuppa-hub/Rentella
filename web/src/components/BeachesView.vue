@@ -80,19 +80,26 @@
 
           <div v-else class="zones-list">
             <div v-for="zone in zonesByBeach[beach.id]" :key="zone.id" class="zone-card">
-              <div class="zone-header">
-                <h4 class="zone-name">{{ zone.name }}</h4>
+              <div class="zone-content">
+                <div class="zone-header">
+                  <h4 class="zone-name">{{ zone.name }}</h4>
+                </div>
+                <div class="zone-meta">
+                  <span class="detail-item" v-if="zone.price !== null">
+                    <img :src="icons.money" alt="" class="detail-icon" />
+                    €{{ zone.price }}
+                  </span>
+                  <span class="detail-item" v-if="zone.umbrellasCount !== null">
+                    {{ zone.umbrellasCount }} {{ t('desktop.beach.available') }}
+                  </span>
+                </div>
+                <p v-if="zone.description" class="zone-description">{{ zone.description }}</p>
               </div>
-              <div class="zone-meta">
-                <span class="detail-item" v-if="zone.price !== null">
-                  <img :src="icons.money" alt="" class="detail-icon" />
-                  €{{ zone.price }}
-                </span>
-                <span class="detail-item" v-if="zone.umbrellasCount !== null">
-                  {{ zone.umbrellasCount }} {{ t('desktop.beach.available') }}
-                </span>
+              <div class="zone-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
               </div>
-              <p v-if="zone.description" class="zone-description">{{ zone.description }}</p>
             </div>
           </div>
         </div>
@@ -531,6 +538,29 @@ const icons = {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 10px 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.zone-card:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.zone-card:active {
+  transform: scale(0.98);
+}
+
+.zone-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .zone-header {
@@ -543,6 +573,19 @@ const icons = {
   margin: 0;
   font-size: 15px;
   color: #242b2c;
+}
+
+.zone-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.zone-card:hover .zone-arrow {
+  color: #005f6f;
 }
 
 .zone-meta {

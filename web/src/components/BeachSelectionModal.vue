@@ -170,8 +170,8 @@ const dogsAllowedLabel = computed(() => {
   position: absolute;
   top: 6px;
   right: 8px;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border: 0;
   background: transparent;
   color: #4f5d61;
@@ -181,16 +181,23 @@ const dogsAllowedLabel = computed(() => {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
 }
 
 .close-button:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.08);
+  color: #1f2937;
+}
+
+.close-button:active {
+  background: rgba(0, 0, 0, 0.12);
+  transform: scale(0.95);
 }
 
 .close-button:focus {
   outline: 2px solid #005f6f;
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
 .header-divider {
@@ -212,12 +219,25 @@ const dogsAllowedLabel = computed(() => {
   overflow: hidden;
   background: #d6dcde;
   aspect-ratio: 16 / 9;
+  cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
+  flex-shrink: 0;
+}
+
+.beach-image-wrapper:hover {
+  transform: scale(1.02);
+  filter: brightness(1.05);
+}
+
+.beach-image-wrapper:active {
+  transform: scale(0.98);
 }
 
 .beach-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .beach-image-placeholder {
@@ -242,8 +262,14 @@ const dogsAllowedLabel = computed(() => {
   gap: 12px;
   color: #242b2c;
   font-size: clamp(14px, 3.4vw, 15px);
-  padding: 10px 0;
+  padding: 12px 4px;
   border-bottom: 1px solid #d6dee0;
+  transition: background 0.15s, padding 0.15s;
+  cursor: default;
+}
+
+.detail-row:hover {
+  background: rgba(0, 95, 111, 0.03);
 }
 
 .detail-row:last-child {
@@ -252,33 +278,39 @@ const dogsAllowedLabel = computed(() => {
 
 .detail-label {
   font-weight: 600;
-  color: #5d6b6e;
+  color: #4f5d61;
+  flex-shrink: 0;
 }
 
 .detail-value {
-  font-weight: 500;
+  font-weight: 600;
   color: #242b2c;
   text-align: right;
+  flex-shrink: 0;
 }
 
 .modal-footer {
-  margin-top: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #d6dee0;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .btn-cancel,
 .btn-select {
-  min-width: 128px;
-  height: clamp(40px, 10vw, 46px);
-  padding: 10px 14px;
+  min-width: 140px;
+  height: clamp(42px, 10vw, 48px);
+  padding: 12px 18px;
   border-radius: 10px;
   font-size: clamp(14px, 3.2vw, 15px);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  border: none;
+  flex-shrink: 0;
 }
 
 .btn-cancel {
@@ -290,10 +322,14 @@ const dogsAllowedLabel = computed(() => {
 .btn-cancel:hover {
   background: #f3f4f6;
   border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+.btn-cancel:active {
+  transform: translateY(0);
 }
 
 .btn-select {
-  border: none;
   background: #005f6f;
   color: #ffffff;
 }
@@ -301,6 +337,17 @@ const dogsAllowedLabel = computed(() => {
 .btn-select:hover {
   background: #004a5a;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 95, 111, 0.2);
+}
+
+.btn-select:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 95, 111, 0.15);
+}
+
+.btn-select:focus {
+  outline: 2px solid #005f6f;
+  outline-offset: 2px;
 }
 
 .modal-fade-enter-active,
