@@ -24,7 +24,15 @@
         <div class="header-divider"></div>
 
         <div class="modal-body">
-          <div class="beach-image-wrapper">
+          <div
+            class="beach-image-wrapper"
+            role="button"
+            tabindex="0"
+            :aria-label="t('desktop.common.selectBeach')"
+            @click="emit('confirm', beach!)"
+            @keydown.enter.prevent="emit('confirm', beach!)"
+            @keydown.space.prevent="emit('confirm', beach!)"
+          >
             <img v-if="beach.photo_url" :src="beach.photo_url" :alt="beach.name" class="beach-image" loading="lazy" />
             <div v-else class="beach-image-placeholder">🏖️</div>
           </div>
