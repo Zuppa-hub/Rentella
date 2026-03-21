@@ -33,6 +33,9 @@ use App\Http\Controllers\UmbrellasController;
 // protected endpoints
 Route::group(['middleware' => 'auth:api', 'prefix' => 'users'], function () {
     //Route::get('/protected-endpoint', 'SecretController@index');
+    // preferred location endpoints
+    Route::post('/preferred-location', [UserController::class, 'setPreferredLocation'])->name('users.set-preferred-location');
+    Route::get('/preferred-location', [UserController::class, 'getPreferredLocation'])->name('users.get-preferred-location');
     //user update 
     Route::put('/{id}', [UserController::class, 'update'])->name('users.update');
     //all user
@@ -41,9 +44,6 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'users'], function () {
     Route::get('/{id}', [UserController::class, 'show'])->name('users.show');
     //delete user by id 
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('users.destroy');
-    // preferred location endpoints
-    Route::post('/preferred-location', [UserController::class, 'setPreferredLocation'])->name('users.set-preferred-location');
-    Route::get('/preferred-location', [UserController::class, 'getPreferredLocation'])->name('users.get-preferred-location');
 });
 Route::group(['middleware' => 'auth:api', 'prefix' => 'locations'], function () {
     Route::get('/', [LocationController::class, 'index'])->name('locations.index');

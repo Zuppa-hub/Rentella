@@ -53,7 +53,6 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import L from 'leaflet'
-import { useGeolocation } from '../composables/useGeolocation'
 import type { MapLocation } from './MapSection.vue'
 import DesktopSidebar from './DesktopSidebar.vue'
 import logoDark from '../assets/LogoDark.svg'

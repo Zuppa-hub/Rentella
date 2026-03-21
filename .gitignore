@@ -39,9 +39,7 @@ api/.phpunit.result.cache
 api/coverage/
 
 # Package managers
-composer.lock
 composer.phar
-package-lock.json
 yarn.lock
 .pnp
 .pnp.js
@@ -84,7 +82,4 @@ coverage/
 
 # Miscellaneous
 api/export-migration.txt
-web/package-lock.json
 *.lock
-*.lock
-api/composer.lock

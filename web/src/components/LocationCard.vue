@@ -12,9 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import iconDistance from '../assets/icons/Distance.svg'
-import iconMoney from '../assets/icons/Money.svg'
-
 export type LocationItem = {
   id: number
   name: string
@@ -24,7 +21,7 @@ export type LocationItem = {
   lng: number
 }
 
-const props = defineProps<{ location: LocationItem; index: number }>()
+defineProps<{ location: LocationItem; index: number }>()
 const emit = defineEmits<{
   click: []
 }>()

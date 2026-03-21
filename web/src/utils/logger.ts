@@ -3,7 +3,7 @@
  * Provides consistent logging across the application
  */
 
-import { LOG_LEVEL, DEBUG_MODE } from '../constants/index'
+import { LOG_LEVEL } from '../constants/index'
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 

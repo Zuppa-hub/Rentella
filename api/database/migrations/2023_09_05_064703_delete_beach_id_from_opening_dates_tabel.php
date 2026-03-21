@@ -11,9 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('opening_dates', function (Blueprint $table) {
-            $table->dropForeign(['beach_id']);
-            $table->dropColumn("beach_id");
+        $driver = Schema::getConnection()->getDriverName();
+
+        Schema::table('opening_dates', function (Blueprint $table) use ($driver) {
+            if (Schema::hasColumn('opening_dates', 'beach_id')) {
+                if ($driver !== 'sqlite') {
+                    $table->dropForeign(['beach_id']);
+                }
+
+                $table->dropColumn('beach_id');
+            }
         });
     }
 

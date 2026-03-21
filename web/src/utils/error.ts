@@ -74,7 +74,7 @@ export class ErrorHandler {
     if (error instanceof ApiError) {
       return error.code === 'NETWORK_ERROR'
     }
-    return error instanceof TypeError && 'Failed to fetch' in String(error)
+    return error instanceof TypeError && String(error).includes('Failed to fetch')
   }
 
   /**

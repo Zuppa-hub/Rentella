@@ -86,6 +86,25 @@ make -C api new_migration name_here
 docker exec Rentella_app php artisan test tests/Feature/
 ```
 
+## CI quality gates
+
+GitHub Actions runs automatically:
+
+- `web`: `npm ci` + `npm run build`
+- `api`: `composer install` + `php artisan migrate:fresh --force` + `php artisan test`
+
+Workflow file: `.github/workflows/ci.yml`
+
+## Production hardening checklist
+
+Before deploying to production:
+
+- set strong credentials in `api/.env` for `MYSQL_ROOT_PASSWORD`, `POSTGRES_PASSWORD`, `KEYCLOAK_ADMIN_PASSWORD`
+- set `APP_ENV=production` and `APP_DEBUG=false`
+- set `LOG_LEVEL=warning` or `error`
+- restrict `CORS_ALLOWED_ORIGINS` to authorized public domains only
+- avoid default admin accounts (`KEYCLOAK_ADMIN=admin`) and use a dedicated name
+
 ## License
 
 MIT

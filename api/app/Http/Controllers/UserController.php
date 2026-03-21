@@ -9,6 +9,7 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 
 /* The `class UserController extends Controller` is defining a PHP class called `UserController` that
@@ -298,6 +299,11 @@ class UserController extends Controller
                 'message' => 'Preferred location updated successfully',
                 'data' => $user
             ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'The given data was invalid.',
+                'errors' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
