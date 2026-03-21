@@ -47,7 +47,7 @@
               <span class="detail-value">{{ beachTypeLabel }}</span>
             </div>
             <div class="detail-row">
-              <span class="detail-label">{{ t('desktop.beach.dogsAllowed') }}</span>
+              <span class="detail-label">{{ t('desktop.beach.animals') }}</span>
               <span class="detail-value">{{ dogsAllowedLabel }}</span>
             </div>
           </div>
