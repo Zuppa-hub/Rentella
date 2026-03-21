@@ -88,6 +88,14 @@
     @location-set="handleLocationSet"
     @use-current-location="handleUseCurrentLocationFromModal"
   />
+
+  <BeachSelectionModal
+    :is-open="isBeachModalOpen"
+    :beach="selectedBeach"
+    :beach-types="beachTypesMap"
+    @close="closeBeachSelectionModal"
+    @confirm="confirmBeachSelection"
+  />
 </template>
 
 <script setup lang="ts">
@@ -103,6 +111,7 @@ import LocationModal from './components/LocationModal.vue'
 import BeachesView from './components/BeachesView.vue'
 import DesktopBeachesLayout from './components/DesktopBeachesLayout.vue'
 import SetLocationModal from './components/SetLocationModal.vue'
+import BeachSelectionModal from './components/BeachSelectionModal.vue'
 import type { LocationItem } from './components/LocationCard.vue'
 import { getLocations, getBeaches, getBeachTypes, type Beach, type Location, type CityLocation } from './services/api'
 import { toNumber } from './utils/helpers'
@@ -147,6 +156,8 @@ const isBeachesViewOpen = ref(false)
 const beachesViewLocation = ref<(LocationItem & MapLocation) | null>(null)
 const beachesViewBeaches = ref<Beach[]>([])
 const beachTypesMap = ref<Record<number, string>>({})
+const isBeachModalOpen = ref(false)
+const selectedBeach = ref<Beach | null>(null)
 
 const filteredLocations = computed(() => {
   if (!searchTerm.value) return locations.value
@@ -376,13 +387,26 @@ const closeBeachesView = () => {
   isBeachesViewOpen.value = false
   beachesViewLocation.value = null
   beachesViewBeaches.value = []
+  isBeachModalOpen.value = false
+  selectedBeach.value = null
   // Reset selected location to return to initial map view
   selectedLocation.value = null
   modalBeaches.value = []
 }
 
 const handleBeachSelectFromView = (beach: Beach) => {
-  console.log('Beach selected from view:', beach)
+  selectedBeach.value = beach
+  isBeachModalOpen.value = true
+}
+
+const closeBeachSelectionModal = () => {
+  isBeachModalOpen.value = false
+  selectedBeach.value = null
+}
+
+const confirmBeachSelection = (beach: Beach) => {
+  console.log('Beach selected from modal:', beach)
+  closeBeachSelectionModal()
   // TODO: Navigate to beach detail or booking page
   closeBeachesView()
 }

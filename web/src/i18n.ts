@@ -57,7 +57,10 @@ export const messages = {
       },
       beach: {
         type: 'Type',
+        typeLabel: 'Beach Type',
         animals: 'Allowed animals',
+        dogsAllowed: 'Dogs Allowed',
+        priceRange: 'Price range',
         typeUnknown: 'Unknown type',
         yes: 'Yes',
         no: 'No',
@@ -65,6 +68,7 @@ export const messages = {
       common: {
         close: 'Close',
         select: 'Select',
+        selectBeach: 'Select Beach',
         cancel: 'Cancel',
         continue: 'Continue',
       },
@@ -126,7 +130,10 @@ export const messages = {
       },
       beach: {
         type: 'Tipo',
+        typeLabel: 'Tipo Spiaggia',
         animals: 'Animali ammessi',
+        dogsAllowed: 'Cani ammessi',
+        priceRange: 'Fascia prezzo',
         typeUnknown: 'Tipo sconosciuto',
         yes: 'Sì',
         no: 'No',
@@ -134,6 +141,7 @@ export const messages = {
       common: {
         close: 'Chiudi',
         select: 'Seleziona',
+        selectBeach: 'Seleziona Spiaggia',
         cancel: 'Annulla',
         continue: 'Continua',
       },
