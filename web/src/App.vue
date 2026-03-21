@@ -8,6 +8,7 @@
       v-if="isBeachesViewOpen && beachesViewLocation"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
+      :expand-beach-id="beachToExpandId"
       :beach-types="beachTypesMap"
       :initials="initials"
       :user-location="userLocation"
@@ -49,6 +50,7 @@
       v-if="isBeachesViewOpen && beachesViewLocation"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
+      :expand-beach-id="beachToExpandId"
       :beach-types="beachTypesMap"
       @back="closeBeachesView"
       @select-beach="handleBeachSelectFromView"
@@ -99,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { getUser, isAuthenticated, login, logout, updateToken } from './keycloak'
 import { useGeolocation } from './composables/useGeolocation'
 import TopBar from './components/TopBar.vue'
@@ -155,6 +157,7 @@ const modalBeaches = ref<Beach[]>([])
 const isBeachesViewOpen = ref(false)
 const beachesViewLocation = ref<(LocationItem & MapLocation) | null>(null)
 const beachesViewBeaches = ref<Beach[]>([])
+const beachToExpandId = ref<number | null>(null)
 const beachTypesMap = ref<Record<number, string>>({})
 const isBeachModalOpen = ref(false)
 const selectedBeach = ref<Beach | null>(null)
@@ -387,6 +390,7 @@ const closeBeachesView = () => {
   isBeachesViewOpen.value = false
   beachesViewLocation.value = null
   beachesViewBeaches.value = []
+  beachToExpandId.value = null
   isBeachModalOpen.value = false
   selectedBeach.value = null
   // Reset selected location to return to initial map view
@@ -404,11 +408,12 @@ const closeBeachSelectionModal = () => {
   selectedBeach.value = null
 }
 
-const confirmBeachSelection = (beach: Beach) => {
+const confirmBeachSelection = async (beach: Beach) => {
   console.log('Beach selected from modal:', beach)
   closeBeachSelectionModal()
-  // TODO: Navigate to beach detail or booking page
-  closeBeachesView()
+  beachToExpandId.value = null
+  await nextTick()
+  beachToExpandId.value = beach.id
 }
 
 const loadBeaches = async () => {

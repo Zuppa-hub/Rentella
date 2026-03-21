@@ -3,8 +3,17 @@
     <div v-if="isOpen && beach" class="modal-overlay" @click="handleOverlayClick">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
-          <h2 class="modal-title">{{ beach.name }}</h2>
-          <button class="close-button" @click="emit('close')" :title="t('common.close')">
+          <div class="title-block">
+            <h2 class="modal-title">{{ beach.name }}</h2>
+            <p v-if="locationName" class="modal-subtitle">{{ locationName }}</p>
+          </div>
+          <button
+            class="close-button"
+            type="button"
+            @click="emit('close')"
+            :title="t('common.close')"
+            :aria-label="t('common.close')"
+          >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
@@ -16,7 +25,7 @@
 
         <div class="modal-body">
           <div class="beach-image-wrapper">
-            <img v-if="beach.photo_url" :src="beach.photo_url" :alt="beach.name" class="beach-image" />
+            <img v-if="beach.photo_url" :src="beach.photo_url" :alt="beach.name" class="beach-image" loading="lazy" />
             <div v-else class="beach-image-placeholder">🏖️</div>
           </div>
 
@@ -37,8 +46,8 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn-cancel" @click="emit('close')">{{ t('common.cancel') }}</button>
-          <button class="btn-select" @click="emit('confirm', beach)">{{ t('desktop.common.selectBeach') }}</button>
+          <button class="btn-cancel" type="button" @click="emit('close')">{{ t('common.cancel') }}</button>
+          <button class="btn-select" type="button" @click="emit('confirm', beach)">{{ t('desktop.common.selectBeach') }}</button>
         </div>
       </div>
     </div>
@@ -68,6 +77,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+const locationName = computed(() => props.beach?.city_location?.name ?? '')
 
 const handleOverlayClick = () => {
   emit('close')
@@ -107,70 +118,100 @@ const dogsAllowedLabel = computed(() => {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(15, 23, 42, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
-  z-index: 10010;
+  padding: 20px;
+  z-index: 2300;
 }
 
 .modal-content {
-  width: 100%;
-  max-width: 760px;
-  background: #f7f7f7;
-  border-radius: 24px;
+  width: min(560px, 100%);
+  background: #f3f4f5;
+  border-radius: 16px;
+  padding: clamp(16px, 4vw, 20px);
+  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden auto;
+  max-height: 92vh;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 28px 32px 16px 32px;
+  align-items: flex-start;
+  gap: 8px;
+  padding-right: 36px;
+}
+
+.title-block {
+  min-width: 0;
 }
 
 .modal-title {
   margin: 0;
-  color: #414d4f;
-  font-size: 34px;
+  color: #242b2c;
+  font-size: clamp(20px, 4.6vw, 24px);
   line-height: 1.1;
   font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.modal-subtitle {
+  margin: 6px 0 0;
+  color: #5d6b6e;
+  font-size: clamp(12px, 2.8vw, 14px);
+  line-height: 1.35;
 }
 
 .close-button {
-  border: none;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border: 0;
   background: transparent;
-  color: #414d4f;
+  color: #4f5d61;
   cursor: pointer;
-  padding: 4px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.close-button:focus {
+  outline: 2px solid #005f6f;
+  outline-offset: 2px;
 }
 
 .header-divider {
   height: 1px;
-  margin: 0 32px;
-  background: #b9c4c6;
+  margin: 10px 0 0;
+  background: #cfd8dc;
 }
 
 .modal-body {
-  padding: 24px 32px 12px 32px;
+  padding: 12px 0 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
 }
 
 .beach-image-wrapper {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   background: #d6dcde;
-  aspect-ratio: 16 / 8;
+  aspect-ratio: 16 / 9;
 }
 
 .beach-image {
@@ -191,7 +232,7 @@ const dogsAllowedLabel = computed(() => {
 .details-grid {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 0;
 }
 
 .detail-row {
@@ -199,44 +240,67 @@ const dogsAllowedLabel = computed(() => {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: #5c6a6e;
-  font-size: 16px;
+  color: #242b2c;
+  font-size: clamp(14px, 3.4vw, 15px);
+  padding: 10px 0;
+  border-bottom: 1px solid #d6dee0;
 }
 
-.detail-label,
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #5d6b6e;
+}
+
 .detail-value {
   font-weight: 500;
+  color: #242b2c;
+  text-align: right;
 }
 
 .modal-footer {
-  padding: 20px 32px 28px 32px;
+  margin-top: 12px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 
 .btn-cancel,
 .btn-select {
-  border-radius: 12px;
-  font-size: 16px;
+  min-width: 128px;
+  height: clamp(40px, 10vw, 46px);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: clamp(14px, 3.2vw, 15px);
   font-weight: 700;
   cursor: pointer;
-  min-height: 52px;
-  padding: 12px 24px;
+  transition: all 0.2s;
 }
 
 .btn-cancel {
-  border: none;
-  background: transparent;
-  color: #005f6f;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.btn-cancel:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
 }
 
 .btn-select {
   border: none;
-  background: #006779;
+  background: #005f6f;
   color: #ffffff;
-  min-width: 240px;
+}
+
+.btn-select:hover {
+  background: #004a5a;
+  transform: translateY(-1px);
 }
 
 .modal-fade-enter-active,
@@ -249,80 +313,47 @@ const dogsAllowedLabel = computed(() => {
   opacity: 0;
 }
 
-@media (max-width: 1024px) {
-  .modal-content {
-    max-width: 708px;
-  }
-
-  .modal-title {
-    font-size: 34px;
-  }
-
-  .detail-row {
-    font-size: 16px;
-  }
-
-  .btn-cancel,
-  .btn-select {
-    font-size: 16px;
-    min-height: 52px;
-  }
-
-  .btn-select {
-    min-width: 220px;
-  }
-}
-
 @media (max-width: 640px) {
   .modal-overlay {
     padding: 16px;
   }
 
   .modal-content {
-    border-radius: 18px;
-    max-width: 100%;
+    max-height: 50vh;
   }
 
   .modal-header {
-    padding: 20px 20px 12px 20px;
+    padding-right: 32px;
   }
 
-  .modal-title {
-    font-size: 18px;
-  }
-
-  .header-divider {
-    margin: 0 20px;
+  .modal-subtitle {
+    margin-top: 6px;
+    font-size: 13px;
   }
 
   .modal-body {
-    padding: 16px 20px 10px 20px;
-    gap: 18px;
-  }
-
-  .detail-row {
-    font-size: 16px;
+    padding-top: 10px;
   }
 
   .modal-footer {
-    padding: 12px 20px 20px 20px;
-    gap: 10px;
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
 
   .btn-cancel,
   .btn-select {
-    min-height: 44px;
-    font-size: 14px;
-    border-radius: 10px;
-  }
-
-  .btn-select {
+    width: 100%;
     min-width: 0;
-    flex: 1;
+  }
+}
+
+@media (max-width: 360px) {
+  .modal-content {
+    padding: 14px;
   }
 
-  .btn-cancel {
-    flex: 1;
+  .detail-row {
+    padding: 8px 0;
   }
 }
 </style>
