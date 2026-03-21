@@ -59,7 +59,7 @@
                 <img :src="icons.allowedAnimals" alt="" class="detail-icon" />
                 {{ isAnimalsAllowed(beach.allowed_animals) ? t('desktop.beach.yes') : t('desktop.beach.no') }}
               </span>
-              <span class="detail-item" v-if="beach.min_price && beach.max_price" :title="t('common.price')">
+              <span class="detail-item" v-if="beach.min_price && beach.max_price" :title="t('desktop.beach.priceRange')">
                 <img :src="icons.money" alt="" class="detail-icon" />
                 €{{ beach.min_price }}-{{ beach.max_price }}
               </span>
@@ -197,14 +197,14 @@ const handlePhotoClick = (beach: BeachViewModel) => {
 }
 
 const normalizeZones = (beachDetails: Beach): BeachZoneViewModel[] => {
-  const prices = Array.isArray(beachDetails?.prices) ? beachDetails.prices : []
+  const zones = Array.isArray(beachDetails?.zones) ? beachDetails.zones : []
 
-  return prices.map((price, index) => ({
-    id: price.id,
-    name: t('desktop.beach.zoneNumber', { number: index + 1 }),
-    description: null,
-    umbrellasCount: price.umbrella_count ?? null,
-    price: price.price ?? null,
+  return zones.map((zone: any) => ({
+    id: zone.id,
+    name: zone.name || t('desktop.beach.zoneNumber', { number: zone.id }),
+    description: zone.description ? String(zone.description) : null,
+    umbrellasCount: zone.umbrellas?.length ?? null,
+    price: zone.prices?.price ?? null,
   }))
 }
 
