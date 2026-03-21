@@ -374,7 +374,7 @@ const dogsAllowedLabel = computed(() => {
   }
 
   .modal-content {
-    max-height: 50vh;
+    max-height: 80vh;
   }
 
   .modal-header {
