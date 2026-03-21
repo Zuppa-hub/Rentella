@@ -36,7 +36,7 @@
         :class="{ expanded: expandedBeachId === beach.id }"
       >
         <div class="beach-main" @click="handleSelectBeach(beach)">
-          <button class="beach-image" type="button" @click.stop="handlePhotoClick(beach)">
+          <button class="beach-image" type="button" @click.stop="handlePhotoClick(beach)" :aria-label="beach.name">
             <img
               v-if="beach.photo_url"
               :src="beach.photo_url"
@@ -59,7 +59,7 @@
                 <img :src="icons.allowedAnimals" alt="" class="detail-icon" />
                 {{ isAnimalsAllowed(beach.allowed_animals) ? t('desktop.beach.yes') : t('desktop.beach.no') }}
               </span>
-              <span class="detail-item" v-if="beach.min_price && beach.max_price" :title="t('common.price')">
+              <span class="detail-item" v-if="beach.min_price && beach.max_price" :title="t('desktop.beach.priceRange')">
                 <img :src="icons.money" alt="" class="detail-icon" />
                 €{{ beach.min_price }}-{{ beach.max_price }}
               </span>
@@ -79,7 +79,16 @@
           <p v-else-if="!(zonesByBeach[beach.id]?.length)" class="zones-state">{{ t('desktop.beach.noZones') }}</p>
 
           <div v-else class="zones-list">
-            <div v-for="zone in zonesByBeach[beach.id]" :key="zone.id" class="zone-card">
+            <div
+              v-for="zone in zonesByBeach[beach.id]"
+              :key="zone.id"
+              class="zone-card"
+              role="button"
+              tabindex="0"
+              @click="emit('select-zone', zone, beach)"
+              @keydown.enter.prevent="emit('select-zone', zone, beach)"
+              @keydown.space.prevent="emit('select-zone', zone, beach)"
+            >
               <div class="zone-content">
                 <div class="zone-header">
                   <h4 class="zone-name">{{ zone.name }}</h4>
@@ -155,6 +164,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   back: []
   'select-beach': [beach: BeachViewModel]
+  'select-zone': [zone: BeachZoneViewModel, beach: BeachViewModel]
 }>()
 
 const searchTerm = ref('')
@@ -186,22 +196,16 @@ const handlePhotoClick = (beach: BeachViewModel) => {
   emit('select-beach', beach)
 }
 
-const normalizeZones = (payload: unknown): BeachZoneViewModel[] => {
-  const beachPayload = payload as { zones?: Array<Record<string, unknown>> }
-  const zones = Array.isArray(beachPayload?.zones) ? beachPayload.zones : []
+const normalizeZones = (beachDetails: Beach): BeachZoneViewModel[] => {
+  const prices = Array.isArray(beachDetails?.prices) ? beachDetails.prices : []
 
-  return zones.map((zone) => {
-    const priceRaw = (zone.prices as { price?: number | string } | undefined)?.price
-    const umbrellasRaw = zone.umbrellas_count as number | string | undefined
-
-    return {
-      id: Number(zone.id),
-      name: String(zone.name ?? '-'),
-      description: zone.description ? String(zone.description) : null,
-      umbrellasCount: umbrellasRaw !== undefined ? Number(umbrellasRaw) : null,
-      price: priceRaw !== undefined ? Number(priceRaw) : null,
-    }
-  })
+  return prices.map((price, index) => ({
+    id: price.id,
+    name: t('desktop.beach.zoneNumber', { number: index + 1 }),
+    description: null,
+    umbrellasCount: price.umbrella_count ?? null,
+    price: price.price ?? null,
+  }))
 }
 
 const loadZonesForBeach = async (beachId: number) => {
@@ -237,7 +241,7 @@ const handleSelectBeach = (beach: BeachViewModel) => {
 watch(
   () => props.expandBeachId,
   (beachId) => {
-    if (!beachId) return
+    if (beachId == null) return
     const beach = props.beaches.find((item) => item.id === beachId)
     if (beach) {
       void expandBeach(beach, true)
