@@ -382,6 +382,13 @@ const icons = {
   border-radius: 16px;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
   transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.beach-card:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
 }
 
 .beach-card.expanded {
@@ -392,11 +399,6 @@ const icons = {
   display: flex;
   gap: 12px;
   cursor: pointer;
-}
-
-.beach-main:hover {
-  background: #f3f4f6;
-  border-radius: 10px;
 }
 
 /* Beach Image */
