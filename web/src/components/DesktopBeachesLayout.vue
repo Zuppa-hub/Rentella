@@ -47,6 +47,7 @@
       <BeachesView
         :location="location"
         :beaches="beaches"
+        :expand-beach-id="expandBeachId"
         :beach-types="beachTypes"
         @back="emit('back')"
         @select-beach="emit('select-beach', $event)"
@@ -80,6 +81,7 @@ interface Location {
 const props = defineProps<{
   location: Location
   beaches: Beach[]
+  expandBeachId?: number | null
   beachTypes?: Record<number, string>
   initials: string
   userLocation?: { lat: number; lng: number } | null

@@ -8,6 +8,7 @@
       v-if="isBeachesViewOpen && beachesViewLocation"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
+      :expand-beach-id="beachToExpandId"
       :beach-types="beachTypesMap"
       :initials="initials"
       :user-location="userLocation"
@@ -49,6 +50,7 @@
       v-if="isBeachesViewOpen && beachesViewLocation"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
+      :expand-beach-id="beachToExpandId"
       :beach-types="beachTypesMap"
       @back="closeBeachesView"
       @select-beach="handleBeachSelectFromView"
@@ -88,10 +90,18 @@
     @location-set="handleLocationSet"
     @use-current-location="handleUseCurrentLocationFromModal"
   />
+
+  <BeachSelectionModal
+    :is-open="isBeachModalOpen"
+    :beach="selectedBeach"
+    :beach-types="beachTypesMap"
+    @close="closeBeachSelectionModal"
+    @confirm="confirmBeachSelection"
+  />
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { getUser, isAuthenticated, login, logout, updateToken } from './keycloak'
 import { useGeolocation } from './composables/useGeolocation'
 import TopBar from './components/TopBar.vue'
@@ -103,6 +113,7 @@ import LocationModal from './components/LocationModal.vue'
 import BeachesView from './components/BeachesView.vue'
 import DesktopBeachesLayout from './components/DesktopBeachesLayout.vue'
 import SetLocationModal from './components/SetLocationModal.vue'
+import BeachSelectionModal from './components/BeachSelectionModal.vue'
 import type { LocationItem } from './components/LocationCard.vue'
 import { getLocations, getBeaches, getBeachTypes, type Beach, type Location, type CityLocation } from './services/api'
 import { toNumber } from './utils/helpers'
@@ -146,7 +157,10 @@ const modalBeaches = ref<Beach[]>([])
 const isBeachesViewOpen = ref(false)
 const beachesViewLocation = ref<(LocationItem & MapLocation) | null>(null)
 const beachesViewBeaches = ref<Beach[]>([])
+const beachToExpandId = ref<number | null>(null)
 const beachTypesMap = ref<Record<number, string>>({})
+const isBeachModalOpen = ref(false)
+const selectedBeach = ref<Beach | null>(null)
 
 const filteredLocations = computed(() => {
   if (!searchTerm.value) return locations.value
@@ -376,15 +390,30 @@ const closeBeachesView = () => {
   isBeachesViewOpen.value = false
   beachesViewLocation.value = null
   beachesViewBeaches.value = []
+  beachToExpandId.value = null
+  isBeachModalOpen.value = false
+  selectedBeach.value = null
   // Reset selected location to return to initial map view
   selectedLocation.value = null
   modalBeaches.value = []
 }
 
 const handleBeachSelectFromView = (beach: Beach) => {
-  console.log('Beach selected from view:', beach)
-  // TODO: Navigate to beach detail or booking page
-  closeBeachesView()
+  selectedBeach.value = beach
+  isBeachModalOpen.value = true
+}
+
+const closeBeachSelectionModal = () => {
+  isBeachModalOpen.value = false
+  selectedBeach.value = null
+}
+
+const confirmBeachSelection = async (beach: Beach) => {
+  console.log('Beach selected from modal:', beach)
+  closeBeachSelectionModal()
+  beachToExpandId.value = null
+  await nextTick()
+  beachToExpandId.value = beach.id
 }
 
 const loadBeaches = async () => {

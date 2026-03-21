@@ -24,6 +24,20 @@ export interface Beach {
     latitude: number
     longitude: number
   }
+  zones?: Array<{
+    id: number
+    name: string
+    description?: string | null
+    price_id: number
+    prices?: {
+      id: number
+      price: number
+    }
+    umbrellas?: Array<{
+      id: number
+      number: number
+    }>
+  }>
   prices?: Array<{
     id: number
     price: number

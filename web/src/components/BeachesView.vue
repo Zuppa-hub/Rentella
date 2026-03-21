@@ -33,45 +33,84 @@
         v-for="(beach, idx) in filteredBeaches"
         :key="beach.id"
         class="beach-card"
-        @click="handleSelectBeach(beach)"
+        :class="{ expanded: expandedBeachId === beach.id }"
       >
-        <!-- Beach Image -->
-        <div class="beach-image">
-          <img
-            v-if="beach.photo_url"
-            :src="beach.photo_url"
-            :alt="beach.name"
-            class="beach-photo"
-            loading="lazy"
-          />
-          <div v-else class="image-placeholder">🏖️</div>
-          <div class="beach-badge">{{ idx + 1 }}</div>
-        </div>
+        <div class="beach-main" @click="handleSelectBeach(beach)">
+          <button class="beach-image" type="button" @click.stop="handlePhotoClick(beach)" :aria-label="beach.name">
+            <img
+              v-if="beach.photo_url"
+              :src="beach.photo_url"
+              :alt="beach.name"
+              class="beach-photo"
+              loading="lazy"
+            />
+            <div v-else class="image-placeholder">🏖️</div>
+            <div class="beach-badge">{{ idx + 1 }}</div>
+          </button>
 
-        <!-- Beach Info -->
-        <div class="beach-info">
-          <h3 class="beach-name">{{ beach.name }}</h3>
-          <div class="beach-details">
-            <span class="detail-item" :title="t('desktop.beach.type')">
-              <img :src="icons.beachType" alt="" class="detail-icon" />
-              {{ getBeachTypeLabel(beach) }}
-            </span>
-            <span class="detail-item" :title="t('desktop.beach.animals')">
-              <img :src="icons.allowedAnimals" alt="" class="detail-icon" />
-              {{ isAnimalsAllowed(beach.allowed_animals) ? t('desktop.beach.yes') : t('desktop.beach.no') }}
-            </span>
-            <span class="detail-item" v-if="beach.min_price && beach.max_price" :title="t('common.price')">
-              <img :src="icons.money" alt="" class="detail-icon" />
-              €{{ beach.min_price }}-{{ beach.max_price }}
-            </span>
+          <div class="beach-info">
+            <h3 class="beach-name">{{ beach.name }}</h3>
+            <div class="beach-details">
+              <span class="detail-item" :title="t('desktop.beach.type')">
+                <img :src="icons.beachType" alt="" class="detail-icon" />
+                {{ getBeachTypeLabel(beach) }}
+              </span>
+              <span class="detail-item" :title="t('desktop.beach.animals')">
+                <img :src="icons.allowedAnimals" alt="" class="detail-icon" />
+                {{ isAnimalsAllowed(beach.allowed_animals) ? t('desktop.beach.yes') : t('desktop.beach.no') }}
+              </span>
+              <span class="detail-item" v-if="beach.min_price && beach.max_price" :title="t('desktop.beach.priceRange')">
+                <img :src="icons.money" alt="" class="detail-icon" />
+                €{{ beach.min_price }}-{{ beach.max_price }}
+              </span>
+            </div>
+          </div>
+
+          <div class="expand-icon" :class="{ expanded: expandedBeachId === beach.id }">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </div>
         </div>
 
-        <!-- Expand Icon -->
-        <div class="expand-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
+        <div v-if="expandedBeachId === beach.id" class="zones-section">
+          <p v-if="loadingZonesByBeach[beach.id]" class="zones-state">{{ t('desktop.beach.loadingZones') }}</p>
+          <p v-else-if="zonesErrorByBeach[beach.id]" class="zones-state error">{{ zonesErrorByBeach[beach.id] }}</p>
+          <p v-else-if="!(zonesByBeach[beach.id]?.length)" class="zones-state">{{ t('desktop.beach.noZones') }}</p>
+
+          <div v-else class="zones-list">
+            <div
+              v-for="zone in zonesByBeach[beach.id]"
+              :key="zone.id"
+              class="zone-card"
+              role="button"
+              tabindex="0"
+              @click="emit('select-zone', zone, beach)"
+              @keydown.enter.prevent="emit('select-zone', zone, beach)"
+              @keydown.space.prevent="emit('select-zone', zone, beach)"
+            >
+              <div class="zone-content">
+                <div class="zone-header">
+                  <h4 class="zone-name">{{ zone.name }}</h4>
+                </div>
+                <div class="zone-meta">
+                  <span class="detail-item" v-if="zone.price !== null">
+                    <img :src="icons.money" alt="" class="detail-icon" />
+                    €{{ zone.price }}
+                  </span>
+                  <span class="detail-item" v-if="zone.umbrellasCount !== null">
+                    {{ zone.umbrellasCount }} {{ t('desktop.beach.available') }}
+                  </span>
+                </div>
+                <p v-if="zone.description" class="zone-description">{{ zone.description }}</p>
+              </div>
+              <div class="zone-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -79,9 +118,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Beach } from '../services/api'
+import { getBeach, type Beach } from '../services/api'
 import SearchBox from './SearchBox.vue'
 import allowedAnimalsIcon from '../assets/icons/AllowedAnimals.svg'
 import beachTypeIcon from '../assets/icons/BeachType.svg'
@@ -107,18 +146,32 @@ type BeachViewModel = Beach & {
   photo_url?: string
 }
 
+type BeachZoneViewModel = {
+  id: number
+  name: string
+  description: string | null
+  umbrellasCount: number | null
+  price: number | null
+}
+
 const props = defineProps<{
   location: Location
   beaches: BeachViewModel[]
+  expandBeachId?: number | null
   beachTypes?: Record<number, string>
 }>()
 
 const emit = defineEmits<{
   back: []
   'select-beach': [beach: BeachViewModel]
+  'select-zone': [zone: BeachZoneViewModel, beach: BeachViewModel]
 }>()
 
 const searchTerm = ref('')
+const expandedBeachId = ref<number | null>(null)
+const zonesByBeach = ref<Record<number, BeachZoneViewModel[]>>({})
+const loadingZonesByBeach = ref<Record<number, boolean>>({})
+const zonesErrorByBeach = ref<Record<number, string>>({})
 
 const filteredBeaches = computed(() => {
   if (!searchTerm.value) return props.beaches
@@ -139,9 +192,62 @@ const handleBack = () => {
   emit('back')
 }
 
-const handleSelectBeach = (beach: BeachViewModel) => {
+const handlePhotoClick = (beach: BeachViewModel) => {
   emit('select-beach', beach)
 }
+
+const normalizeZones = (beachDetails: Beach): BeachZoneViewModel[] => {
+  const zones = Array.isArray(beachDetails?.zones) ? beachDetails.zones : []
+
+  return zones.map((zone: any) => ({
+    id: zone.id,
+    name: zone.name || t('desktop.beach.zoneNumber', { number: zone.id }),
+    description: zone.description ? String(zone.description) : null,
+    umbrellasCount: zone.umbrellas?.length ?? null,
+    price: zone.prices?.price ?? null,
+  }))
+}
+
+const loadZonesForBeach = async (beachId: number) => {
+  if (zonesByBeach.value[beachId] || loadingZonesByBeach.value[beachId]) return
+
+  loadingZonesByBeach.value[beachId] = true
+  zonesErrorByBeach.value[beachId] = ''
+
+  try {
+    const beachDetails = await getBeach(beachId)
+    zonesByBeach.value[beachId] = normalizeZones(beachDetails)
+  } catch (err) {
+    zonesErrorByBeach.value[beachId] = err instanceof Error ? err.message : t('desktop.beach.zonesLoadError')
+  } finally {
+    loadingZonesByBeach.value[beachId] = false
+  }
+}
+
+const expandBeach = async (beach: BeachViewModel, force: boolean = false) => {
+  if (!force && expandedBeachId.value === beach.id) {
+    expandedBeachId.value = null
+    return
+  }
+
+  expandedBeachId.value = beach.id
+  await loadZonesForBeach(beach.id)
+}
+
+const handleSelectBeach = (beach: BeachViewModel) => {
+  void expandBeach(beach)
+}
+
+watch(
+  () => props.expandBeachId,
+  (beachId) => {
+    if (beachId == null) return
+    const beach = props.beaches.find((item) => item.id === beachId)
+    if (beach) {
+      void expandBeach(beach, true)
+    }
+  }
+)
 
 const icons = {
   beachType: beachTypeIcon,
@@ -272,22 +378,38 @@ const icons = {
 
 .beach-card {
   display: flex;
+  flex-direction: column;
   gap: 12px;
   padding: 16px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-  cursor: pointer;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .beach-card:hover {
   background: #f3f4f6;
+  border-color: #d1d5db;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+.beach-card.expanded {
+  border-color: #c7d5d9;
+}
+
+.beach-main {
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
 }
 
 /* Beach Image */
 .beach-image {
+  border: none;
+  padding: 0;
+  cursor: pointer;
   position: relative;
   width: 80px;
   height: 80px;
@@ -335,7 +457,7 @@ const icons = {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 8px;
 }
 
 .beach-name {
@@ -384,11 +506,107 @@ const icons = {
   justify-content: center;
   color: #9ca3af;
   flex-shrink: 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.beach-main:hover .expand-icon {
+  color: #005f6f;
+}
+
+.expand-icon.expanded {
+  transform: rotate(90deg);
+  color: #005f6f;
+}
+
+.zones-section {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 10px;
+}
+
+.zones-state {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.zones-state.error {
+  color: #b42318;
+}
+
+.zones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zone-card {
+  background: #f8fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.zone-card:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.zone-card:active {
+  transform: scale(0.98);
+}
+
+.zone-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.zone-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.zone-name {
+  margin: 0;
+  font-size: 15px;
+  color: #242b2c;
+}
+
+.zone-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  flex-shrink: 0;
   transition: color 0.2s ease;
 }
 
-.beach-card:hover .expand-icon {
+.zone-card:hover .zone-arrow {
   color: #005f6f;
+}
+
+.zone-meta {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.zone-description {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 /* Desktop styling - sidebar layout */
