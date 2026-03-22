@@ -1,5 +1,5 @@
 <template>
-  <div class="order-history">
+  <div class="order-history-fullscreen">
     <!-- Header -->
     <div class="order-history-header">
       <button class="order-history-back" @click="handleBack">
@@ -10,22 +10,38 @@
       <h1 class="order-history-title">Order History</h1>
     </div>
 
-    <p class="order-history-subtitle">See all the past Purchases</p>
+    <p class="order-history-subtitle">See all your past purchases</p>
+
+    <!-- Loading State -->
+    <div v-if="loading" class="order-history-loading">
+      <p>Loading orders...</p>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="order-history-error">
+      <p>{{ error }}</p>
+      <button @click="fetchOrders" class="rt-btn rt-btn-primary">Retry</button>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="orders.length === 0" class="order-history-empty">
+      <p>No orders found</p>
+    </div>
 
     <!-- Orders List -->
-    <div class="order-history-list">
+    <div v-else class="order-history-list">
       <div
-        v-for="order in allOrders"
+        v-for="order in orders"
         :key="order.id"
         class="order-card"
         @click="selectOrder(order)"
       >
         <div class="order-card-content">
           <div class="order-card-main">
-            <h3 class="order-card-beach">{{ order.beachName }}</h3>
-            <span class="order-card-city">{{ order.location }}</span>
+            <h3 class="order-card-beach">{{ getBeachName(order) }}</h3>
+            <span class="order-card-city">{{ getCityName(order) }}</span>
           </div>
-          <span class="order-card-date">{{ formatDate(order.checkInDate) }}</span>
+          <span class="order-card-date">{{ formatDate(order.start_date) }}</span>
         </div>
         <svg class="order-card-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="9 18 15 12 9 6"></polyline>
@@ -34,13 +50,7 @@
     </div>
 
     <!-- Records Count -->
-    <p class="order-history-count">{{ allOrders.length }} Records</p>
-
-    <!-- Active Orders Section -->
-    <div class="order-history-active">
-      <p class="order-history-active-question">Looking for Active Orders?</p>
-      <button class="order-history-active-btn" @click="showActive = true">Active</button>
-    </div>
+    <p v-if="!loading && orders.length > 0" class="order-history-count">{{ orders.length }} Records</p>
 
     <!-- Order Detail Modal -->
     <div v-if="selectedOrder" class="order-detail-modal-overlay" @click="selectedOrder = null">
@@ -51,31 +61,31 @@
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
-        <h3 class="order-detail-title">{{ selectedOrder.beachName }}</h3>
+        <h3 class="order-detail-title">{{ getBeachName(selectedOrder) }}</h3>
         <div class="order-detail-content">
           <div class="order-detail-row">
             <span class="order-detail-label">Order ID:</span>
-            <span class="order-detail-value">{{ selectedOrder.id }}</span>
+            <span class="order-detail-value">#{{ selectedOrder.id }}</span>
           </div>
           <div class="order-detail-row">
             <span class="order-detail-label">Location:</span>
-            <span class="order-detail-value">{{ selectedOrder.location }}</span>
+            <span class="order-detail-value">{{ getCityName(selectedOrder) }}</span>
           </div>
           <div class="order-detail-row">
             <span class="order-detail-label">Zone:</span>
-            <span class="order-detail-value">{{ selectedOrder.zoneName }}</span>
+            <span class="order-detail-value">{{ getZoneName(selectedOrder) }}</span>
           </div>
           <div class="order-detail-row">
             <span class="order-detail-label">Check-in:</span>
-            <span class="order-detail-value">{{ selectedOrder.checkInDate }}</span>
+            <span class="order-detail-value">{{ formatDate(selectedOrder.start_date) }}</span>
           </div>
           <div class="order-detail-row">
             <span class="order-detail-label">Check-out:</span>
-            <span class="order-detail-value">{{ selectedOrder.checkOutDate }}</span>
+            <span class="order-detail-value">{{ formatDate(selectedOrder.end_date) }}</span>
           </div>
           <div class="order-detail-row order-detail-row-total">
             <span class="order-detail-label">Total Price:</span>
-            <span class="order-detail-value">{{ selectedOrder.totalPrice }}</span>
+            <span class="order-detail-value">{{ getPrice(selectedOrder) }}</span>
           </div>
         </div>
         <button class="order-detail-close-btn rt-btn rt-btn-primary" @click="selectedOrder = null">Close</button>
@@ -85,82 +95,54 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-
-interface Order {
-  id: string
-  beachName: string
-  zoneName: string
-  location: string
-  checkInDate: string
-  checkOutDate: string
-  totalPrice: string
-  createdAt: number
-  status: 'completed' | 'active' | 'cancelled'
-}
+import { onMounted, ref } from 'vue'
+import { getOrders, type Order } from '../services/api'
 
 const emit = defineEmits<{
   back: []
 }>()
 
+const orders = ref<Order[]>([])
 const selectedOrder = ref<Order | null>(null)
-const showActive = ref(false)
+const loading = ref(false)
+const error = ref<string | null>(null)
 
-// Load orders from localStorage (simulated data)
-const allOrders = computed(() => {
-  const stored = localStorage.getItem('rentella_orders')
-  const orders: Order[] = stored ? JSON.parse(stored) : [
-    {
-      id: 'ORD-20230804-1234',
-      beachName: 'Tortuga Beach',
-      zoneName: 'Zone A',
-      location: 'Rimini',
-      checkInDate: '2023-08-04',
-      checkOutDate: '2023-08-06',
-      totalPrice: '150 €',
-      createdAt: Date.now() - 30 * 24 * 60 * 60 * 1000,
-      status: 'completed',
-    },
-    {
-      id: 'ORD-20230805-5678',
-      beachName: 'Tortuga Beach',
-      zoneName: 'Zone B',
-      location: 'Rimini',
-      checkInDate: '2023-08-05',
-      checkOutDate: '2023-08-07',
-      totalPrice: '180 €',
-      createdAt: Date.now() - 25 * 24 * 60 * 60 * 1000,
-      status: 'completed',
-    },
-    {
-      id: 'ORD-20230810-9012',
-      beachName: 'Tortuga Beach',
-      zoneName: 'Zone C',
-      location: 'Rimini',
-      checkInDate: '2023-08-10',
-      checkOutDate: '2023-08-12',
-      totalPrice: '200 €',
-      createdAt: Date.now() - 20 * 24 * 60 * 60 * 1000,
-      status: 'completed',
-    },
-    {
-      id: 'ORD-20230815-3456',
-      beachName: 'Tortuga Beach',
-      zoneName: 'Zone A',
-      location: 'Rimini',
-      checkInDate: '2023-08-15',
-      checkOutDate: '2023-08-18',
-      totalPrice: '225 €',
-      createdAt: Date.now() - 10 * 24 * 60 * 60 * 1000,
-      status: 'completed',
-    },
-  ]
-  return orders.sort((a, b) => b.createdAt - a.createdAt)
-})
+const fetchOrders = async () => {
+  loading.value = true
+  error.value = null
+  try {
+    orders.value = await getOrders()
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to load orders'
+    console.error('Failed to fetch orders:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const getBeachName = (order: Order): string => {
+  return order.umbrella?.zone?.beach?.name || 'Unknown Beach'
+}
+
+const getCityName = (order: Order): string => {
+  return order.umbrella?.zone?.beach?.city_location?.city_name || 'Unknown City'
+}
+
+const getZoneName = (order: Order): string => {
+  return order.umbrella?.zone?.name || 'Unknown Zone'
+}
+
+const getPrice = (order: Order): string => {
+  return order.price?.price ? `€ ${order.price.price}` : 'N/A'
+}
 
 const formatDate = (dateStr: string): string => {
-  const [year, month, day] = dateStr.split('-')
-  return `${day}.${month}.${year}`
+  try {
+    const [year, month, day] = dateStr.split('-')
+    return `${day}.${month}.${year}`
+  } catch {
+    return dateStr
+  }
 }
 
 const selectOrder = (order: Order) => {
@@ -170,23 +152,27 @@ const selectOrder = (order: Order) => {
 const handleBack = () => {
   emit('back')
 }
+
+onMounted(() => {
+  fetchOrders()
+})
 </script>
 
 <style scoped>
-.order-history {
+.order-history-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  flex: 1;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: #ffffff;
   font-family: 'Inter', sans-serif;
-  border-radius: 32px 32px 0 0;
   padding: 20px clamp(12px, 4vw, 32px) calc(100px + env(safe-area-inset-bottom));
-  box-shadow: 0 -2px 8px rgba(85, 85, 102, 0.18);
-  min-height: calc(100vh - 80px - (64px + 80px - 67px));
-  max-height: calc(100vh - 80px - (64px + 80px - 67px));
   box-sizing: border-box;
-  position: relative;
   z-index: 99;
   overflow: hidden;
 }
@@ -227,6 +213,29 @@ const handleBack = () => {
   font-size: 14px;
   color: #78898c;
   font-weight: 400;
+}
+
+.order-history-loading,
+.order-history-error,
+.order-history-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.order-history-error p {
+  margin: 0;
+  color: #d32f2f;
+  font-size: 14px;
+}
+
+.order-history-empty p {
+  margin: 0;
+  color: #78898c;
+  font-size: 16px;
 }
 
 .order-history-list {
@@ -317,38 +326,6 @@ const handleBack = () => {
   color: #9ca3af;
   text-align: center;
   font-weight: 600;
-}
-
-.order-history-active {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 0;
-  border-top: 1px solid #e5e7eb;
-}
-
-.order-history-active-question {
-  margin: 0;
-  font-size: 14px;
-  color: #414d4f;
-  font-weight: 600;
-}
-
-.order-history-active-btn {
-  background: #005f6f;
-  color: white;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.order-history-active-btn:hover {
-  background: #003d47;
 }
 
 .order-detail-modal-overlay {

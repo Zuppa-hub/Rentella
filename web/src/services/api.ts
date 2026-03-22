@@ -86,6 +86,36 @@ export interface ZoneCheckoutResponse {
   umbrella_id: number
 }
 
+export interface Order {
+  id: number
+  umbrella_id: number
+  start_date: string
+  end_date: string
+  user_id: number
+  price_id: number
+  zone_id?: number
+  umbrella?: {
+    id: number
+    number: number
+    zone?: {
+      id: number
+      name: string
+      beach?: {
+        id: number
+        name: string
+        city_location?: {
+          id: number
+          city_name: string
+        }
+      }
+    }
+  }
+  price?: {
+    id: number
+    price: number
+  }
+}
+
 interface FetchOptions extends RequestInit {
   authenticated?: boolean
 }
@@ -243,5 +273,14 @@ export async function createZoneOrder(payload: {
       ...(payload.priceId ? { price_id: payload.priceId } : {}),
     }),
   })
+}
+
+// Orders endpoints
+export async function getOrders(): Promise<Order[]> {
+  return fetchApi<Order[]>('/orders')
+}
+
+export async function getOrder(id: number): Promise<Order> {
+  return fetchApi<Order>(`/orders/${id}`)
 }
 
