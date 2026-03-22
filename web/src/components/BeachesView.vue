@@ -261,6 +261,52 @@
             {{ checkoutFeedback.message }}
           </p>
         </div>
+
+        <div v-else-if="zonePickerStep === 'success'" class="zone-success-page">
+          <div class="zone-success-header">
+            <svg class="zone-success-icon" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <h3 class="zone-success-title">Reservation Confirmed!</h3>
+          </div>
+
+          <div class="zone-success-order-id">
+            <span class="zone-success-label">Order ID</span>
+            <span class="zone-success-value">{{ orderId }}</span>
+          </div>
+
+          <div class="zone-success-divider"></div>
+
+          <div class="zone-success-details">
+            <div class="zone-success-row">
+              <span class="zone-success-detail-label">Location:</span>
+              <span class="zone-success-detail-value">{{ location.name }}</span>
+            </div>
+            <div class="zone-success-row">
+              <span class="zone-success-detail-label">Beach:</span>
+              <span class="zone-success-detail-value">{{ selectedZoneBeach?.name }}</span>
+            </div>
+            <div class="zone-success-row">
+              <span class="zone-success-detail-label">Section:</span>
+              <span class="zone-success-detail-value">{{ selectedZone?.name }}</span>
+            </div>
+            <div class="zone-success-row">
+              <span class="zone-success-detail-label">Check-in:</span>
+              <span class="zone-success-detail-value">{{ reservationFrom }}</span>
+            </div>
+            <div class="zone-success-row">
+              <span class="zone-success-detail-label">Check-out:</span>
+              <span class="zone-success-detail-value">{{ reservationTo }}</span>
+            </div>
+            <div class="zone-success-row zone-success-row-total">
+              <span class="zone-success-detail-label">Total Price:</span>
+              <span class="zone-success-detail-value">{{ selectedZonePrice }}</span>
+            </div>
+          </div>
+
+          <p class="zone-success-note">You will receive a confirmation email shortly with all the details.</p>
+        </div>
+
         <div v-else class="zone-checkout-summary">
           <h3 class="zone-checkout-title">{{ t('desktop.zonePicker.checkout') }}</h3>
           <div class="zone-checkout-table">
@@ -349,7 +395,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { checkZoneAvailability, createZoneOrder, getBeach, type Beach } from '../services/api'
+import { checkZoneAvailability, getBeach, type Beach } from '../services/api'
 import SearchBox from './SearchBox.vue'
 import allowedAnimalsIcon from '../assets/icons/AllowedAnimals.svg'
 import beachTypeIcon from '../assets/icons/BeachType.svg'
@@ -409,15 +455,32 @@ const reservationFrom = ref('')
 const reservationTo = ref('')
 const checkoutFeedback = ref<{ type: 'success' | 'error' | 'info'; message: string } | null>(null)
 const isSubmittingCheckout = ref(false)
-const zonePickerStep = ref<'form' | 'summary' | 'payment'>('form')
+const zonePickerStep = ref<'form' | 'summary' | 'payment' | 'success'>('form')
 const selectedPriceId = ref<number | null>(null)
 const cardOwner = ref('')
 const cardNumber = ref('')
 const expiresOn = ref('')
 const cvv = ref('')
 const showCvvModal = ref(false)
+const orderId = ref<string | null>(null)
 
 const todayDate = new Date().toISOString().slice(0, 10)
+
+const generateOrderId = (): string => {
+  const date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  const random = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, '0')
+  return `ORD-${date}-${random}`
+}
+
+const validateCardFields = (): boolean => {
+  const hasCardOwner = cardOwner.value.trim().length > 0
+  const hasCardNumber = cardNumber.value.trim().length >= 13
+  const expiresMatch = /^\d{1,2}\/\d{4}$/.test(expiresOn.value.trim())
+  const hasCvv = cvv.value.trim().length >= 3
+  return Boolean(hasCardOwner && hasCardNumber && expiresMatch && hasCvv)
+}
 
 const resetReservationForm = () => {
   reservationName.value = ''
@@ -508,11 +571,15 @@ const formattedDuration = computed(() => {
 })
 
 const primaryActionLabel = computed(() => {
+  if (zonePickerStep.value === 'success') return 'New Reservation'
   if (zonePickerStep.value === 'payment') return t('desktop.zonePicker.payment')
   return zonePickerStep.value === 'summary' ? t('desktop.zonePicker.payment') : t('desktop.zonePicker.checkout')
 })
 
 const isCheckoutValid = computed(() => {
+  if (zonePickerStep.value === 'success') {
+    return true
+  }
   if (zonePickerStep.value === 'payment') {
     const hasCardOwner = cardOwner.value.trim().length > 0
     const hasCardNumber = cardNumber.value.trim().length > 0
@@ -567,25 +634,31 @@ const handleCheckout = async () => {
 
 const handlePayment = async () => {
   if (!selectedZone.value || !selectedZoneBeach.value) return
+  if (!validateCardFields()) {
+    checkoutFeedback.value = {
+      type: 'error',
+      message: 'Please check your card details',
+    }
+    return
+  }
 
   isSubmittingCheckout.value = true
-  checkoutFeedback.value = null
+  checkoutFeedback.value = {
+    type: 'info',
+    message: 'Processing payment...',
+  }
+
+  // Simulate payment processing delay
+  await new Promise((resolve) => setTimeout(resolve, 2000))
+
   try {
-    await createZoneOrder({
-      zoneId: selectedZone.value.id,
-      startDate: reservationFrom.value,
-      endDate: reservationTo.value,
-      priceId: selectedPriceId.value,
-    })
+    // Simulate API call (in real app, would call createZoneOrder here)
+    const generatedOrderId = generateOrderId()
+    orderId.value = generatedOrderId
 
-    checkoutFeedback.value = {
-      type: 'success',
-      message: t('desktop.zonePicker.orderSuccess'),
-    }
-
-    setTimeout(() => {
-      closeZonePicker()
-    }, 900)
+    // Move to success step
+    zonePickerStep.value = 'success'
+    checkoutFeedback.value = null
   } catch {
     checkoutFeedback.value = {
       type: 'error',
@@ -597,6 +670,10 @@ const handlePayment = async () => {
 }
 
 const handlePrimaryAction = () => {
+  if (zonePickerStep.value === 'success') {
+    closeZonePicker()
+    return
+  }
   if (zonePickerStep.value === 'payment') {
     void handlePayment()
     return
@@ -609,6 +686,10 @@ const handlePrimaryAction = () => {
 }
 
 const handleZonePickerBack = () => {
+  if (zonePickerStep.value === 'success') {
+    closeZonePicker()
+    return
+  }
   if (zonePickerStep.value === 'payment') {
     zonePickerStep.value = 'summary'
     checkoutFeedback.value = null
@@ -1467,6 +1548,116 @@ const icons = {
   line-height: 1.2;
   font-weight: 700;
   color: #3f4a4f;
+}
+
+.zone-success-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.zone-success-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.zone-success-icon {
+  color: #059669;
+  animation: scaleIn 0.4s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.zone-success-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #242b2c;
+  text-align: center;
+}
+
+.zone-success-order-id {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  background: #f0fdf4;
+  border-radius: 12px;
+}
+
+.zone-success-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #73858a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.zone-success-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #059669;
+  font-family: 'Courier New', monospace;
+}
+
+.zone-success-divider {
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.zone-success-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zone-success-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.zone-success-row-total {
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.zone-success-detail-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #73858a;
+}
+
+.zone-success-detail-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #242b2c;
+  text-align: right;
+}
+
+.zone-success-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #73858a;
+  line-height: 1.4;
+  text-align: center;
+  font-style: italic;
 }
 
 .zone-picker-actions {
