@@ -149,18 +149,7 @@ async function fetchApi<T>(
     const error = await response.text()
 
     if (response.status === 401) {
-      try {
-        const parsed = JSON.parse(error) as { message?: string; error?: string }
-        const isAuthError =
-          parsed.message === 'Unauthenticated' ||
-          parsed.error?.includes('Signature verification failed')
-
-        if (isAuthError) {
-          await login()
-        }
-      } catch {
-        await login()
-      }
+      await login()
     }
 
     throw new Error(`API Error: ${response.status} - ${error}`)
