@@ -3,9 +3,9 @@
     <p class="auth-redirect">Redirecting to login...</p>
   </div>
   <div v-else-if="isDesktop" class="app-desktop">
-    <DesktopHome v-if="!isBeachesViewOpen" :locations="locations" :initials="initials" :user-location="userLocation" :selected-location="selectedLocation" @location-click="openLocationModal" />
+    <DesktopHome v-if="!isBeachesViewOpen && !isOrderHistoryOpen" :locations="locations" :initials="initials" :user-location="userLocation" :selected-location="selectedLocation" @location-click="openLocationModal" />
     <DesktopBeachesLayout
-      v-if="isBeachesViewOpen && beachesViewLocation"
+      v-if="isBeachesViewOpen && beachesViewLocation && !isOrderHistoryOpen"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
       :expand-beach-id="beachToExpandId"
@@ -14,6 +14,10 @@
       :user-location="userLocation"
       @back="closeBeachesView"
       @select-beach="handleBeachSelectFromView"
+    />
+    <OrderHistory
+      v-if="isOrderHistoryOpen"
+      @back="closeOrderHistory"
     />
     <LocationModal
       :is-open="isModalOpen"
@@ -36,7 +40,7 @@
     />
 
     <BottomSheet
-      v-if="!isBeachesViewOpen"
+      v-if="!isBeachesViewOpen && !isOrderHistoryOpen"
       :locations="filteredLocations"
       :total-count="filteredLocations.length"
       :search-term="searchTerm"
@@ -47,13 +51,18 @@
     />
 
     <BeachesView
-      v-if="isBeachesViewOpen && beachesViewLocation"
+      v-if="isBeachesViewOpen && beachesViewLocation && !isOrderHistoryOpen"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
       :expand-beach-id="beachToExpandId"
       :beach-types="beachTypesMap"
       @back="closeBeachesView"
       @select-beach="handleBeachSelectFromView"
+    />
+
+    <OrderHistory
+      v-if="isOrderHistoryOpen && !isBeachesViewOpen"
+      @back="closeOrderHistory"
     />
 
     <LocationModal
@@ -64,7 +73,7 @@
       @select-beach="handleBeachSelect"
     />
 
-    <BottomNav />
+    <BottomNav @navigate="handleBottomNavigation" />
 
     <p v-if="error" class="error">{{ error }}</p>
   </div>
@@ -111,6 +120,7 @@ import BottomNav from './components/BottomNav.vue'
 import DesktopHome from './components/DesktopHome.vue'
 import LocationModal from './components/LocationModal.vue'
 import BeachesView from './components/BeachesView.vue'
+import OrderHistory from './components/OrderHistory.vue'
 import DesktopBeachesLayout from './components/DesktopBeachesLayout.vue'
 import SetLocationModal from './components/SetLocationModal.vue'
 import BeachSelectionModal from './components/BeachSelectionModal.vue'
@@ -161,6 +171,9 @@ const beachToExpandId = ref<number | null>(null)
 const beachTypesMap = ref<Record<number, string>>({})
 const isBeachModalOpen = ref(false)
 const selectedBeach = ref<Beach | null>(null)
+
+// Order History state
+const isOrderHistoryOpen = ref(false)
 
 const filteredLocations = computed(() => {
   if (!searchTerm.value) return locations.value
@@ -383,6 +396,24 @@ const closeModalAndOpenBeaches = () => {
     isBeachesViewOpen.value = true
     isModalOpen.value = false
     modalLocation.value = null
+  }
+}
+
+const closeOrderHistory = () => {
+  isOrderHistoryOpen.value = false
+}
+
+const openOrderHistory = () => {
+  isOrderHistoryOpen.value = true
+  isBeachesViewOpen.value = false
+}
+
+const handleBottomNavigation = (tab: string) => {
+  if (tab === 'history') {
+    openOrderHistory()
+  } else if (tab === 'home') {
+    closeOrderHistory()
+    closeBeachesView()
   }
 }
 

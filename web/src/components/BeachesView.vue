@@ -656,6 +656,24 @@ const handlePayment = async () => {
     const generatedOrderId = generateOrderId()
     orderId.value = generatedOrderId
 
+    // Save order to localStorage
+    const newOrder = {
+      id: generatedOrderId,
+      beachName: selectedZoneBeach.value?.name || '',
+      zoneName: selectedZone.value?.name || '',
+      location: props.location.name,
+      checkInDate: reservationFrom.value,
+      checkOutDate: reservationTo.value,
+      totalPrice: selectedZonePrice.value,
+      createdAt: Date.now(),
+      status: 'active' as const,
+    }
+
+    const existingOrders = localStorage.getItem('rentella_orders')
+    const orders = existingOrders ? JSON.parse(existingOrders) : []
+    orders.unshift(newOrder)
+    localStorage.setItem('rentella_orders', JSON.stringify(orders))
+
     // Move to success step
     zonePickerStep.value = 'success'
     checkoutFeedback.value = null
