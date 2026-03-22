@@ -198,64 +198,22 @@
 
           <div class="zone-payment-divider"></div>
 
-          <div class="zone-payment-fields">
-            <label class="zone-payment-label rt-text-label">{{ t('desktop.zonePicker.cardOwner') }}</label>
-            <input
-              v-model="cardOwner"
-              type="text"
-              class="zone-payment-input"
-              :placeholder="t('desktop.zonePicker.cardOwnerPlaceholder')"
-              maxlength="80"
-            />
-
-            <label class="zone-payment-label rt-text-label">{{ t('desktop.zonePicker.cardNumber') }}</label>
-            <input
-              v-model="cardNumber"
-              type="text"
-              class="zone-payment-input"
-              :placeholder="t('desktop.zonePicker.cardNumberPlaceholder')"
-              maxlength="19"
-            />
-
-            <div class="zone-payment-row">
-              <div>
-                <label class="zone-payment-label rt-text-label">{{ t('desktop.zonePicker.expiresOn') }}</label>
-                <input
-                  v-model="expiresOn"
-                  type="text"
-                  class="zone-payment-input"
-                  :placeholder="t('desktop.zonePicker.expiresOnPlaceholder')"
-                  maxlength="7"
-                />
-              </div>
-              <div>
-                <label class="zone-payment-label rt-text-label">{{ t('desktop.zonePicker.cvv') }}</label>
-                <div class="zone-payment-cvv-input-wrapper">
-                  <input
-                    v-model="cvv"
-                    type="text"
-                    class="zone-payment-input"
-                    :placeholder="t('desktop.zonePicker.cvvPlaceholder')"
-                    maxlength="4"
-                  />
-                  <button
-                    type="button"
-                    class="zone-payment-cvv-info-btn"
-                    @click="showCvvModal = true"
-                    :aria-label="t('desktop.zonePicker.cvvInfo')"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="16" x2="12" y2="12"></line>
-                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
+          <div class="zone-payment-demo-notice" role="note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>Demo Mode — payment is simulated. No real card data is collected or processed.</span>
           </div>
 
-          <p class="zone-payment-disclaimer">{{ t('desktop.zonePicker.disclaimer') }}</p>
+          <div class="zone-payment-mock-card" aria-hidden="true">
+            <span class="zone-payment-mock-card-number">•••• •••• •••• 0000</span>
+            <div class="zone-payment-mock-card-row">
+              <span class="zone-payment-mock-card-name">DEMO CARDHOLDER</span>
+              <span class="zone-payment-mock-card-expiry">12/9999</span>
+            </div>
+          </div>
 
           <p v-if="checkoutFeedback" class="zone-picker-feedback" :class="checkoutFeedback.type">
             {{ checkoutFeedback.message }}
@@ -357,38 +315,6 @@
       </div>
     </div>
 
-    <!-- CVV Modal -->
-    <div v-if="showCvvModal" class="cvv-modal-overlay" @click="showCvvModal = false">
-      <div class="cvv-modal" @click.stop>
-        <button class="cvv-modal-close" @click="showCvvModal = false">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-        <h3 class="cvv-modal-title">{{ t('desktop.zonePicker.cvvModalTitle') }}</h3>
-        <div class="cvv-modal-divider"></div>
-        <p class="cvv-modal-text">
-          {{ t('desktop.zonePicker.cvvModalText') }}
-        </p>
-        <div class="cvv-modal-image">
-          <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
-            <!-- Card background -->
-            <rect width="300" height="180" rx="8" fill="#2563eb" />
-            <!-- Black stripe -->
-            <rect y="120" width="300" height="30" fill="#000" />
-            <!-- Signature area -->
-            <rect x="20" y="135" width="260" height="10" fill="#fff" opacity="0.7" />
-            <!-- CVV box -->
-            <rect x="190" y="105" width="70" height="40" fill="#fff" rx="3" />
-            <text x="225" y="130" font-size="18" font-weight="bold" text-anchor="middle" fill="#000">567</text>
-            <!-- CVV label -->
-            <rect x="185" y="100" width="80" height="8" fill="none" stroke="#f44336" stroke-width="3" />
-          </svg>
-        </div>
-        <button class="cvv-modal-done-btn rt-btn rt-btn-primary" @click="showCvvModal = false">{{ t('desktop.zonePicker.cvvModalDone') }}</button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -457,11 +383,6 @@ const checkoutFeedback = ref<{ type: 'success' | 'error' | 'info'; message: stri
 const isSubmittingCheckout = ref(false)
 const zonePickerStep = ref<'form' | 'summary' | 'payment' | 'success'>('form')
 const selectedPriceId = ref<number | null>(null)
-const cardOwner = ref('')
-const cardNumber = ref('')
-const expiresOn = ref('')
-const cvv = ref('')
-const showCvvModal = ref(false)
 const orderId = ref<string | null>(null)
 
 const todayDate = new Date().toISOString().slice(0, 10)
@@ -474,13 +395,6 @@ const generateOrderId = (): string => {
   return `ORD-${date}-${random}`
 }
 
-const validateCardFields = (): boolean => {
-  const hasCardOwner = cardOwner.value.trim().length > 0
-  const hasCardNumber = cardNumber.value.trim().length >= 13
-  const expiresMatch = /^\d{1,2}\/\d{4}$/.test(expiresOn.value.trim())
-  const hasCvv = cvv.value.trim().length >= 3
-  return Boolean(hasCardOwner && hasCardNumber && expiresMatch && hasCvv)
-}
 
 const resetReservationForm = () => {
   reservationName.value = ''
@@ -489,11 +403,6 @@ const resetReservationForm = () => {
   zonePickerStep.value = 'form'
   selectedPriceId.value = null
   checkoutFeedback.value = null
-  cardOwner.value = ''
-  cardNumber.value = ''
-  expiresOn.value = ''
-  cvv.value = ''
-  showCvvModal.value = false
 }
 
 const filteredBeaches = computed(() => {
@@ -581,11 +490,7 @@ const isCheckoutValid = computed(() => {
     return true
   }
   if (zonePickerStep.value === 'payment') {
-    const hasCardOwner = cardOwner.value.trim().length > 0
-    const hasCardNumber = cardNumber.value.trim().length > 0
-    const hasExpires = expiresOn.value.trim().length > 0
-    const hasCvv = cvv.value.trim().length > 0
-    return Boolean(hasCardOwner && hasCardNumber && hasExpires && hasCvv && !isSubmittingCheckout.value)
+    return !isSubmittingCheckout.value
   }
   if (zonePickerStep.value === 'summary') {
     return !isSubmittingCheckout.value
@@ -634,13 +539,6 @@ const handleCheckout = async () => {
 
 const handlePayment = async () => {
   if (!selectedZone.value || !selectedZoneBeach.value) return
-  if (!validateCardFields()) {
-    checkoutFeedback.value = {
-      type: 'error',
-      message: 'Please check your card details',
-    }
-    return
-  }
 
   isSubmittingCheckout.value = true
   checkoutFeedback.value = {
@@ -1352,151 +1250,51 @@ const icons = {
   background: #c6d0d3;
 }
 
-.zone-payment-fields {
+
+.zone-payment-demo-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #92400e;
+  line-height: 1.45;
+}
+
+.zone-payment-demo-notice svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.zone-payment-mock-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #005f6f 100%);
+  border-radius: 14px;
+  color: #ffffff;
+  font-family: monospace;
+  user-select: none;
+  opacity: 0.85;
 }
 
-.zone-payment-label {
-  color: #3f4a4f;
+.zone-payment-mock-card-number {
+  font-size: 18px;
+  letter-spacing: 2px;
 }
 
-.zone-payment-cvv-input-wrapper {
-  position: relative;
+.zone-payment-mock-card-row {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  opacity: 0.85;
 }
 
-.zone-payment-cvv-input-wrapper .zone-payment-input {
-  padding-right: 42px;
-}
 
-.zone-payment-cvv-info-btn {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  padding: 6px;
-  cursor: pointer;
-  color: #a0aeb4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
-  pointer-events: auto;
-}
-
-.zone-payment-cvv-info-btn:hover {
-  color: #005f6f;
-}
-
-.zone-payment-input {
-  width: 100%;
-  height: 42px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  color: #4d5c60;
-  font-size: 14px;
-  padding: 0 12px;
-  box-sizing: border-box;
-}
-
-.zone-payment-input:focus {
-  outline: 2px solid #005f6f;
-  outline-offset: 1px;
-}
-
-.zone-payment-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.zone-payment-disclaimer {
-  margin: 8px 0 0;
-  font-size: 12px;
-  color: #73858a;
-  line-height: 1.4;
-  font-style: italic;
-}
-
-.cvv-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 20px;
-}
-
-.cvv-modal {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 24px;
-  max-width: 400px;
-  width: 100%;
-  position: relative;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.cvv-modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-  color: #414d4f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
-}
-
-.cvv-modal-close:hover {
-  color: #005f6f;
-}
-
-.cvv-modal-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #242b2c;
-}
-
-.cvv-modal-divider {
-  height: 1px;
-  background: #e5e7eb;
-}
-
-.cvv-modal-text {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.5;
-  color: #414d4f;
-}
-
-.cvv-modal-image {
-  width: 100%;
-  max-width: 300px;
-  margin: 16px auto;
-}
-
-.cvv-modal-done-btn {
-  width: 100%;
-  margin-top: 8px;
-}
 
 .zone-checkout-summary {
   display: flex;
