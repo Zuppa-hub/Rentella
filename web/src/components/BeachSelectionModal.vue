@@ -4,8 +4,8 @@
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <div class="title-block">
-            <h2 class="modal-title">{{ beach.name }}</h2>
-            <p v-if="locationName" class="modal-subtitle">{{ locationName }}</p>
+            <h2 class="modal-title rt-text-title">{{ beach.name }}</h2>
+            <p v-if="locationName" class="modal-subtitle rt-text-muted">{{ locationName }}</p>
           </div>
           <button
             class="close-button"
@@ -54,8 +54,8 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn-cancel" type="button" @click="emit('close')">{{ t('common.cancel') }}</button>
-          <button class="btn-select" type="button" @click="emit('confirm', beach)">{{ t('desktop.common.selectBeach') }}</button>
+          <button class="btn-cancel rt-btn rt-btn-secondary" type="button" @click="emit('close')">{{ t('common.cancel') }}</button>
+          <button class="btn-select rt-btn rt-btn-primary" type="button" @click="emit('confirm', beach)">{{ t('desktop.common.selectBeach') }}</button>
         </div>
       </div>
     </div>
@@ -161,16 +161,13 @@ const dogsAllowedLabel = computed(() => {
 .modal-title {
   margin: 0;
   color: #242b2c;
-  font-size: clamp(20px, 4.6vw, 24px);
   line-height: 1.1;
-  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
 .modal-subtitle {
   margin: 6px 0 0;
   color: #5d6b6e;
-  font-size: clamp(12px, 2.8vw, 14px);
   line-height: 1.35;
 }
 
@@ -310,26 +307,15 @@ const dogsAllowedLabel = computed(() => {
 .btn-cancel,
 .btn-select {
   min-width: 140px;
-  height: clamp(42px, 10vw, 48px);
-  padding: 12px 18px;
-  border-radius: 10px;
-  font-size: clamp(14px, 3.2vw, 15px);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
+  padding: 0 18px;
   flex-shrink: 0;
 }
 
 .btn-cancel {
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  color: #0f172a;
+  border-width: 1px;
 }
 
 .btn-cancel:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
   transform: translateY(-1px);
 }
 
@@ -338,12 +324,10 @@ const dogsAllowedLabel = computed(() => {
 }
 
 .btn-select {
-  background: #005f6f;
-  color: #ffffff;
+  border: none;
 }
 
 .btn-select:hover {
-  background: #004a5a;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 95, 111, 0.2);
 }

@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Illuminate\Auth\AuthenticationException;
+use KeycloakGuard\Exceptions\TokenException;
 
 class Handler extends ExceptionHandler
 {
@@ -26,6 +27,18 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        $this->renderable(function (TokenException $exception, $request) {
+            $response = [
+                'message' => 'Unauthenticated',
+            ];
+
+            if (config('app.debug')) {
+                $response['error'] = $exception->getMessage();
+            }
+
+            return response()->json($response, 401);
         });
     }
 

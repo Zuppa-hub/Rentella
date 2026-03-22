@@ -1,4 +1,4 @@
-import { getToken } from '../keycloak'
+import { getToken, login } from '../keycloak'
 
 const API_BASE_URL = 'http://localhost:9000/api'
 
@@ -65,6 +65,27 @@ export interface CityLocation {
   longitude: number
 }
 
+export interface ZoneAvailabilityResponse {
+  available: boolean
+  total_umbrellas: number
+  available_umbrellas: number
+  first_available_umbrella_id: number | null
+  price_id: number | null
+}
+
+export interface ZoneCheckoutResponse {
+  order: {
+    id: number
+    umbrella_id: number
+    start_date: string
+    end_date: string
+    user_id: number
+    price_id: number
+  }
+  zone_id: number
+  umbrella_id: number
+}
+
 interface FetchOptions extends RequestInit {
   authenticated?: boolean
 }
@@ -96,6 +117,22 @@ async function fetchApi<T>(
 
   if (!response.ok) {
     const error = await response.text()
+
+    if (response.status === 401) {
+      try {
+        const parsed = JSON.parse(error) as { message?: string; error?: string }
+        const isAuthError =
+          parsed.message === 'Unauthenticated' ||
+          parsed.error?.includes('Signature verification failed')
+
+        if (isAuthError) {
+          await login()
+        }
+      } catch {
+        await login()
+      }
+    }
+
     throw new Error(`API Error: ${response.status} - ${error}`)
   }
 
@@ -173,5 +210,38 @@ export async function setUserPreferredLocation(locationId: number): Promise<void
 export async function getUserPreferredLocation(): Promise<CityLocation | null> {
   const response = await fetchApi<{ preferred_location: CityLocation | null }>('/users/preferred-location')
   return response.preferred_location
+}
+
+// Orders availability + checkout
+export async function checkZoneAvailability(payload: {
+  zoneId: number
+  startDate: string
+  endDate: string
+}): Promise<ZoneAvailabilityResponse> {
+  return fetchApi<ZoneAvailabilityResponse>('/orders/availability', {
+    method: 'POST',
+    body: JSON.stringify({
+      zone_id: payload.zoneId,
+      start_date: payload.startDate,
+      end_date: payload.endDate,
+    }),
+  })
+}
+
+export async function createZoneOrder(payload: {
+  zoneId: number
+  startDate: string
+  endDate: string
+  priceId?: number | null
+}): Promise<ZoneCheckoutResponse> {
+  return fetchApi<ZoneCheckoutResponse>('/orders/checkout', {
+    method: 'POST',
+    body: JSON.stringify({
+      zone_id: payload.zoneId,
+      start_date: payload.startDate,
+      end_date: payload.endDate,
+      ...(payload.priceId != null ? { price_id: payload.priceId } : {}),
+    }),
+  })
 }
 

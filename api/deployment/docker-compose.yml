@@ -10,7 +10,10 @@ services:
     ports:
       - 9000:80
     depends_on:
-      - mysql_db
+      mysql_db:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - keycloak-network
   vue:
@@ -30,8 +33,12 @@ services:
       context: ./
       dockerfile: cors.Dockerfile
     container_name: cors
+    restart: unless-stopped
     ports:
       - "4545:80"
+    depends_on:
+      laravel-docker:
+        condition: service_started
     networks:
       - keycloak-network
   mysql_db:
@@ -41,6 +48,11 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me_mysql_root}
     ports:
       - 3306:3306
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p${MYSQL_ROOT_PASSWORD:-change_me_mysql_root} --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     networks:
       - keycloak-network
   postgres:
@@ -72,6 +84,7 @@ services:
     volumes:
       - ../themes/Rentella:/opt/keycloak/themes/Rentella
       - ./keycloak/realm-rentella.json:/opt/keycloak/data/import/realm-rentella.json
+      - keycloak_data:/opt/keycloak/data
       - keycloak_standalone_data:/opt/jboss/keycloak/standalone/data
       - keycloak_standalone_deployments:/opt/jboss/keycloak/standalone/deployments
     environment:
@@ -87,6 +100,11 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-change_me_keycloak_admin}
     depends_on:
       - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
     networks:
       - keycloak-network
 
@@ -95,5 +113,6 @@ networks:
     driver: bridge
 volumes:
   postgres_data:
+  keycloak_data:
   keycloak_standalone_data:
   keycloak_standalone_deployments:
