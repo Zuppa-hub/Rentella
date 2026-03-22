@@ -199,50 +199,50 @@
           <div class="zone-payment-divider"></div>
 
           <div class="zone-payment-fields">
-            <label class="zone-payment-label rt-text-label">Card Owner</label>
+            <label class="zone-payment-label rt-text-label">{{ t('desktop.zonePicker.cardOwner') }}</label>
             <input
               v-model="cardOwner"
               type="text"
               class="zone-payment-input"
-              placeholder="John Doe"
+              :placeholder="t('desktop.zonePicker.cardOwnerPlaceholder')"
               maxlength="80"
             />
 
-            <label class="zone-payment-label rt-text-label">Card Number</label>
+            <label class="zone-payment-label rt-text-label">{{ t('desktop.zonePicker.cardNumber') }}</label>
             <input
               v-model="cardNumber"
               type="text"
               class="zone-payment-input"
-              placeholder="e.g. 1234 1234 1234 1234"
+              :placeholder="t('desktop.zonePicker.cardNumberPlaceholder')"
               maxlength="19"
             />
 
             <div class="zone-payment-row">
               <div>
-                <label class="zone-payment-label rt-text-label">Expires on:</label>
+                <label class="zone-payment-label rt-text-label">{{ t('desktop.zonePicker.expiresOn') }}</label>
                 <input
                   v-model="expiresOn"
                   type="text"
                   class="zone-payment-input"
-                  placeholder="8/2023"
+                  :placeholder="t('desktop.zonePicker.expiresOnPlaceholder')"
                   maxlength="7"
                 />
               </div>
               <div>
-                <label class="zone-payment-label rt-text-label">CVV</label>
+                <label class="zone-payment-label rt-text-label">{{ t('desktop.zonePicker.cvv') }}</label>
                 <div class="zone-payment-cvv-input-wrapper">
                   <input
                     v-model="cvv"
                     type="text"
                     class="zone-payment-input"
-                    placeholder="e.g. 345"
+                    :placeholder="t('desktop.zonePicker.cvvPlaceholder')"
                     maxlength="4"
                   />
                   <button
                     type="button"
                     class="zone-payment-cvv-info-btn"
                     @click="showCvvModal = true"
-                    aria-label="CVV Info"
+                    :aria-label="t('desktop.zonePicker.cvvInfo')"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="12" cy="12" r="10"></circle>
@@ -255,7 +255,7 @@
             </div>
           </div>
 
-          <p class="zone-payment-disclaimer">*All transactions within the App are secure and encrypted, we do not store any card information.</p>
+          <p class="zone-payment-disclaimer">{{ t('desktop.zonePicker.disclaimer') }}</p>
 
           <p v-if="checkoutFeedback" class="zone-picker-feedback" :class="checkoutFeedback.type">
             {{ checkoutFeedback.message }}
@@ -267,11 +267,11 @@
             <svg class="zone-success-icon" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <h3 class="zone-success-title">Reservation Confirmed!</h3>
+            <h3 class="zone-success-title">{{ t('desktop.zonePicker.reservationConfirmed') }}</h3>
           </div>
 
           <div class="zone-success-order-id">
-            <span class="zone-success-label">Order ID</span>
+            <span class="zone-success-label">{{ t('desktop.zonePicker.orderId') }}</span>
             <span class="zone-success-value">{{ orderId }}</span>
           </div>
 
@@ -279,32 +279,32 @@
 
           <div class="zone-success-details">
             <div class="zone-success-row">
-              <span class="zone-success-detail-label">Location:</span>
+              <span class="zone-success-detail-label">{{ t('desktop.zonePicker.location') }}</span>
               <span class="zone-success-detail-value">{{ location.name }}</span>
             </div>
             <div class="zone-success-row">
-              <span class="zone-success-detail-label">Beach:</span>
+              <span class="zone-success-detail-label">{{ t('desktop.zonePicker.beach') }}</span>
               <span class="zone-success-detail-value">{{ selectedZoneBeach?.name }}</span>
             </div>
             <div class="zone-success-row">
-              <span class="zone-success-detail-label">Section:</span>
+              <span class="zone-success-detail-label">{{ t('desktop.zonePicker.section') }}</span>
               <span class="zone-success-detail-value">{{ selectedZone?.name }}</span>
             </div>
             <div class="zone-success-row">
-              <span class="zone-success-detail-label">Check-in:</span>
+              <span class="zone-success-detail-label">{{ t('desktop.zonePicker.checkIn') }}</span>
               <span class="zone-success-detail-value">{{ reservationFrom }}</span>
             </div>
             <div class="zone-success-row">
-              <span class="zone-success-detail-label">Check-out:</span>
+              <span class="zone-success-detail-label">{{ t('desktop.zonePicker.checkOut') }}</span>
               <span class="zone-success-detail-value">{{ reservationTo }}</span>
             </div>
             <div class="zone-success-row zone-success-row-total">
-              <span class="zone-success-detail-label">Total Price:</span>
+              <span class="zone-success-detail-label">{{ t('desktop.zonePicker.totalPrice') }}</span>
               <span class="zone-success-detail-value">{{ selectedZonePrice }}</span>
             </div>
           </div>
 
-          <p class="zone-success-note">You will receive a confirmation email shortly with all the details.</p>
+          <p class="zone-success-note">{{ t('desktop.zonePicker.successNote') }}</p>
         </div>
 
         <div v-else class="zone-checkout-summary">
@@ -366,10 +366,10 @@
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
-        <h3 class="cvv-modal-title">What is CVC/CVV?</h3>
+        <h3 class="cvv-modal-title">{{ t('desktop.zonePicker.cvvModalTitle') }}</h3>
         <div class="cvv-modal-divider"></div>
         <p class="cvv-modal-text">
-          CVC or sometimes CVV is a 3 or 4 digit security code you can usually find on the back of your Credit/Debit Card.
+          {{ t('desktop.zonePicker.cvvModalText') }}
         </p>
         <div class="cvv-modal-image">
           <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
@@ -386,7 +386,7 @@
             <rect x="185" y="100" width="80" height="8" fill="none" stroke="#f44336" stroke-width="3" />
           </svg>
         </div>
-        <button class="cvv-modal-done-btn rt-btn rt-btn-primary" @click="showCvvModal = false">Done</button>
+        <button class="cvv-modal-done-btn rt-btn rt-btn-primary" @click="showCvvModal = false">{{ t('desktop.zonePicker.cvvModalDone') }}</button>
       </div>
     </div>
   </div>
@@ -571,7 +571,7 @@ const formattedDuration = computed(() => {
 })
 
 const primaryActionLabel = computed(() => {
-  if (zonePickerStep.value === 'success') return 'New Reservation'
+  if (zonePickerStep.value === 'success') return t('desktop.zonePicker.newReservation')
   if (zonePickerStep.value === 'payment') return t('desktop.zonePicker.payment')
   return zonePickerStep.value === 'summary' ? t('desktop.zonePicker.payment') : t('desktop.zonePicker.checkout')
 })
