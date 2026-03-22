@@ -1,8 +1,8 @@
 <template>
-  <div class="beaches-view">
+  <div class="beaches-view" :class="{ 'checkout-mode': isZonePickerOpen }">
     <!-- Back Button -->
-    <div class="back-section">
-      <button class="back-button" @click="handleBack">
+    <div v-if="!isZonePickerOpen" class="back-section">
+      <button class="back-button" @click="handleTopBack">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
@@ -10,25 +10,26 @@
       </button>
     </div>
 
-    <!-- Search -->
-    <SearchBox v-model="searchTerm" :placeholder="t('desktop.search.placeholder')" />
+    <template v-if="!isZonePickerOpen">
+      <!-- Search -->
+      <SearchBox v-model="searchTerm" :placeholder="t('desktop.search.placeholder')" />
 
-    <div class="divider"></div>
+      <div class="divider"></div>
 
-    <!-- Header Info -->
-    <div class="beaches-header">
-      <div class="header-title">
-        <h2>{{ location.name }}</h2>
-        <span class="distance">
-          <img :src="icons.distance" alt="" class="meta-icon" />
-          {{ location.distance }} km
-        </span>
-        <span class="count">{{ beaches.length }} {{ t('common.beaches') }}</span>
+      <!-- Header Info -->
+      <div class="beaches-header">
+        <div class="header-title">
+          <h2>{{ location.name }}</h2>
+          <span class="distance">
+            <img :src="icons.distance" alt="" class="meta-icon" />
+            {{ location.distance }} km
+          </span>
+          <span class="count">{{ beaches.length }} {{ t('common.beaches') }}</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Beaches List -->
-    <div class="beaches-list">
+      <!-- Beaches List -->
+      <div class="beaches-list">
       <div
         v-for="(beach, idx) in filteredBeaches"
         :key="beach.id"
@@ -85,9 +86,9 @@
               class="zone-card"
               role="button"
               tabindex="0"
-              @click="emit('select-zone', zone, beach)"
-              @keydown.enter.prevent="emit('select-zone', zone, beach)"
-              @keydown.space.prevent="emit('select-zone', zone, beach)"
+              @click="handleZoneSelect(zone, beach)"
+              @keydown.enter.prevent="handleZoneSelect(zone, beach)"
+              @keydown.space.prevent="handleZoneSelect(zone, beach)"
             >
               <div class="zone-content">
                 <div class="zone-header">
@@ -113,6 +114,130 @@
           </div>
         </div>
       </div>
+
+      </div>
+    </template>
+
+    <div v-else class="zone-picker-menu">
+      <div class="zone-picker-hero">
+        <img v-if="selectedZoneBeach?.photo_url" :src="selectedZoneBeach.photo_url" :alt="selectedZoneBeach.name" class="zone-picker-hero-image" loading="lazy" />
+        <div v-else class="zone-picker-hero-placeholder">🏖️</div>
+      </div>
+
+      <div class="zone-picker-content">
+        <div class="zone-picker-summary">
+          <div class="zone-picker-title-wrap">
+            <h3 class="zone-picker-beach-name rt-text-title-sm">{{ selectedZoneBeach?.name }}</h3>
+            <span class="zone-picker-zone-name rt-text-muted">{{ selectedZone?.name }}</span>
+          </div>
+          <span class="zone-picker-price rt-text-title-sm">{{ selectedZonePrice }}</span>
+        </div>
+
+        <div class="zone-picker-divider"></div>
+
+        <div v-if="zonePickerStep === 'form'" class="zone-picker-form">
+          <label class="zone-picker-label rt-text-label">{{ t('desktop.zonePicker.name') }}</label>
+          <input
+            v-model="reservationName"
+            type="text"
+            class="zone-picker-input"
+            :placeholder="t('desktop.zonePicker.namePlaceholder')"
+            autocomplete="name"
+            maxlength="80"
+          />
+
+          <div class="zone-picker-dates-grid">
+            <div>
+              <label class="zone-picker-label rt-text-label">{{ t('desktop.zonePicker.from') }}</label>
+              <div class="zone-picker-date-wrap">
+                <input
+                  v-model="reservationFrom"
+                  type="date"
+                  class="zone-picker-input zone-picker-date"
+                  :min="todayDate"
+                />
+                <svg class="zone-picker-date-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </div>
+            </div>
+
+            <div>
+              <label class="zone-picker-label rt-text-label">{{ t('desktop.zonePicker.to') }}</label>
+              <div class="zone-picker-date-wrap">
+                <input
+                  v-model="reservationTo"
+                  type="date"
+                  class="zone-picker-input zone-picker-date"
+                  :min="reservationFrom || todayDate"
+                />
+                <svg class="zone-picker-date-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <p class="zone-picker-note rt-text-muted">{{ t('desktop.zonePicker.note') }}</p>
+          <p v-if="checkoutFeedback" class="zone-picker-feedback" :class="checkoutFeedback.type">
+            {{ checkoutFeedback.message }}
+          </p>
+        </div>
+
+        <div v-else class="zone-checkout-summary">
+          <h3 class="zone-checkout-title">{{ t('desktop.zonePicker.checkout') }}</h3>
+          <div class="zone-checkout-table">
+            <div class="zone-checkout-row">
+              <span class="zone-checkout-label">{{ t('desktop.zonePicker.location') }}</span>
+              <span class="zone-checkout-value">{{ location.name }}</span>
+            </div>
+            <div class="zone-checkout-row">
+              <span class="zone-checkout-label">{{ t('desktop.zonePicker.beach') }}</span>
+              <span class="zone-checkout-value">{{ selectedZoneBeach?.name }}</span>
+            </div>
+            <div class="zone-checkout-row">
+              <span class="zone-checkout-label">{{ t('desktop.zonePicker.section') }}</span>
+              <span class="zone-checkout-value">{{ selectedZone?.name }}</span>
+            </div>
+            <div class="zone-checkout-row">
+              <span class="zone-checkout-label">{{ t('desktop.zonePicker.price') }}</span>
+              <span class="zone-checkout-value">{{ selectedZonePrice }}</span>
+            </div>
+            <div class="zone-checkout-row">
+              <span class="zone-checkout-label">{{ t('desktop.zonePicker.duration') }}</span>
+              <span class="zone-checkout-value">{{ formattedDuration }}</span>
+            </div>
+          </div>
+
+          <div class="zone-checkout-total">
+            <span>{{ t('desktop.zonePicker.total') }}</span>
+            <span>{{ selectedZonePrice }}</span>
+          </div>
+
+          <p class="zone-picker-note rt-text-muted">{{ t('desktop.zonePicker.note') }}</p>
+          <p v-if="checkoutFeedback" class="zone-picker-feedback" :class="checkoutFeedback.type">
+            {{ checkoutFeedback.message }}
+          </p>
+        </div>
+      </div>
+
+      <div class="zone-picker-actions">
+        <button class="zone-picker-back-btn rt-btn rt-btn-ghost" type="button" @click="handleZonePickerBack">{{ t('common.back') }}</button>
+        <button
+          class="zone-picker-checkout-btn rt-btn rt-btn-primary"
+          type="button"
+          :disabled="!isCheckoutValid"
+          @click="handlePrimaryAction"
+        >
+          {{ isSubmittingCheckout ? t('desktop.zonePicker.processing') : primaryActionLabel }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -120,7 +245,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getBeach, type Beach } from '../services/api'
+import { checkZoneAvailability, createZoneOrder, getBeach, type Beach } from '../services/api'
 import SearchBox from './SearchBox.vue'
 import allowedAnimalsIcon from '../assets/icons/AllowedAnimals.svg'
 import beachTypeIcon from '../assets/icons/BeachType.svg'
@@ -152,6 +277,7 @@ type BeachZoneViewModel = {
   description: string | null
   umbrellasCount: number | null
   price: number | null
+  priceId: number | null
 }
 
 const props = defineProps<{
@@ -164,7 +290,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   back: []
   'select-beach': [beach: BeachViewModel]
-  'select-zone': [zone: BeachZoneViewModel, beach: BeachViewModel]
 }>()
 
 const searchTerm = ref('')
@@ -172,6 +297,27 @@ const expandedBeachId = ref<number | null>(null)
 const zonesByBeach = ref<Record<number, BeachZoneViewModel[]>>({})
 const loadingZonesByBeach = ref<Record<number, boolean>>({})
 const zonesErrorByBeach = ref<Record<number, string>>({})
+const isZonePickerOpen = ref(false)
+const selectedZone = ref<BeachZoneViewModel | null>(null)
+const selectedZoneBeach = ref<BeachViewModel | null>(null)
+const reservationName = ref('')
+const reservationFrom = ref('')
+const reservationTo = ref('')
+const checkoutFeedback = ref<{ type: 'success' | 'error' | 'info'; message: string } | null>(null)
+const isSubmittingCheckout = ref(false)
+const zonePickerStep = ref<'form' | 'summary'>('form')
+const selectedPriceId = ref<number | null>(null)
+
+const todayDate = new Date().toISOString().slice(0, 10)
+
+const resetReservationForm = () => {
+  reservationName.value = ''
+  reservationFrom.value = todayDate
+  reservationTo.value = todayDate
+  zonePickerStep.value = 'form'
+  selectedPriceId.value = null
+  checkoutFeedback.value = null
+}
 
 const filteredBeaches = computed(() => {
   if (!searchTerm.value) return props.beaches
@@ -192,8 +338,140 @@ const handleBack = () => {
   emit('back')
 }
 
+const handleTopBack = () => {
+  if (isZonePickerOpen.value) {
+    closeZonePicker()
+    return
+  }
+  handleBack()
+}
+
 const handlePhotoClick = (beach: BeachViewModel) => {
   emit('select-beach', beach)
+}
+
+const handleZoneSelect = (zone: BeachZoneViewModel, beach: BeachViewModel) => {
+  selectedZone.value = zone
+  selectedZoneBeach.value = beach
+  isZonePickerOpen.value = true
+  resetReservationForm()
+}
+
+const closeZonePicker = () => {
+  isZonePickerOpen.value = false
+  selectedZone.value = null
+  selectedZoneBeach.value = null
+  resetReservationForm()
+}
+
+const selectedZonePrice = computed(() => {
+  if (!selectedZone.value || selectedZone.value.price == null) return '-'
+  return `${selectedZone.value.price} €`
+})
+
+const formattedDuration = computed(() => {
+  if (!reservationFrom.value || !reservationTo.value) return '-'
+  const from = reservationFrom.value.split('-').reverse().join('.')
+  const to = reservationTo.value.split('-').reverse().join('.')
+  return `${from}-${to}`
+})
+
+const primaryActionLabel = computed(() => {
+  return zonePickerStep.value === 'summary' ? t('desktop.zonePicker.payment') : t('desktop.zonePicker.checkout')
+})
+
+const isCheckoutValid = computed(() => {
+  if (zonePickerStep.value === 'summary') {
+    return !isSubmittingCheckout.value
+  }
+  const hasName = reservationName.value.trim().length > 0
+  const hasDates = Boolean(reservationFrom.value) && Boolean(reservationTo.value)
+  const isDateRangeValid = reservationFrom.value <= reservationTo.value
+  return Boolean(selectedZone.value && selectedZoneBeach.value && hasName && hasDates && isDateRangeValid && !isSubmittingCheckout.value)
+})
+
+const handleCheckout = async () => {
+  if (!selectedZone.value || !selectedZoneBeach.value) return
+  checkoutFeedback.value = {
+    type: 'info',
+    message: t('desktop.zonePicker.checkingAvailability'),
+  }
+  isSubmittingCheckout.value = true
+
+  try {
+    const availability = await checkZoneAvailability({
+      zoneId: selectedZone.value.id,
+      startDate: reservationFrom.value,
+      endDate: reservationTo.value,
+    })
+
+    if (!availability.available) {
+      checkoutFeedback.value = {
+        type: 'error',
+        message: t('desktop.zonePicker.notAvailable'),
+      }
+      return
+    }
+
+    selectedPriceId.value = selectedZone.value.priceId ?? availability.price_id
+    zonePickerStep.value = 'summary'
+    checkoutFeedback.value = null
+  } catch {
+    checkoutFeedback.value = {
+      type: 'error',
+      message: t('desktop.zonePicker.orderError'),
+    }
+  } finally {
+    isSubmittingCheckout.value = false
+  }
+}
+
+const handlePayment = async () => {
+  if (!selectedZone.value || !selectedZoneBeach.value) return
+
+  isSubmittingCheckout.value = true
+  checkoutFeedback.value = null
+  try {
+    await createZoneOrder({
+      zoneId: selectedZone.value.id,
+      startDate: reservationFrom.value,
+      endDate: reservationTo.value,
+      priceId: selectedPriceId.value,
+    })
+
+    checkoutFeedback.value = {
+      type: 'success',
+      message: t('desktop.zonePicker.orderSuccess'),
+    }
+
+    setTimeout(() => {
+      closeZonePicker()
+    }, 900)
+  } catch {
+    checkoutFeedback.value = {
+      type: 'error',
+      message: t('desktop.zonePicker.orderError'),
+    }
+  } finally {
+    isSubmittingCheckout.value = false
+  }
+}
+
+const handlePrimaryAction = () => {
+  if (zonePickerStep.value === 'summary') {
+    void handlePayment()
+    return
+  }
+  void handleCheckout()
+}
+
+const handleZonePickerBack = () => {
+  if (zonePickerStep.value === 'summary') {
+    zonePickerStep.value = 'form'
+    checkoutFeedback.value = null
+    return
+  }
+  closeZonePicker()
 }
 
 const normalizeZones = (beachDetails: Beach): BeachZoneViewModel[] => {
@@ -205,6 +483,7 @@ const normalizeZones = (beachDetails: Beach): BeachZoneViewModel[] => {
     description: zone.description ? String(zone.description) : null,
     umbrellasCount: zone.umbrellas?.length ?? null,
     price: zone.prices?.price ?? null,
+    priceId: zone.prices?.id ?? zone.price_id ?? null,
   }))
 }
 
@@ -249,6 +528,16 @@ watch(
   }
 )
 
+watch(
+  () => reservationFrom.value,
+  (fromDate) => {
+    if (!fromDate) return
+    if (!reservationTo.value || reservationTo.value < fromDate) {
+      reservationTo.value = fromDate
+    }
+  }
+)
+
 const icons = {
   beachType: beachTypeIcon,
   allowedAnimals: allowedAnimalsIcon,
@@ -275,6 +564,20 @@ const icons = {
   position: relative;
   z-index: 99;
   overflow: hidden;
+}
+
+.beaches-view.checkout-mode {
+  position: relative;
+  margin-top: 0;
+  min-height: 100%;
+  max-height: 100%;
+  height: 100%;
+  width: 100%;
+  flex: 1;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  background: #fafafc;
 }
 
 /* Back Section */
@@ -609,6 +912,244 @@ const icons = {
   line-height: 1.35;
 }
 
+.zone-picker-menu {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fafafc;
+}
+
+.zone-picker-hero {
+  width: 100%;
+  height: 168px;
+  background: #d6dcde;
+}
+
+.zone-picker-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.zone-picker-hero-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+}
+
+.zone-picker-content {
+  padding: clamp(12px, 2.2vw, 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.zone-picker-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.zone-picker-title-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.zone-picker-beach-name {
+  margin: 0;
+  line-height: 1.25;
+  color: #3f4a4f;
+  overflow-wrap: anywhere;
+}
+
+.zone-picker-zone-name {
+  color: #7a888c;
+  white-space: nowrap;
+}
+
+.zone-picker-price {
+  line-height: 1.25;
+  color: #3f4a4f;
+  white-space: nowrap;
+}
+
+.zone-picker-divider {
+  height: 1px;
+  background: #c6d0d3;
+}
+
+.zone-picker-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zone-picker-label {
+  color: #3f4a4f;
+}
+
+.zone-picker-input {
+  width: 100%;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid #c8d1d4;
+  background: #e6eaec;
+  color: #4d5c60;
+  font-size: 14px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.zone-picker-input:focus {
+  outline: 2px solid #005f6f;
+  outline-offset: 1px;
+}
+
+.zone-picker-dates-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.zone-picker-date-wrap {
+  position: relative;
+}
+
+.zone-picker-date {
+  padding-right: 34px;
+}
+
+.zone-picker-date::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  width: 34px;
+  cursor: pointer;
+}
+
+.zone-picker-date-icon {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4d5c60;
+  pointer-events: none;
+}
+
+.zone-picker-note {
+  margin: 10px 0 0;
+  color: #73858a;
+  line-height: 1.35;
+}
+
+.zone-picker-feedback {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.zone-picker-feedback.info {
+  color: #0b4b58;
+}
+
+.zone-picker-feedback.success {
+  color: #027a48;
+}
+
+.zone-picker-feedback.error {
+  color: #b42318;
+}
+
+.zone-checkout-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.zone-checkout-title {
+  margin: 0;
+  font-size: 20px;
+  color: #242b2c;
+  font-weight: 700;
+}
+
+.zone-checkout-table {
+  border-top: 1px solid #c6d0d3;
+  border-bottom: 1px solid #c6d0d3;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zone-checkout-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.zone-checkout-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #73858a;
+}
+
+.zone-checkout-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #3f4a4f;
+  text-align: right;
+}
+
+.zone-checkout-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #3f4a4f;
+}
+
+.zone-picker-actions {
+  border-top: 1px solid #cdd6d9;
+  background: #f3f4f5;
+  padding: clamp(10px, 1.8vw, 14px) clamp(12px, 2.2vw, 18px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.zone-picker-back-btn,
+.zone-picker-checkout-btn {
+  width: 100%;
+}
+
+.zone-picker-back-btn {
+  justify-self: stretch;
+}
+
+.zone-picker-checkout-btn {
+  justify-self: stretch;
+}
+
+.zone-picker-checkout-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 /* Desktop styling - sidebar layout */
 @media (min-width: 1024px) {
   .beaches-view {
@@ -633,6 +1174,33 @@ const icons = {
     max-height: none;
   }
 
+  .beaches-view.checkout-mode {
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    width: 100%;
+    background: transparent;
+  }
+
+  .beaches-view.checkout-mode .zone-picker-menu {
+    border-radius: 20px;
+    background: transparent;
+  }
+
+  .beaches-view.checkout-mode .zone-picker-hero {
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+  }
+
+  .beaches-view.checkout-mode .zone-picker-content {
+    background: #fafafc;
+  }
+
+  .beaches-view.checkout-mode .zone-picker-actions {
+    background: #f3f4f5;
+    border-radius: 0 0 20px 20px;
+  }
+
   .back-section {
     padding: 0 16px;
   }
@@ -647,6 +1215,48 @@ const icons = {
 
   .beaches-list {
     padding: 0 16px;
+  }
+
+  .zone-picker-content {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .beaches-view.checkout-mode {
+    position: fixed;
+    top: calc(var(--topbar-height, 64px) + env(safe-area-inset-top));
+    right: 0;
+    bottom: calc(var(--nav-height, 80px) + env(safe-area-inset-bottom));
+    left: 0;
+    z-index: 1200;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .beaches-view.checkout-mode .zone-picker-menu,
+  .beaches-view.checkout-mode .zone-picker-hero,
+  .beaches-view.checkout-mode .zone-picker-hero-image {
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .zone-picker-hero {
+    height: 200px;
+  }
+
+  .zone-picker-dates-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .zone-picker-actions {
+    grid-template-columns: 1fr 1fr;
   }
 }
 </style>

@@ -90,6 +90,8 @@ Route::group(['middleware' => 'auth:api', 'prefix' => 'opening-dates'], function
     Route::delete('/{id}', [OpeningDatesController::class, 'destroy'])->name('opening-dates.destroy');
 });
 Route::group(['middleware' => 'auth:api', 'prefix' => 'orders'], function () {
+    Route::post('/availability', [OrdersController::class, 'checkAvailability'])->name('orders.availability');
+    Route::post('/checkout', [OrdersController::class, 'createFromZone'])->name('orders.checkout');
     Route::get('/', [OrdersController::class, 'index'])->name('orders.index');
     Route::get('/{id}', [OrdersController::class, 'show'])->name('orders.show');
     Route::post('/', [OrdersController::class, 'store'])->name('orders.store');

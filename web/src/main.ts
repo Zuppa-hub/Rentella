@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import { initKeycloak } from './keycloak'
 import { i18n } from './i18n'
+import './assets/ui-common.css'
 import 'leaflet/dist/leaflet.css'
 
 initKeycloak()
