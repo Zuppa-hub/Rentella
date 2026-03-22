@@ -259,7 +259,7 @@ export async function createZoneOrder(payload: {
       zone_id: payload.zoneId,
       start_date: payload.startDate,
       end_date: payload.endDate,
-      ...(payload.priceId ? { price_id: payload.priceId } : {}),
+      ...(payload.priceId != null ? { price_id: payload.priceId } : {}),
     }),
   })
 }
