@@ -30,10 +30,15 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (TokenException $exception, $request) {
-            return response()->json([
+            $response = [
                 'message' => 'Unauthenticated',
-                'error' => $exception->getMessage(),
-            ], 401);
+            ];
+
+            if (config('app.debug')) {
+                $response['error'] = $exception->getMessage();
+            }
+
+            return response()->json($response, 401);
         });
     }
 
