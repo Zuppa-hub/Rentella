@@ -92,7 +92,7 @@ const icons = {
   max-width: 500px;
   flex: 0 0 500px;
   background: #fafafc;
-  border-radius: 0 32px 32px 0;
+  border-radius: 0 20px 20px 0;
   box-shadow: 8px 0px 8px rgba(136, 136, 136, 0.16);
   display: flex;
   flex-direction: column;

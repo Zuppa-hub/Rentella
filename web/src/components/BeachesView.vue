@@ -1158,7 +1158,7 @@ const icons = {
     max-width: 500px;
     flex: 0 0 500px;
     background: #fafafc;
-    border-radius: 0 32px 32px 0;
+    border-radius: 0 20px 20px 0;
     box-shadow: 8px 0px 8px rgba(136, 136, 136, 0.16);
     padding: 32px 0;
     display: flex;
@@ -1183,12 +1183,12 @@ const icons = {
   }
 
   .beaches-view.checkout-mode .zone-picker-menu {
-    border-radius: 20px;
+    border-radius: 0 20px 20px 0;
     background: transparent;
   }
 
   .beaches-view.checkout-mode .zone-picker-hero {
-    border-radius: 20px 20px 0 0;
+    border-radius: 0 20px 0 0;
     overflow: hidden;
   }
 
