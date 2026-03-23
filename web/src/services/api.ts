@@ -1,6 +1,6 @@
 import { getToken, login } from '../keycloak'
 
-const API_BASE_URL = 'http://localhost:9000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000/api'
 
 export interface ApiResponse<T> {
   data: T

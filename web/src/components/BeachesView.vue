@@ -204,13 +204,13 @@
               <line x1="12" y1="8" x2="12" y2="12"></line>
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
-            <span>Demo Mode — payment is simulated. No real card data is collected or processed.</span>
+            <span>{{ t('desktop.zonePicker.demoModeNotice') }}</span>
           </div>
 
           <div class="zone-payment-mock-card" aria-hidden="true">
             <span class="zone-payment-mock-card-number">•••• •••• •••• 0000</span>
             <div class="zone-payment-mock-card-row">
-              <span class="zone-payment-mock-card-name">DEMO CARDHOLDER</span>
+              <span class="zone-payment-mock-card-name">{{ t('desktop.zonePicker.demoCardholder') }}</span>
               <span class="zone-payment-mock-card-expiry">12/9999</span>
             </div>
           </div>
@@ -328,6 +328,7 @@ import beachTypeIcon from '../assets/icons/BeachType.svg'
 import distanceIcon from '../assets/icons/Distance.svg'
 import moneyIcon from '../assets/icons/Money.svg'
 import { isAnimalsAllowed, parseBeachTypeId } from '../utils/helpers'
+import { getCompactTodayDate, getTodayIsoDate } from '../utils/date'
 
 const { t } = useI18n()
 
@@ -354,6 +355,18 @@ type BeachZoneViewModel = {
   umbrellasCount: number | null
   price: number | null
   priceId: number | null
+}
+
+type BeachZoneSource = {
+  id: number
+  name?: string | null
+  description?: string | null
+  umbrellas?: Array<unknown>
+  prices?: {
+    id?: number | null
+    price?: number | null
+  } | null
+  price_id?: number | null
 }
 
 const props = defineProps<{
@@ -385,10 +398,10 @@ const zonePickerStep = ref<'form' | 'summary' | 'payment' | 'success'>('form')
 const selectedPriceId = ref<number | null>(null)
 const orderId = ref<string | null>(null)
 
-const todayDate = new Date().toISOString().slice(0, 10)
+const todayDate = getTodayIsoDate()
 
 const generateOrderId = (): string => {
-  const date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  const date = getCompactTodayDate()
   const random = Math.floor(Math.random() * 10000)
     .toString()
     .padStart(4, '0')
@@ -460,7 +473,7 @@ const calculateDays = (): number => {
 }
 
 const selectedZonePrice = computed(() => {
-  if (!selectedZone.value || selectedZone.value.price == null) return '-'
+  if (!selectedZone.value || selectedZone.value.price === null) return '-'
   const dailyPrice = selectedZone.value.price
   const days = calculateDays()
   const totalPrice = dailyPrice * days
@@ -468,7 +481,7 @@ const selectedZonePrice = computed(() => {
 })
 
 const zoneDailyPrice = computed(() => {
-  if (!selectedZone.value || selectedZone.value.price == null) return '-'
+  if (!selectedZone.value || selectedZone.value.price === null) return '-'
   return `${selectedZone.value.price} €/giorno`
 })
 
@@ -543,7 +556,7 @@ const handlePayment = async () => {
   isSubmittingCheckout.value = true
   checkoutFeedback.value = {
     type: 'info',
-    message: 'Processing payment...',
+    message: t('desktop.zonePicker.paymentProcessing'),
   }
 
   // Simulate payment gateway processing delay
@@ -625,9 +638,11 @@ const handleZonePickerBack = () => {
 }
 
 const normalizeZones = (beachDetails: Beach): BeachZoneViewModel[] => {
-  const zones = Array.isArray(beachDetails?.zones) ? beachDetails.zones : []
+  const zones: BeachZoneSource[] = Array.isArray(beachDetails?.zones)
+    ? (beachDetails.zones as BeachZoneSource[])
+    : []
 
-  return zones.map((zone: any) => ({
+  return zones.map((zone) => ({
     id: zone.id,
     name: zone.name || t('desktop.beach.zoneNumber', { number: zone.id }),
     description: zone.description ? String(zone.description) : null,
@@ -670,7 +685,7 @@ const handleSelectBeach = (beach: BeachViewModel) => {
 watch(
   () => props.expandBeachId,
   (beachId) => {
-    if (beachId == null) return
+    if (beachId === null || beachId === undefined) return
     const beach = props.beaches.find((item) => item.id === beachId)
     if (beach) {
       void expandBeach(beach, true)

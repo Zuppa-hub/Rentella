@@ -4,24 +4,24 @@
       <nav class="navbar">
         <div class="navbar-container">
           <div class="logo-section">
-            <img :src="icons.logo" alt="Rentella" class="logo" />
+            <img :src="icons.logo" :alt="t('desktop.brand.alt')" class="logo" />
           </div>
           <div class="nav-items">
             <button class="nav-item" type="button" @click="emit('navigate', 'home')">
               <img :src="icons.home" alt="" class="nav-icon" />
-              <span>Home</span>
+              <span>{{ t('desktop.nav.home') }}</span>
             </button>
             <button class="nav-item" type="button" @click="emit('navigate', 'active')">
               <img :src="icons.active" alt="" class="nav-icon" />
-              <span>Active</span>
+              <span>{{ t('desktop.nav.active') }}</span>
             </button>
             <button class="nav-item" type="button" @click="emit('navigate', 'history')">
               <img :src="icons.history" alt="" class="nav-icon" />
-              <span>History</span>
+              <span>{{ t('desktop.nav.history') }}</span>
             </button>
             <button class="nav-item active" type="button" aria-current="page">
               <img :src="icons.settings" alt="" class="nav-icon" />
-              <span>Settings</span>
+              <span>{{ t('desktop.nav.settings') }}</span>
             </button>
           </div>
           <div class="profile-section">
@@ -30,24 +30,24 @@
         </div>
       </nav>
 
-      <div class="desktop-layout" role="main" aria-label="Settings desktop layout">
-        <section class="desktop-main" aria-label="Account settings">
-          <h2 class="desktop-main-title">Settings</h2>
+      <div class="desktop-layout" role="main" :aria-label="t('desktop.settings.title')">
+        <section class="desktop-main" :aria-label="t('desktop.settings.manageAccount')">
+          <h2 class="desktop-main-title">{{ t('desktop.settings.title') }}</h2>
 
           <div class="settings-card">
             <div class="settings-card-row">
-              <span>Full Name</span>
+              <span>{{ t('desktop.settings.fullName') }}</span>
               <strong>{{ fullName || '-' }}</strong>
             </div>
             <div class="settings-card-row">
-              <span>Email</span>
+              <span>{{ t('desktop.settings.email') }}</span>
               <strong>{{ email || '-' }}</strong>
             </div>
             <div class="settings-card-row">
-              <span>Username</span>
+              <span>{{ t('desktop.settings.username') }}</span>
               <strong>{{ username || '-' }}</strong>
             </div>
-            <button type="button" class="settings-logout-btn" @click="emit('logout')">Log out</button>
+            <button type="button" class="settings-logout-btn" @click="emit('logout')">{{ t('desktop.settings.logout') }}</button>
           </div>
         </section>
       </div>
@@ -55,32 +55,32 @@
 
     <template v-else>
       <div class="settings-header">
-        <button class="settings-back" @click="emit('back')" aria-label="Go back">
+        <button class="settings-back" @click="emit('back')" :aria-label="t('desktop.settings.goBack')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        <h1 class="settings-title">Settings</h1>
+        <h1 class="settings-title">{{ t('desktop.settings.title') }}</h1>
       </div>
 
-      <p class="settings-subtitle">Manage your account</p>
+      <p class="settings-subtitle">{{ t('desktop.settings.manageAccount') }}</p>
 
-      <section class="settings-mobile-section" aria-label="Account details">
-        <h2>Account</h2>
+      <section class="settings-mobile-section" :aria-label="t('desktop.settings.account')">
+        <h2>{{ t('desktop.settings.account') }}</h2>
         <div class="settings-mobile-card">
           <div class="settings-mobile-row">
-            <span>Full Name</span>
+            <span>{{ t('desktop.settings.fullName') }}</span>
             <strong>{{ fullName || '-' }}</strong>
           </div>
           <div class="settings-mobile-row">
-            <span>Email</span>
+            <span>{{ t('desktop.settings.email') }}</span>
             <strong>{{ email || '-' }}</strong>
           </div>
           <div class="settings-mobile-row">
-            <span>Username</span>
+            <span>{{ t('desktop.settings.username') }}</span>
             <strong>{{ username || '-' }}</strong>
           </div>
-          <button type="button" class="settings-logout-btn" @click="emit('logout')">Log out</button>
+          <button type="button" class="settings-logout-btn" @click="emit('logout')">{{ t('desktop.settings.logout') }}</button>
         </div>
       </section>
     </template>
@@ -88,11 +88,14 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import logoDark from '../assets/LogoDark.svg'
 import homeIcon from '../assets/icons/Home.svg'
 import activeIcon from '../assets/icons/Active.svg'
 import historyIcon from '../assets/icons/History.svg'
 import settingsIcon from '../assets/icons/Settings.svg'
+
+const { t } = useI18n()
 
 defineProps<{
   isDesktop?: boolean

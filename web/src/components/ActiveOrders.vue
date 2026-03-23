@@ -4,24 +4,24 @@
       <nav class="navbar">
         <div class="navbar-container">
           <div class="logo-section">
-            <img :src="icons.logo" alt="Rentella" class="logo" />
+            <img :src="icons.logo" :alt="t('desktop.brand.alt')" class="logo" />
           </div>
           <div class="nav-items">
             <button class="nav-item" type="button" @click="emit('navigate', 'home')">
               <img :src="icons.home" alt="" class="nav-icon" />
-              <span>Home</span>
+              <span>{{ t('desktop.nav.home') }}</span>
             </button>
             <button class="nav-item active" type="button" aria-current="page">
               <img :src="icons.active" alt="" class="nav-icon" />
-              <span>Active</span>
+              <span>{{ t('desktop.nav.active') }}</span>
             </button>
             <button class="nav-item" type="button" @click="emit('navigate', 'history')">
               <img :src="icons.history" alt="" class="nav-icon" />
-              <span>History</span>
+              <span>{{ t('desktop.nav.history') }}</span>
             </button>
             <button class="nav-item" type="button" @click="emit('navigate', 'settings')">
               <img :src="icons.settings" alt="" class="nav-icon" />
-              <span>Settings</span>
+              <span>{{ t('desktop.nav.settings') }}</span>
             </button>
           </div>
           <div class="profile-section">
@@ -30,27 +30,27 @@
         </div>
       </nav>
 
-      <div class="desktop-layout" role="main" aria-label="Active orders desktop layout">
+      <div class="desktop-layout" role="main" :aria-label="t('desktop.orders.activeTitle')">
         <aside class="desktop-sidebar">
-          <h1 class="desktop-sidebar-title">Active Orders</h1>
+          <h1 class="desktop-sidebar-title">{{ t('desktop.orders.activeTitle') }}</h1>
 
           <div class="desktop-metrics">
             <div class="desktop-metric-row">
-              <span>Total Orders</span>
+              <span>{{ t('desktop.orders.totalOrders') }}</span>
               <strong>{{ orders.length }}</strong>
             </div>
             <div class="desktop-metric-row">
-              <span>Favourite City</span>
+              <span>{{ t('desktop.orders.favouriteCity') }}</span>
               <strong>{{ favouriteCity }}</strong>
             </div>
             <div class="desktop-metric-row">
-              <span>Favourite Beach</span>
+              <span>{{ t('desktop.orders.favouriteBeach') }}</span>
               <strong>{{ favouriteBeach }}</strong>
             </div>
           </div>
 
           <div class="desktop-most-visited">
-            <h2>Most Visited Beaches</h2>
+            <h2>{{ t('desktop.orders.mostVisitedBeaches') }}</h2>
             <div class="desktop-most-visited-list">
               <div v-for="(item, index) in topVisitedBeaches" :key="item.name" class="desktop-most-visited-item">
                 <span class="desktop-most-visited-rank">{{ index + 1 }}.</span>
@@ -58,7 +58,7 @@
                   <div class="desktop-most-visited-thumb" aria-hidden="true">🏖️</div>
                   <div class="desktop-most-visited-content">
                     <strong>{{ item.name }}</strong>
-                    <span>{{ item.city }} • {{ item.count }} orders</span>
+                    <span>{{ item.city }} • {{ t('desktop.orders.ordersCount', { count: item.count }) }}</span>
                   </div>
                 </div>
               </div>
@@ -66,59 +66,59 @@
           </div>
 
           <div class="desktop-history-link-wrap">
-            <p>Looking for previous orders?</p>
-            <button type="button" class="desktop-history-link" @click="emit('navigate', 'history')">History</button>
+            <p>{{ t('desktop.orders.previousOrdersHint') }}</p>
+            <button type="button" class="desktop-history-link" @click="emit('navigate', 'history')">{{ t('desktop.nav.history') }}</button>
           </div>
         </aside>
 
-        <section class="desktop-main" aria-label="Active orders">
-          <h2 class="desktop-main-title">Active orders</h2>
+        <section class="desktop-main" :aria-label="t('desktop.orders.activeTitle')">
+          <h2 class="desktop-main-title">{{ t('desktop.orders.activeTitle') }}</h2>
 
           <div v-if="loading" class="active-orders-loading" aria-live="polite">
-            <p>Loading orders...</p>
+            <p>{{ t('desktop.orders.loadingOrders') }}</p>
           </div>
 
           <div v-else-if="error" class="active-orders-error" role="alert">
             <p>{{ error }}</p>
-            <button @click="fetchOrders" class="rt-btn rt-btn-primary">Retry</button>
+            <button @click="fetchOrders" class="rt-btn rt-btn-primary">{{ t('desktop.orders.retry') }}</button>
           </div>
 
           <div v-else-if="activeOrders.length === 0" class="active-orders-empty">
-            <p>No active orders found</p>
+            <p>{{ t('desktop.orders.noActiveOrders') }}</p>
           </div>
 
-          <div v-else class="desktop-orders-list" role="list" aria-label="Active orders list">
+          <div v-else class="desktop-orders-list" role="list" :aria-label="t('desktop.orders.activeOrdersListAria')">
             <button
               v-for="order in activeOrders"
               :key="order.id"
               type="button"
               class="desktop-order-row"
               @click="selectedOrder = order"
-              :aria-label="`Open active order ${order.id} details`"
+              :aria-label="t('desktop.orders.openActiveOrderDetails', { id: order.id })"
               role="listitem"
             >
               <div class="desktop-order-col desktop-order-col-beach">
-                <span class="desktop-order-label">Beach Name</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.beachName') }}</span>
                 <strong>{{ getBeachName(order) }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Order ID</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.orderId') }}</span>
                 <strong>#{{ order.id }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Section</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.section') }}</span>
                 <strong>{{ getZoneName(order) }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Umbrella</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.umbrella') }}</span>
                 <strong>{{ getUmbrellaNumber(order) }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Price</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.price') }}</span>
                 <strong>{{ getPrice(order) }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Date</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.date') }}</span>
                 <strong>{{ formatDate(order.start_date) }}</strong>
               </div>
               <div class="desktop-order-action">
@@ -129,13 +129,13 @@
                   :disabled="!isOrderCancellable(order) || loadingActionId === order.id"
                   @click.stop="cancelOrder(order.id)"
                 >
-                  {{ loadingActionId === order.id ? 'Cancelling...' : isOrderCancellable(order) ? 'Cancel Order' : 'Active' }}
+                  {{ loadingActionId === order.id ? t('desktop.orders.cancelling') : isOrderCancellable(order) ? t('desktop.orders.cancelOrder') : t('desktop.orders.activeStatus') }}
                 </button>
               </div>
             </button>
 
             <p v-if="actionError" class="desktop-action-error" role="alert">{{ actionError }}</p>
-            <p class="desktop-records-count">{{ activeOrders.length }} Records Shown</p>
+            <p class="desktop-records-count">{{ t('desktop.orders.recordsShown', { count: activeOrders.length }) }}</p>
           </div>
         </section>
       </div>
@@ -148,25 +148,25 @@
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        <h1 class="active-orders-title">Active Orders</h1>
+        <h1 class="active-orders-title">{{ t('desktop.orders.activeTitle') }}</h1>
       </div>
 
-      <p class="active-orders-subtitle">See your upcoming bookings</p>
+      <p class="active-orders-subtitle">{{ t('desktop.orders.activeSubtitle') }}</p>
 
       <div v-if="loading" class="active-orders-loading" aria-live="polite">
-        <p>Loading orders...</p>
+        <p>{{ t('desktop.orders.loadingOrders') }}</p>
       </div>
 
       <div v-else-if="error" class="active-orders-error" role="alert">
         <p>{{ error }}</p>
-        <button @click="fetchOrders" class="rt-btn rt-btn-primary">Retry</button>
+        <button @click="fetchOrders" class="rt-btn rt-btn-primary">{{ t('desktop.orders.retry') }}</button>
       </div>
 
       <div v-else-if="activeOrders.length === 0" class="active-orders-empty">
-        <p>No active orders found</p>
+        <p>{{ t('desktop.orders.noActiveOrders') }}</p>
       </div>
 
-      <div v-else class="active-orders-list" role="list" aria-label="Active orders list">
+      <div v-else class="active-orders-list" role="list" :aria-label="t('desktop.orders.activeOrdersListAria')">
         <div
           v-for="order in activeOrders"
           :key="order.id"
@@ -174,7 +174,7 @@
           @click="openOrderDetails(order)"
           @keydown.enter.prevent="openOrderDetails(order)"
           @keydown.space.prevent="openOrderDetails(order)"
-          :aria-label="`Open active order ${order.id} details`"
+          :aria-label="t('desktop.orders.openActiveOrderDetails', { id: order.id })"
           role="listitem"
           tabindex="0"
         >
@@ -190,7 +190,7 @@
             :disabled="!isOrderCancellable(order) || loadingActionId === order.id"
             @click.stop="cancelOrder(order.id)"
           >
-            {{ loadingActionId === order.id ? 'Cancelling...' : isOrderCancellable(order) ? 'Cancel' : 'Active' }}
+            {{ loadingActionId === order.id ? t('desktop.orders.cancelling') : isOrderCancellable(order) ? t('desktop.orders.cancel') : t('desktop.orders.activeStatus') }}
           </button>
         </div>
       </div>
@@ -198,9 +198,9 @@
       <p v-if="actionError" class="desktop-action-error" role="alert">{{ actionError }}</p>
     </template>
 
-    <div v-if="selectedOrder" class="order-detail-modal-overlay" @click="selectedOrder = null" role="dialog" aria-modal="true" aria-label="Order details">
+    <div v-if="selectedOrder" class="order-detail-modal-overlay" @click="selectedOrder = null" role="dialog" aria-modal="true" :aria-label="t('desktop.orders.orderDetails')">
       <div class="order-detail-modal" @click.stop>
-        <button class="order-detail-close" @click="selectedOrder = null" aria-label="Close order details">
+        <button class="order-detail-close" @click="selectedOrder = null" :aria-label="t('desktop.orders.closeOrderDetails')">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -208,13 +208,13 @@
         </button>
         <h3 class="order-detail-title">{{ getBeachName(selectedOrder) }}</h3>
         <div class="order-detail-content">
-          <div class="order-detail-row"><span>Order ID:</span><strong>#{{ selectedOrder.id }}</strong></div>
-          <div class="order-detail-row"><span>Location:</span><strong>{{ getCityName(selectedOrder) }}</strong></div>
-          <div class="order-detail-row"><span>Zone:</span><strong>{{ getZoneName(selectedOrder) }}</strong></div>
-          <div class="order-detail-row"><span>Umbrella:</span><strong>{{ getUmbrellaNumber(selectedOrder) }}</strong></div>
-          <div class="order-detail-row"><span>Check-in:</span><strong>{{ formatDate(selectedOrder.start_date) }}</strong></div>
-          <div class="order-detail-row"><span>Check-out:</span><strong>{{ formatDate(selectedOrder.end_date) }}</strong></div>
-          <div class="order-detail-row"><span>Total Price:</span><strong>{{ getPrice(selectedOrder) }}</strong></div>
+          <div class="order-detail-row"><span>{{ t('desktop.orders.orderId') }}:</span><strong>#{{ selectedOrder.id }}</strong></div>
+          <div class="order-detail-row"><span>{{ t('desktop.orders.location') }}:</span><strong>{{ getCityName(selectedOrder) }}</strong></div>
+          <div class="order-detail-row"><span>{{ t('desktop.orders.section') }}:</span><strong>{{ getZoneName(selectedOrder) }}</strong></div>
+          <div class="order-detail-row"><span>{{ t('desktop.orders.umbrella') }}:</span><strong>{{ getUmbrellaNumber(selectedOrder) }}</strong></div>
+          <div class="order-detail-row"><span>{{ t('desktop.orders.checkIn') }}:</span><strong>{{ formatDate(selectedOrder.start_date) }}</strong></div>
+          <div class="order-detail-row"><span>{{ t('desktop.orders.checkOut') }}:</span><strong>{{ formatDate(selectedOrder.end_date) }}</strong></div>
+          <div class="order-detail-row"><span>{{ t('desktop.orders.totalPrice') }}:</span><strong>{{ getPrice(selectedOrder) }}</strong></div>
         </div>
       </div>
     </div>
@@ -223,6 +223,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { deleteOrder, getOrders, type Order } from '../services/api'
 import {
   getOrderBeachName,
@@ -241,6 +242,8 @@ import homeIcon from '../assets/icons/Home.svg'
 import activeIcon from '../assets/icons/Active.svg'
 import historyIcon from '../assets/icons/History.svg'
 import settingsIcon from '../assets/icons/Settings.svg'
+
+const { t } = useI18n()
 
 defineProps<{
   isDesktop?: boolean

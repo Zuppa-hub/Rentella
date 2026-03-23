@@ -4,24 +4,24 @@
       <nav class="navbar">
         <div class="navbar-container">
           <div class="logo-section">
-            <img :src="icons.logo" alt="Rentella" class="logo" />
+            <img :src="icons.logo" :alt="t('desktop.brand.alt')" class="logo" />
           </div>
           <div class="nav-items">
             <button class="nav-item" type="button" @click="emit('navigate', 'home')">
               <img :src="icons.home" alt="" class="nav-icon" />
-              <span>Home</span>
+              <span>{{ t('desktop.nav.home') }}</span>
             </button>
             <button class="nav-item" type="button" @click="emit('navigate', 'active')">
               <img :src="icons.active" alt="" class="nav-icon" />
-              <span>Active</span>
+              <span>{{ t('desktop.nav.active') }}</span>
             </button>
             <button class="nav-item active" type="button" aria-current="page">
               <img :src="icons.history" alt="" class="nav-icon" />
-              <span>History</span>
+              <span>{{ t('desktop.nav.history') }}</span>
             </button>
             <button class="nav-item" type="button" @click="emit('navigate', 'settings')">
               <img :src="icons.settings" alt="" class="nav-icon" />
-              <span>Settings</span>
+              <span>{{ t('desktop.nav.settings') }}</span>
             </button>
           </div>
           <div class="profile-section">
@@ -30,84 +30,84 @@
         </div>
       </nav>
 
-      <div class="desktop-layout" role="main" aria-label="Order history desktop layout">
+      <div class="desktop-layout" role="main" :aria-label="t('desktop.orders.historyTitle')">
         <aside class="desktop-sidebar">
-          <h1 class="desktop-sidebar-title">Order History</h1>
+          <h1 class="desktop-sidebar-title">{{ t('desktop.orders.historyTitle') }}</h1>
 
           <div class="desktop-metrics">
             <div class="desktop-metric-row">
-              <span>Total Orders</span>
+              <span>{{ t('desktop.orders.totalOrders') }}</span>
               <strong>{{ finishedOrders.length }}</strong>
             </div>
             <div class="desktop-metric-row">
-              <span>Favourite City</span>
+              <span>{{ t('desktop.orders.favouriteCity') }}</span>
               <strong>{{ favouriteCity }}</strong>
             </div>
             <div class="desktop-metric-row">
-              <span>Favourite Beach</span>
+              <span>{{ t('desktop.orders.favouriteBeach') }}</span>
               <strong>{{ favouriteBeach }}</strong>
             </div>
           </div>
 
           <div class="desktop-active-link-wrap">
-            <p>Looking for Active Orders?</p>
-            <button type="button" class="desktop-active-link" @click="emit('navigate', 'active')">Active</button>
+            <p>{{ t('desktop.orders.activeOrdersHint') }}</p>
+            <button type="button" class="desktop-active-link" @click="emit('navigate', 'active')">{{ t('desktop.nav.active') }}</button>
           </div>
         </aside>
 
-        <section class="desktop-main" aria-label="Previous purchases">
-          <h2 class="desktop-main-title">Previous Purchases</h2>
+        <section class="desktop-main" :aria-label="t('desktop.orders.previousPurchases')">
+          <h2 class="desktop-main-title">{{ t('desktop.orders.previousPurchases') }}</h2>
 
           <div v-if="loading" class="order-history-loading" aria-live="polite">
-            <p>Loading orders...</p>
+            <p>{{ t('desktop.orders.loadingOrders') }}</p>
           </div>
 
           <div v-else-if="error" class="order-history-error" role="alert">
             <p>{{ error }}</p>
-            <button @click="fetchOrders" class="rt-btn rt-btn-primary">Retry</button>
+            <button @click="fetchOrders" class="rt-btn rt-btn-primary">{{ t('desktop.orders.retry') }}</button>
           </div>
 
           <div v-else-if="finishedOrders.length === 0" class="order-history-empty">
-            <p>No orders found</p>
+            <p>{{ t('desktop.orders.noOrdersFound') }}</p>
           </div>
 
-          <div v-else class="desktop-orders-list" role="list" aria-label="Orders list">
+          <div v-else class="desktop-orders-list" role="list" :aria-label="t('desktop.orders.ordersListAria')">
             <button
               v-for="order in finishedOrders"
               :key="order.id"
               type="button"
               class="desktop-order-row"
               @click="selectOrder(order)"
-              :aria-label="`Open order ${order.id} details`"
+              :aria-label="t('desktop.orders.openOrderDetails', { id: order.id })"
               role="listitem"
             >
               <div class="desktop-order-col desktop-order-col-beach">
-                <span class="desktop-order-label">Beach Name</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.beachName') }}</span>
                 <strong>{{ getBeachName(order) }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Order ID</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.orderId') }}</span>
                 <strong>#{{ order.id }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Section</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.section') }}</span>
                 <strong>{{ getZoneName(order) }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Umbrella</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.umbrella') }}</span>
                 <strong>{{ getUmbrellaNumber(order) }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Price</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.price') }}</span>
                 <strong>{{ getPrice(order) }}</strong>
               </div>
               <div class="desktop-order-col">
-                <span class="desktop-order-label">Date</span>
+                <span class="desktop-order-label">{{ t('desktop.orders.date') }}</span>
                 <strong>{{ formatDate(order.start_date) }}</strong>
               </div>
             </button>
 
-            <p class="desktop-records-count">{{ finishedOrders.length }} Records Shown</p>
+            <p class="desktop-records-count">{{ t('desktop.orders.recordsShown', { count: finishedOrders.length }) }}</p>
           </div>
         </section>
       </div>
@@ -120,32 +120,32 @@
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        <h1 class="order-history-title">Order History</h1>
+        <h1 class="order-history-title">{{ t('desktop.orders.historyTitle') }}</h1>
       </div>
 
-      <p class="order-history-subtitle">See all your past purchases</p>
+      <p class="order-history-subtitle">{{ t('desktop.orders.historySubtitle') }}</p>
 
       <div v-if="loading" class="order-history-loading" aria-live="polite">
-        <p>Loading orders...</p>
+        <p>{{ t('desktop.orders.loadingOrders') }}</p>
       </div>
 
       <div v-else-if="error" class="order-history-error" role="alert">
         <p>{{ error }}</p>
-        <button @click="fetchOrders" class="rt-btn rt-btn-primary">Retry</button>
+        <button @click="fetchOrders" class="rt-btn rt-btn-primary">{{ t('desktop.orders.retry') }}</button>
       </div>
 
       <div v-else-if="finishedOrders.length === 0" class="order-history-empty">
-        <p>No orders found</p>
+        <p>{{ t('desktop.orders.noOrdersFound') }}</p>
       </div>
 
-      <div v-else class="order-history-list" role="list" aria-label="Orders list">
+      <div v-else class="order-history-list" role="list" :aria-label="t('desktop.orders.ordersListAria')">
         <button
           v-for="order in finishedOrders"
           :key="order.id"
           class="order-card"
           type="button"
           @click="selectOrder(order)"
-          :aria-label="`Open order ${order.id} details`"
+          :aria-label="t('desktop.orders.openOrderDetails', { id: order.id })"
           role="listitem"
         >
           <div class="order-card-content">
@@ -161,7 +161,7 @@
         </button>
       </div>
 
-      <p v-if="!loading && finishedOrders.length > 0" class="order-history-count">{{ finishedOrders.length }} Records</p>
+      <p v-if="!loading && finishedOrders.length > 0" class="order-history-count">{{ t('desktop.orders.records', { count: finishedOrders.length }) }}</p>
     </template>
 
     <div
@@ -171,10 +171,10 @@
       @click="selectedOrder = null"
       role="dialog"
       aria-modal="true"
-      aria-label="Order details"
+      :aria-label="t('desktop.orders.orderDetails')"
     >
       <div class="order-detail-modal" :class="{ desktop: isDesktop }" @click.stop>
-        <button class="order-detail-close" @click="selectedOrder = null" aria-label="Close order details">
+        <button class="order-detail-close" @click="selectedOrder = null" :aria-label="t('desktop.orders.closeOrderDetails')">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -183,31 +183,31 @@
         <h3 class="order-detail-title">{{ getBeachName(selectedOrder) }}</h3>
         <div class="order-detail-content">
           <div class="order-detail-row">
-            <span class="order-detail-label">Order ID:</span>
+            <span class="order-detail-label">{{ t('desktop.orders.orderId') }}:</span>
             <span class="order-detail-value">#{{ selectedOrder.id }}</span>
           </div>
           <div class="order-detail-row">
-            <span class="order-detail-label">Location:</span>
+            <span class="order-detail-label">{{ t('desktop.orders.location') }}:</span>
             <span class="order-detail-value">{{ getCityName(selectedOrder) }}</span>
           </div>
           <div class="order-detail-row">
-            <span class="order-detail-label">Zone:</span>
+            <span class="order-detail-label">{{ t('desktop.orders.section') }}:</span>
             <span class="order-detail-value">{{ getZoneName(selectedOrder) }}</span>
           </div>
           <div class="order-detail-row">
-            <span class="order-detail-label">Check-in:</span>
+            <span class="order-detail-label">{{ t('desktop.orders.checkIn') }}:</span>
             <span class="order-detail-value">{{ formatDate(selectedOrder.start_date) }}</span>
           </div>
           <div class="order-detail-row">
-            <span class="order-detail-label">Check-out:</span>
+            <span class="order-detail-label">{{ t('desktop.orders.checkOut') }}:</span>
             <span class="order-detail-value">{{ formatDate(selectedOrder.end_date) }}</span>
           </div>
           <div class="order-detail-row order-detail-row-total">
-            <span class="order-detail-label">Total Price:</span>
+            <span class="order-detail-label">{{ t('desktop.orders.totalPrice') }}:</span>
             <span class="order-detail-value">{{ getPrice(selectedOrder) }}</span>
           </div>
         </div>
-        <button class="order-detail-close-btn rt-btn rt-btn-primary" @click="selectedOrder = null">Close</button>
+        <button class="order-detail-close-btn rt-btn rt-btn-primary" @click="selectedOrder = null">{{ t('common.close') }}</button>
       </div>
     </div>
   </div>
@@ -215,6 +215,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getOrders, type Order } from '../services/api'
 import {
   getOrderBeachName,
@@ -232,6 +233,8 @@ import homeIcon from '../assets/icons/Home.svg'
 import activeIcon from '../assets/icons/Active.svg'
 import historyIcon from '../assets/icons/History.svg'
 import settingsIcon from '../assets/icons/Settings.svg'
+
+const { t } = useI18n()
 
 defineProps<{
   isDesktop?: boolean

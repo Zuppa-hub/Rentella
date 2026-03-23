@@ -2,29 +2,32 @@
   <nav class="bottom-nav">
     <button class="nav-item" :class="{ active: activeTab === 'home' }" @click="handleNavigation('home')">
       <img :src="icons.home" alt="" />
-      Home
+      {{ t('desktop.nav.home') }}
     </button>
     <button class="nav-item" :class="{ active: activeTab === 'active' }" @click="handleNavigation('active')">
       <img :src="icons.active" alt="" />
-      Active bookings
+      {{ t('desktop.nav.active') }}
     </button>
     <button class="nav-item" :class="{ active: activeTab === 'history' }" @click="handleNavigation('history')">
       <img :src="icons.history" alt="" />
-      Order history
+      {{ t('desktop.nav.history') }}
     </button>
     <button class="nav-item" :class="{ active: activeTab === 'settings' }" @click="handleNavigation('settings')">
       <img :src="icons.settings" alt="" />
-      Settings
+      {{ t('desktop.nav.settings') }}
     </button>
   </nav>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import iconHistory from '../assets/icons/History.svg'
 import iconHome from '../assets/icons/Home.svg'
 import iconSettings from '../assets/icons/Settings.svg'
 import iconActive from '../assets/icons/Active.svg'
+
+const { t } = useI18n()
 
 const activeTab = ref('home')
 
