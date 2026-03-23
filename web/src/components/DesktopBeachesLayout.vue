@@ -1,34 +1,6 @@
 <template>
   <div class="desktop-beaches-layout">
-    <!-- Navbar -->
-    <nav class="navbar">
-      <div class="navbar-container">
-        <div class="logo-section">
-          <img :src="icons.logo" :alt="t('desktop.brand.alt')" class="logo" />
-        </div>
-        <div class="nav-items">
-          <button class="nav-item active" type="button" @click="emit('navigate', 'home')">
-            <img :src="icons.home" alt="" class="nav-icon" />
-            <span>{{ t('desktop.nav.home') }}</span>
-          </button>
-          <button class="nav-item" type="button" @click="emit('navigate', 'active')">
-            <img :src="icons.active" alt="" class="nav-icon" />
-            <span>{{ t('desktop.nav.active') }}</span>
-          </button>
-          <button class="nav-item" type="button" @click="emit('navigate', 'history')">
-            <img :src="icons.history" alt="" class="nav-icon" />
-            <span>{{ t('desktop.nav.history') }}</span>
-          </button>
-          <button class="nav-item" type="button" @click="emit('navigate', 'settings')">
-            <img :src="icons.settings" alt="" class="nav-icon" />
-            <span>{{ t('desktop.nav.settings') }}</span>
-          </button>
-        </div>
-        <div class="profile-section">
-          <div class="profile-avatar">{{ initials }}</div>
-        </div>
-      </div>
-    </nav>
+    <BeachesDesktopNavbar :initials="initials" current-tab="home" @navigate="emit('navigate', $event)" />
 
     <!-- Main Content -->
     <div class="main-content">
@@ -61,26 +33,13 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import L from 'leaflet'
 import BeachesView from './BeachesView.vue'
-import type { Beach } from '../services/api'
+import BeachesDesktopNavbar from './beaches/BeachesDesktopNavbar.vue'
 import { toNumber } from '../utils/helpers'
-import logoDark from '../assets/LogoDark.svg'
-import homeIcon from '../assets/icons/Home.svg'
-import activeIcon from '../assets/icons/Active.svg'
-import historyIcon from '../assets/icons/History.svg'
-import settingsIcon from '../assets/icons/Settings.svg'
-
-interface Location {
-  id: number
-  name: string
-  lat: number
-  lng: number
-  distance?: number
-  priceRange: string
-}
+import type { BeachViewModel, Location } from '../types/beaches'
 
 const props = defineProps<{
   location: Location
-  beaches: Beach[]
+  beaches: BeachViewModel[]
   expandBeachId?: number | null
   beachTypes?: Record<number, string>
   initials: string
@@ -89,7 +48,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   back: []
-  'select-beach': [beach: Beach]
+  'select-beach': [beach: BeachViewModel]
   navigate: [tab: string]
 }>()
 
@@ -99,14 +58,6 @@ const mapEl = ref<HTMLDivElement | null>(null)
 let map: L.Map | undefined
 let markersLayer: L.LayerGroup | undefined
 let userLocationMarker: L.Marker | undefined
-
-const icons = {
-  logo: logoDark,
-  home: homeIcon,
-  active: activeIcon,
-  history: historyIcon,
-  settings: settingsIcon,
-}
 
 const initMap = () => {
   if (!mapEl.value || map) return
@@ -243,94 +194,6 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   background: white;
-}
-
-/* Navbar */
-.navbar {
-  height: 72px;
-  background: var(--color-primary);
-  box-shadow: 0px -4px 8px rgba(85, 85, 85, 0.08);
-  display: flex;
-  align-items: center;
-  padding: 0 32px;
-  flex-shrink: 0;
-}
-
-.navbar-container {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo-section {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-}
-
-.logo {
-  height: 32px;
-  width: auto;
-}
-
-.nav-items {
-  display: flex;
-  gap: 0;
-  flex: 0 0 auto;
-  justify-content: flex-end;
-  margin-left: auto;
-  margin-right: 12px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 16px;
-  height: 100%;
-  cursor: pointer;
-  border: 0;
-  background: transparent;
-  color: var(--color-primary-light);
-  font-size: 11px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  transition: opacity 0.3s ease;
-}
-
-.nav-item:hover {
-  opacity: 0.8;
-}
-
-.nav-item.active {
-  color: var(--color-primary-light-active);
-}
-
-.nav-icon {
-  width: 22px;
-  height: 22px;
-  padding: 0;
-}
-
-.profile-section {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.profile-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #1f2937;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
 }
 
 /* Main Content */

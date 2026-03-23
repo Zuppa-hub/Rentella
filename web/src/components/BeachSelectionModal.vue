@@ -65,13 +65,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Beach } from '../services/api'
+import type { BeachViewModel } from '../types/beaches'
 import { isAnimalsAllowed, parseBeachTypeId } from '../utils/helpers'
-
-type BeachViewModel = Beach & {
-  min_price?: number
-  max_price?: number
-}
 
 const props = defineProps<{
   isOpen: boolean

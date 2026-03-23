@@ -1,5 +1,5 @@
 <template>
-  <template>
+  <div class="beaches-list-content">
     <div class="back-section">
       <button class="back-button" @click="emit('back')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -110,7 +110,7 @@
         </div>
       </div>
     </div>
-  </template>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -158,6 +158,13 @@ const getBeachTypeLabel = (beach: BeachViewModel) => {
 </script>
 
 <style scoped>
+.beaches-list-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .back-section {
   padding: 0 0 12px;
 }
@@ -227,6 +234,7 @@ const getBeachTypeLabel = (beach: BeachViewModel) => {
 
 .beaches-list {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 0;
   display: flex;
