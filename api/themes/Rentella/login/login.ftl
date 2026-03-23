@@ -24,7 +24,7 @@
 
                     <form id="kc-form-login" class="auth-form" action="${url.loginAction}" method="post">
                         <div class="input-group">
-                            <label for="username" class="input-label">Username</label>
+                            <label for="username" class="input-label">Email</label>
                             <input
                                 id="username"
                                 name="username"
