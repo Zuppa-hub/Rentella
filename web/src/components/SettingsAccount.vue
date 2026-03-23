@@ -139,6 +139,8 @@ const icons = {
   height: 100vh;
   background: #f3f4f5;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar {
@@ -198,13 +200,15 @@ const icons = {
 .desktop-layout {
   flex: 1;
   min-height: 0;
-  display: block;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
 .desktop-main {
   padding: 24px 24px 18px;
   min-width: 0;
+  flex: 1;
   min-height: 0;
   overflow-y: auto;
 }

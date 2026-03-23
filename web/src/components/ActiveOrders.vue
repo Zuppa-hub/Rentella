@@ -451,6 +451,8 @@ onMounted(() => {
   height: 100vh;
   background: #f3f4f5;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar {
