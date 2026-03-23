@@ -3,9 +3,9 @@
     <p class="auth-redirect">Redirecting to login...</p>
   </div>
   <div v-else-if="isDesktop" class="app-desktop">
-    <DesktopHome v-if="!isBeachesViewOpen && !isOrderHistoryOpen && !isActiveOrdersOpen" :locations="locations" :initials="initials" :user-location="userLocation" :selected-location="selectedLocation" @location-click="openLocationModal" @navigate="handleDesktopNavigation" />
+    <DesktopHome v-if="!isBeachesViewOpen && !isOrderHistoryOpen && !isActiveOrdersOpen && !isSettingsOpen" :locations="locations" :initials="initials" :user-location="userLocation" :selected-location="selectedLocation" @location-click="openLocationModal" @navigate="handleDesktopNavigation" />
     <DesktopBeachesLayout
-      v-if="isBeachesViewOpen && beachesViewLocation && !isOrderHistoryOpen && !isActiveOrdersOpen"
+      v-if="isBeachesViewOpen && beachesViewLocation && !isOrderHistoryOpen && !isActiveOrdersOpen && !isSettingsOpen"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
       :expand-beach-id="beachToExpandId"
@@ -17,18 +17,29 @@
       @navigate="handleDesktopNavigation"
     />
     <ActiveOrders
-      v-if="isActiveOrdersOpen"
+      v-if="isActiveOrdersOpen && !isSettingsOpen"
       :is-desktop="isDesktop"
       :initials="initials"
       @back="closeActiveOrders"
       @navigate="handleDesktopNavigation"
     />
     <OrderHistory
-      v-if="isOrderHistoryOpen"
+      v-if="isOrderHistoryOpen && !isSettingsOpen"
       :is-desktop="isDesktop"
       :initials="initials"
       @back="closeOrderHistory"
       @navigate="handleDesktopNavigation"
+    />
+    <SettingsAccount
+      v-if="isSettingsOpen"
+      :is-desktop="isDesktop"
+      :initials="initials"
+      :full-name="accountFullName"
+      :email="accountEmail"
+      :username="accountUsername"
+      @back="closeSettings"
+      @navigate="handleDesktopNavigation"
+      @logout="handleLogout"
     />
     <LocationModal
       :is-open="isModalOpen"
@@ -51,7 +62,7 @@
     />
 
     <BottomSheet
-      v-if="!isBeachesViewOpen && !isOrderHistoryOpen && !isActiveOrdersOpen"
+      v-if="!isBeachesViewOpen && !isOrderHistoryOpen && !isActiveOrdersOpen && !isSettingsOpen"
       :locations="filteredLocations"
       :total-count="filteredLocations.length"
       :search-term="searchTerm"
@@ -62,7 +73,7 @@
     />
 
     <BeachesView
-      v-if="isBeachesViewOpen && beachesViewLocation && !isOrderHistoryOpen && !isActiveOrdersOpen"
+      v-if="isBeachesViewOpen && beachesViewLocation && !isOrderHistoryOpen && !isActiveOrdersOpen && !isSettingsOpen"
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
       :expand-beach-id="beachToExpandId"
@@ -72,7 +83,7 @@
     />
 
     <ActiveOrders
-      v-if="isActiveOrdersOpen && !isBeachesViewOpen"
+      v-if="isActiveOrdersOpen && !isBeachesViewOpen && !isSettingsOpen"
       :is-desktop="isDesktop"
       :initials="initials"
       @back="closeActiveOrders"
@@ -80,11 +91,23 @@
     />
 
     <OrderHistory
-      v-if="isOrderHistoryOpen && !isBeachesViewOpen"
+      v-if="isOrderHistoryOpen && !isBeachesViewOpen && !isSettingsOpen"
       :is-desktop="isDesktop"
       :initials="initials"
       @back="closeOrderHistory"
       @navigate="handleDesktopNavigation"
+    />
+
+    <SettingsAccount
+      v-if="isSettingsOpen && !isBeachesViewOpen"
+      :is-desktop="isDesktop"
+      :initials="initials"
+      :full-name="accountFullName"
+      :email="accountEmail"
+      :username="accountUsername"
+      @back="closeSettings"
+      @navigate="handleDesktopNavigation"
+      @logout="handleLogout"
     />
 
     <LocationModal
@@ -144,6 +167,7 @@ import LocationModal from './components/LocationModal.vue'
 import BeachesView from './components/BeachesView.vue'
 import OrderHistory from './components/OrderHistory.vue'
 import ActiveOrders from './components/ActiveOrders.vue'
+import SettingsAccount from './components/SettingsAccount.vue'
 import DesktopBeachesLayout from './components/DesktopBeachesLayout.vue'
 import SetLocationModal from './components/SetLocationModal.vue'
 import BeachSelectionModal from './components/BeachSelectionModal.vue'
@@ -198,6 +222,11 @@ const selectedBeach = ref<Beach | null>(null)
 // Order History state
 const isOrderHistoryOpen = ref(false)
 const isActiveOrdersOpen = ref(false)
+const isSettingsOpen = ref(false)
+
+const accountFullName = computed(() => String(user.value?.name || user.value?.preferred_username || ''))
+const accountEmail = computed(() => String(user.value?.email || ''))
+const accountUsername = computed(() => String(user.value?.preferred_username || user.value?.username || ''))
 
 const filteredLocations = computed(() => {
   if (!searchTerm.value) return locations.value
@@ -430,6 +459,7 @@ const closeOrderHistory = () => {
 const openOrderHistory = () => {
   isOrderHistoryOpen.value = true
   isActiveOrdersOpen.value = false
+  isSettingsOpen.value = false
   isBeachesViewOpen.value = false
 }
 
@@ -440,6 +470,18 @@ const closeActiveOrders = () => {
 const openActiveOrders = () => {
   isActiveOrdersOpen.value = true
   isOrderHistoryOpen.value = false
+  isSettingsOpen.value = false
+  isBeachesViewOpen.value = false
+}
+
+const closeSettings = () => {
+  isSettingsOpen.value = false
+}
+
+const openSettings = () => {
+  isSettingsOpen.value = true
+  isOrderHistoryOpen.value = false
+  isActiveOrdersOpen.value = false
   isBeachesViewOpen.value = false
 }
 
@@ -448,9 +490,12 @@ const handleBottomNavigation = (tab: string) => {
     openOrderHistory()
   } else if (tab === 'active') {
     openActiveOrders()
+  } else if (tab === 'settings') {
+    openSettings()
   } else if (tab === 'home') {
     closeOrderHistory()
     closeActiveOrders()
+    closeSettings()
     closeBeachesView()
   }
 }
@@ -466,9 +511,15 @@ const handleDesktopNavigation = (tab: string) => {
     return
   }
 
+  if (tab === 'settings') {
+    openSettings()
+    return
+  }
+
   if (tab === 'home') {
     closeOrderHistory()
     closeActiveOrders()
+    closeSettings()
     closeBeachesView()
   }
 }
