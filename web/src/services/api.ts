@@ -319,8 +319,14 @@ export async function createZoneOrder(payload: {
 }
 
 // Orders endpoints
-export async function getOrders(): Promise<Order[]> {
-  const raw = await fetchApi<Array<Order | RawOrderEnvelope> | null>('/orders')
+export async function getOrders(filters?: { active?: boolean }): Promise<Order[]> {
+  const params = new URLSearchParams()
+  if (typeof filters?.active === 'boolean') {
+    params.append('active', String(filters.active))
+  }
+
+  const query = params.toString() ? `?${params.toString()}` : ''
+  const raw = await fetchApi<Array<Order | RawOrderEnvelope> | null>(`/orders${query}`)
 
   if (!Array.isArray(raw)) {
     return []

@@ -59,3 +59,30 @@ export const useOrderTimeline = (orders: Ref<Order[]>) => {
     finishedOrders,
   }
 }
+
+export const formatOrderDate = (dateStr: string): string => {
+  const parsed = parseOrderDate(dateStr)
+  if (!parsed) return dateStr
+
+  const day = String(parsed.getDate()).padStart(2, '0')
+  const month = String(parsed.getMonth() + 1).padStart(2, '0')
+  const year = parsed.getFullYear()
+  return `${day}.${month}.${year}`
+}
+
+export const formatOrderTotalPrice = (order: Pick<Order, 'start_date' | 'end_date' | 'price'>): string => {
+  const price = order.price?.price
+  if (typeof price !== 'number') return 'N/A'
+
+  const start = parseOrderDate(order.start_date)
+  const end = parseOrderDate(order.end_date)
+
+  if (!start || !end) return `${price}€`
+
+  const durationMs = end.getTime() - start.getTime()
+  if (durationMs <= 0) return `${price}€`
+
+  const dayMs = 1000 * 60 * 60 * 24
+  const durationDays = Math.max(1, Math.ceil(durationMs / dayMs))
+  return `${price * durationDays}€`
+}

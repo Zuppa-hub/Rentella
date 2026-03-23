@@ -224,7 +224,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { deleteOrder, getOrders, type Order } from '../services/api'
-import { parseOrderDate, useOrderTimeline } from '../composables/useOrderTimeline'
+import {
+  getOrderBeachName,
+  getOrderCityName,
+  getOrderUmbrellaNumber,
+  getOrderZoneName,
+} from '../composables/useOrderPresentation'
+import {
+  formatOrderDate,
+  formatOrderTotalPrice,
+  parseOrderDate,
+  useOrderTimeline,
+} from '../composables/useOrderTimeline'
 import logoDark from '../assets/LogoDark.svg'
 import homeIcon from '../assets/icons/Home.svg'
 import activeIcon from '../assets/icons/Active.svg'
@@ -309,7 +320,7 @@ const fetchOrders = async () => {
   error.value = null
   actionError.value = null
   try {
-    orders.value = await getOrders()
+    orders.value = await getOrders({ active: true })
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load orders'
   } finally {
@@ -346,43 +357,27 @@ const cancelOrder = async (orderId: number) => {
 }
 
 const getBeachName = (order: Order): string => {
-  return order.umbrella?.zone?.beach?.name || 'Unknown Beach'
+  return getOrderBeachName(order)
 }
 
 const getCityName = (order: Order): string => {
-  return order.umbrella?.zone?.beach?.city_location?.city_name || 'Unknown City'
+  return getOrderCityName(order)
 }
 
 const getZoneName = (order: Order): string => {
-  return order.umbrella?.zone?.name || 'Unknown Zone'
+  return getOrderZoneName(order)
 }
 
 const getUmbrellaNumber = (order: Order): string => {
-  return order.umbrella?.number != null ? String(order.umbrella.number) : '-'
+  return getOrderUmbrellaNumber(order)
 }
 
 const getPrice = (order: Order): string => {
-  const price = order.price?.price
-  if (order.end_date != order.start_date) {
-    const start = parseOrderDate(order.start_date)
-    const end = parseOrderDate(order.end_date)
-    if (start && end) {
-      // Calculate total price based on days
-      const durationDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-      return `${price ? price * durationDays : 'N/'}€`
-    }
-  }
-  return price != null ? `${price}€` : 'N/A'
+  return formatOrderTotalPrice(order)
 }
 
 const formatDate = (dateStr: string): string => {
-  const parsed = parseOrderDate(dateStr)
-  if (!parsed) return dateStr
-
-  const day = String(parsed.getDate()).padStart(2, '0')
-  const month = String(parsed.getMonth() + 1).padStart(2, '0')
-  const year = parsed.getFullYear()
-  return `${day}.${month}.${year}`
+  return formatOrderDate(dateStr)
 }
 
 const openOrderDetails = (order: Order) => {

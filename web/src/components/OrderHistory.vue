@@ -161,7 +161,7 @@
         </button>
       </div>
 
-      <p v-if="!loading && orders.length > 0" class="order-history-count">{{ orders.length }} Records</p>
+      <p v-if="!loading && finishedOrders.length > 0" class="order-history-count">{{ finishedOrders.length }} Records</p>
     </template>
 
     <div
@@ -216,7 +216,17 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { getOrders, type Order } from '../services/api'
-import { parseOrderDate, useOrderTimeline } from '../composables/useOrderTimeline'
+import {
+  getOrderBeachName,
+  getOrderCityName,
+  getOrderUmbrellaNumber,
+  getOrderZoneName,
+} from '../composables/useOrderPresentation'
+import {
+  formatOrderDate,
+  formatOrderTotalPrice,
+  useOrderTimeline,
+} from '../composables/useOrderTimeline'
 import logoDark from '../assets/LogoDark.svg'
 import homeIcon from '../assets/icons/Home.svg'
 import activeIcon from '../assets/icons/Active.svg'
@@ -252,7 +262,7 @@ const fetchOrders = async () => {
   loading.value = true
   error.value = null
   try {
-    orders.value = await getOrders()
+    orders.value = await getOrders({ active: false })
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load orders'
     console.error('Failed to fetch orders:', err)
@@ -262,43 +272,27 @@ const fetchOrders = async () => {
 }
 
 const getBeachName = (order: Order): string => {
-  return order.umbrella?.zone?.beach?.name || 'Unknown Beach'
+  return getOrderBeachName(order)
 }
 
 const getCityName = (order: Order): string => {
-  return order.umbrella?.zone?.beach?.city_location?.city_name || 'Unknown City'
+  return getOrderCityName(order)
 }
 
 const getZoneName = (order: Order): string => {
-  return order.umbrella?.zone?.name || 'Unknown Zone'
+  return getOrderZoneName(order)
 }
 
 const getUmbrellaNumber = (order: Order): string => {
-  return order.umbrella?.number != null ? String(order.umbrella.number) : '-'
+  return getOrderUmbrellaNumber(order)
 }
 
 const getPrice = (order: Order): string => {
-  const price = order.price?.price
-  if (order.end_date != order.start_date) {
-    const start = parseOrderDate(order.start_date)
-    const end = parseOrderDate(order.end_date)
-    if (start && end) {
-      // Calculate total price based on days
-      const durationDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-      return `${price ? price * durationDays : 'N/'}€`
-    }
-  }
-  return price != null ? `${price}€` : 'N/A'
+  return formatOrderTotalPrice(order)
 }
 
 const formatDate = (dateStr: string): string => {
-  const parsed = parseOrderDate(dateStr)
-  if (!parsed) return dateStr
-
-  const day = String(parsed.getDate()).padStart(2, '0')
-  const month = String(parsed.getMonth() + 1).padStart(2, '0')
-  const year = parsed.getFullYear()
-  return `${day}.${month}.${year}`
+  return formatOrderDate(dateStr)
 }
 
 const selectOrder = (order: Order) => {
