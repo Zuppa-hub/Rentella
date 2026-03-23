@@ -1,46 +1,13 @@
 <template>
   <div class="desktop-home">
-    <!-- Navbar -->
-    <nav class="navbar">
-      <div class="navbar-container">
-        <div class="logo-section">
-          <img :src="icons.logo" :alt="t('desktop.brand.alt')" class="logo" />
-        </div>
-        <div class="nav-items">
-          <button class="nav-item active" type="button" @click="emit('navigate', 'home')">
-            <img :src="icons.home" alt="" class="nav-icon" />
-            <span>{{ t('desktop.nav.home') }}</span>
-          </button>
-          <button class="nav-item" type="button" @click="emit('navigate', 'active')">
-            <img :src="icons.active" alt="" class="nav-icon" />
-            <span>{{ t('desktop.nav.active') }}</span>
-          </button>
-          <button class="nav-item" type="button" @click="emit('navigate', 'history')">
-            <img :src="icons.history" alt="" class="nav-icon" />
-            <span>{{ t('desktop.nav.history') }}</span>
-          </button>
-          <button class="nav-item" type="button" @click="emit('navigate', 'settings')">
-            <img :src="icons.settings" alt="" class="nav-icon" />
-            <span>{{ t('desktop.nav.settings') }}</span>
-          </button>
-        </div>
-        <div class="profile-section">
-          <div class="profile-avatar">{{ initials }}</div>
-        </div>
-      </div>
-    </nav>
+    <DesktopHomeNavbar :initials="props.initials" active-tab="home" @navigate="emit('navigate', $event)" />
 
     <!-- Main Content -->
     <div class="main-content">
       <!-- Map Section -->
       <div class="map-wrapper">
         <div ref="mapEl" class="map"></div>
-        <button class="map-location-indicator" :class="{ active: props.userLocation }" @click="centerMapOnUser" :disabled="!props.userLocation">
-          <span class="location-dot" :class="{ pulse: props.userLocation }"></span>
-          <span class="location-text">
-            {{ props.userLocation ? t('desktop.map.myLocation') : t('desktop.map.loading') }}
-          </span>
-        </button>
+        <MapLocationIndicator :location="props.userLocation" @center-map="centerMapOnUser" />
       </div>
 
       <!-- Sidebar -->
@@ -55,11 +22,8 @@ import { useI18n } from 'vue-i18n'
 import L from 'leaflet'
 import type { MapLocation } from './MapSection.vue'
 import DesktopSidebar from './DesktopSidebar.vue'
-import logoDark from '../assets/LogoDark.svg'
-import homeIcon from '../assets/icons/Home.svg'
-import activeIcon from '../assets/icons/Active.svg'
-import historyIcon from '../assets/icons/History.svg'
-import settingsIcon from '../assets/icons/Settings.svg'
+import DesktopHomeNavbar from './home/DesktopHomeNavbar.vue'
+import MapLocationIndicator from './home/MapLocationIndicator.vue'
 interface LocationWithMeta extends MapLocation {
   name: string
   distance: number
@@ -100,14 +64,6 @@ const desktopLocations = computed<DesktopLocationProp[]>(() => {
     priceRange: loc.priceRange,
   }))
 })
-
-const icons = {
-  logo: logoDark,
-  home: homeIcon,
-  active: activeIcon,
-  history: historyIcon,
-  settings: settingsIcon,
-}
 
 const initMap = () => {
   if (!mapEl.value || map) return
@@ -261,94 +217,6 @@ watch(
   background: white;
 }
 
-/* Navbar Styles */
-.navbar {
-  height: 72px;
-  background: var(--color-primary);
-  box-shadow: 0px -4px 8px rgba(85, 85, 85, 0.08);
-  display: flex;
-  align-items: center;
-  padding: 0 32px;
-  flex-shrink: 0;
-}
-
-.navbar-container {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo-section {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-}
-
-.logo {
-  height: 32px;
-  width: auto;
-}
-
-.nav-items {
-  display: flex;
-  gap: 0;
-  flex: 0 0 auto;
-  justify-content: flex-end;
-  margin-left: auto;
-  margin-right: 12px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 16px;
-  height: 100%;
-  cursor: pointer;
-  border: 0;
-  background: transparent;
-  color: var(--color-primary-light);
-  font-size: 11px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  transition: opacity 0.3s ease;
-}
-
-.nav-item:hover {
-  opacity: 0.8;
-}
-
-.nav-item.active {
-  color: var(--color-primary-light-active);
-}
-
-.nav-icon {
-  width: 22px;
-  height: 22px;
-  padding: 0;
-}
-
-.profile-section {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.profile-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #1f2937;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-}
-
 /* Main Content Layout */
 .main-content {
   display: flex;
@@ -409,70 +277,5 @@ watch(
   border-radius: 50%;
   border: 3px solid white;
   box-shadow: 0 0 0 2px #00a8cc;
-}
-
-/* Map location indicator */
-.map-location-indicator {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
-  border-radius: 12px;
-  padding: 8px 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #414d4f;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
-  z-index: 999;
-  font-family: 'Inter', sans-serif;
-  backdrop-filter: blur(4px);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.map-location-indicator:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
-  transform: translateY(-1px);
-}
-
-.map-location-indicator:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.location-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #6b7280;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.location-dot.pulse {
-  background: #00a8cc;
-  box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.2);
-  animation: pulse-ring 2s infinite;
-}
-
-@keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.2);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(0, 168, 204, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 3px rgba(0, 168, 204, 0);
-  }
-}
-
-.location-text {
-  white-space: nowrap;
 }
 </style>

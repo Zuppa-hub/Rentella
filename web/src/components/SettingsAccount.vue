@@ -1,54 +1,12 @@
 <template>
   <div class="settings-page" :class="{ desktop: isDesktop }">
     <template v-if="isDesktop">
-      <nav class="navbar">
-        <div class="navbar-container">
-          <div class="logo-section">
-            <img :src="icons.logo" :alt="t('desktop.brand.alt')" class="logo" />
-          </div>
-          <div class="nav-items">
-            <button class="nav-item" type="button" @click="emit('navigate', 'home')">
-              <img :src="icons.home" alt="" class="nav-icon" />
-              <span>{{ t('desktop.nav.home') }}</span>
-            </button>
-            <button class="nav-item" type="button" @click="emit('navigate', 'active')">
-              <img :src="icons.active" alt="" class="nav-icon" />
-              <span>{{ t('desktop.nav.active') }}</span>
-            </button>
-            <button class="nav-item" type="button" @click="emit('navigate', 'history')">
-              <img :src="icons.history" alt="" class="nav-icon" />
-              <span>{{ t('desktop.nav.history') }}</span>
-            </button>
-            <button class="nav-item active" type="button" aria-current="page">
-              <img :src="icons.settings" alt="" class="nav-icon" />
-              <span>{{ t('desktop.nav.settings') }}</span>
-            </button>
-          </div>
-          <div class="profile-section">
-            <div class="profile-avatar">{{ initials || 'JD' }}</div>
-          </div>
-        </div>
-      </nav>
+        <DesktopHomeNavbar :initials="initials || 'JD'" active-tab="settings" @navigate="emit('navigate', $event)" />
 
       <div class="desktop-layout" role="main" :aria-label="t('desktop.settings.title')">
         <section class="desktop-main" :aria-label="t('desktop.settings.manageAccount')">
           <h2 class="desktop-main-title">{{ t('desktop.settings.title') }}</h2>
-
-          <div class="settings-card">
-            <div class="settings-card-row">
-              <span>{{ t('desktop.settings.fullName') }}</span>
-              <strong>{{ fullName || '-' }}</strong>
-            </div>
-            <div class="settings-card-row">
-              <span>{{ t('desktop.settings.email') }}</span>
-              <strong>{{ email || '-' }}</strong>
-            </div>
-            <div class="settings-card-row">
-              <span>{{ t('desktop.settings.username') }}</span>
-              <strong>{{ username || '-' }}</strong>
-            </div>
-            <button type="button" class="settings-logout-btn" @click="emit('logout')">{{ t('desktop.settings.logout') }}</button>
-          </div>
+          <AccountDetailsCard :full-name="fullName" :email="email" :username="username" @logout="emit('logout')" />
         </section>
       </div>
     </template>
@@ -67,21 +25,7 @@
 
       <section class="settings-mobile-section" :aria-label="t('desktop.settings.account')">
         <h2>{{ t('desktop.settings.account') }}</h2>
-        <div class="settings-mobile-card">
-          <div class="settings-mobile-row">
-            <span>{{ t('desktop.settings.fullName') }}</span>
-            <strong>{{ fullName || '-' }}</strong>
-          </div>
-          <div class="settings-mobile-row">
-            <span>{{ t('desktop.settings.email') }}</span>
-            <strong>{{ email || '-' }}</strong>
-          </div>
-          <div class="settings-mobile-row">
-            <span>{{ t('desktop.settings.username') }}</span>
-            <strong>{{ username || '-' }}</strong>
-          </div>
-          <button type="button" class="settings-logout-btn" @click="emit('logout')">{{ t('desktop.settings.logout') }}</button>
-        </div>
+        <AccountDetailsCard :full-name="fullName" :email="email" :username="username" @logout="emit('logout')" />
       </section>
     </template>
   </div>
@@ -89,11 +33,8 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import logoDark from '../assets/LogoDark.svg'
-import homeIcon from '../assets/icons/Home.svg'
-import activeIcon from '../assets/icons/Active.svg'
-import historyIcon from '../assets/icons/History.svg'
-import settingsIcon from '../assets/icons/Settings.svg'
+import DesktopHomeNavbar from './home/DesktopHomeNavbar.vue'
+import AccountDetailsCard from './settings/AccountDetailsCard.vue'
 
 const { t } = useI18n()
 
@@ -110,14 +51,6 @@ const emit = defineEmits<{
   navigate: [tab: string]
   logout: []
 }>()
-
-const icons = {
-  logo: logoDark,
-  home: homeIcon,
-  active: activeIcon,
-  history: historyIcon,
-  settings: settingsIcon,
-}
 </script>
 
 <style scoped>
@@ -146,60 +79,6 @@ const icons = {
   flex-direction: column;
 }
 
-.navbar {
-  height: 72px;
-  background: #005f6f;
-  box-shadow: 0 -4px 8px rgba(85, 85, 85, 0.08);
-  display: flex;
-  align-items: center;
-  padding: 0 32px;
-}
-
-.navbar-container {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo { height: 32px; width: auto; }
-.nav-items { display: flex; margin-left: auto; margin-right: 12px; }
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 16px;
-  height: 100%;
-  border: 0;
-  background: transparent;
-  color: #d2eef1;
-  font-size: 11px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-}
-
-.nav-item:hover {
-  opacity: 0.8;
-}
-
-.nav-item.active { color: #fff; }
-.nav-icon { width: 22px; height: 22px; }
-
-.profile-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #f0f4f6;
-  color: #1f2937;
-  display: grid;
-  place-items: center;
-  font-size: 14px;
-  font-weight: 600;
-}
-
 .desktop-layout {
   flex: 1;
   min-height: 0;
@@ -222,50 +101,6 @@ const icons = {
   line-height: 1.2;
   font-weight: 600;
   color: #414d4f;
-}
-
-.settings-card,
-.settings-mobile-card {
-  margin-top: 14px;
-  border: 1px solid #d7dee2;
-  border-radius: 16px;
-  background: #ffffff;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.settings-card-row,
-.settings-mobile-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 13px;
-  color: #73858a;
-}
-
-.settings-card-row strong,
-.settings-mobile-row strong {
-  color: #2f3b3e;
-}
-
-.settings-logout-btn {
-  margin-top: 6px;
-  align-self: flex-start;
-  width: 100%;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  background: #0b5f6f;
-  color: #ffffff;
-  cursor: pointer;
-}
-
-.settings-logout-btn:hover {
-  opacity: 0.92;
 }
 
 .settings-header {
@@ -326,9 +161,7 @@ const icons = {
   }
 }
 
-.settings-back:focus-visible,
-.settings-logout-btn:focus-visible,
-.nav-item:focus-visible {
+.settings-back:focus-visible {
   outline: 2px solid #005f6f;
   outline-offset: 2px;
 }

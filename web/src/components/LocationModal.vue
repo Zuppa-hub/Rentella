@@ -16,25 +16,7 @@
         <!-- Body -->
         <div class="modal-body">
           <!-- Info Grid -->
-          <div class="info-grid">
-            <!-- Distance -->
-            <div class="info-item">
-              <span class="info-label">{{ t('desktop.location.distance') }}</span>
-              <p class="info-value">{{ location.distance }} km</p>
-            </div>
-
-            <!-- Number of Beaches -->
-            <div class="info-item">
-              <span class="info-label">{{ t('desktop.location.beachCount') }}</span>
-              <p class="info-value">{{ beaches.length }}</p>
-            </div>
-
-            <!-- Price Range -->
-            <div class="info-item">
-              <span class="info-label">{{ t('desktop.location.prices') }}</span>
-              <p class="info-value">{{ location.priceRange }}</p>
-            </div>
-          </div>
+            <LocationInfoGrid :location="location" :beaches="beaches" />
         </div>
 
         <!-- Footer -->
@@ -54,7 +36,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { createLogger } from '../utils/logger'
-import type { Beach } from '../services/api'
+import { type Beach } from '../services/api'
+import LocationInfoGrid from './modals/LocationInfoGrid.vue'
 
 const logger = createLogger('LocationModal')
 const { t } = useI18n()
@@ -190,42 +173,6 @@ const close = () => {
   display: flex;
   flex-direction: column;
   gap: 24px;
-}
-
-.info-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.info-item {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 0;
-  border-bottom: none;
-}
-
-.info-item:last-child {
-  border-bottom: none;
-}
-
-.info-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
-  display: block;
-  margin-bottom: 0;
-}
-
-.info-value {
-  font-size: 14px;
-  font-weight: 500;
-  color: #0f172a;
-  margin: 0;
-  text-align: right;
 }
 
 .modal-footer {
