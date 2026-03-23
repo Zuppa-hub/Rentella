@@ -275,7 +275,8 @@ const getUmbrellaNumber = (order: Order): string => {
 }
 
 const getPrice = (order: Order): string => {
-  return order.price?.price ? `${order.price.price}€` : 'N/A'
+  const price = order.price?.price
+  return price != null ? `${price}€` : 'N/A'
 }
 
 const formatDate = (dateStr: string): string => {
