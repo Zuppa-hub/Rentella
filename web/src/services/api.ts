@@ -116,6 +116,42 @@ export interface Order {
   }
 }
 
+type RawCityLocation = {
+  id?: number
+  city_name?: string
+}
+
+type RawBeach = {
+  id?: number
+  name?: string
+  city_location?: RawCityLocation
+  location?: RawCityLocation
+}
+
+type RawZone = {
+  id?: number
+  name?: string
+  beach?: RawBeach
+}
+
+type RawUmbrella = {
+  id?: number
+  number?: number
+  zone?: RawZone
+  beachzone?: RawZone
+}
+
+type RawOrder = {
+  id?: number
+  umbrella?: RawUmbrella
+  [key: string]: unknown
+}
+
+type RawOrderEnvelope = {
+  orders?: RawOrder
+  name?: string
+}
+
 interface FetchOptions extends RequestInit {
   authenticated?: boolean
 }
@@ -155,7 +191,25 @@ async function fetchApi<T>(
     throw new Error(`API Error: ${response.status} - ${error}`)
   }
 
-  return response.json()
+  if (response.status === 204) {
+    return undefined as T
+  }
+
+  const contentType = response.headers.get('content-type') || ''
+  if (contentType.includes('application/json')) {
+    return response.json() as Promise<T>
+  }
+
+  const text = await response.text()
+  if (!text) {
+    return undefined as T
+  }
+
+  try {
+    return JSON.parse(text) as T
+  } catch {
+    return text as T
+  }
 }
 
 // Location endpoints
@@ -266,10 +320,69 @@ export async function createZoneOrder(payload: {
 
 // Orders endpoints
 export async function getOrders(): Promise<Order[]> {
-  return fetchApi<Order[]>('/orders')
+  const raw = await fetchApi<Array<Order | RawOrderEnvelope> | null>('/orders')
+
+  if (!Array.isArray(raw)) {
+    return []
+  }
+
+  return raw
+    .map((item) => {
+      const candidate: RawOrder | Order | null | undefined =
+        item && typeof item === 'object' && 'orders' in (item as Record<string, unknown>)
+          ? (item as RawOrderEnvelope).orders
+          : item
+
+      if (!candidate || typeof candidate !== 'object') {
+        return null
+      }
+
+      const umbrella = candidate.umbrella
+      const zone =
+        umbrella && typeof umbrella === 'object' && 'beachzone' in umbrella
+          ? (umbrella.beachzone ?? umbrella.zone)
+          : umbrella?.zone
+      const beach = zone?.beach
+      const cityLocation =
+        beach && typeof beach === 'object' && 'location' in beach
+          ? (beach.city_location ?? beach.location)
+          : beach?.city_location
+
+      return {
+        ...candidate,
+        umbrella: umbrella
+          ? {
+              ...umbrella,
+              zone: zone
+                ? {
+                    ...zone,
+                    beach: beach
+                      ? {
+                          ...beach,
+                          city_location: cityLocation
+                            ? {
+                                id: cityLocation.id,
+                                city_name: cityLocation.city_name,
+                              }
+                            : undefined,
+                        }
+                      : undefined,
+                  }
+                : undefined,
+            }
+          : undefined,
+      } as Order
+    })
+    .filter((order): order is Order => Boolean(order && order.id))
 }
 
 export async function getOrder(id: number): Promise<Order> {
   return fetchApi<Order>(`/orders/${id}`)
+}
+
+export async function deleteOrder(id: number): Promise<void> {
+  await fetchApi<void>(`/orders/${id}`, {
+    method: 'DELETE',
+  })
 }
 
