@@ -1,5 +1,5 @@
 <template>
-  <template>
+  <div class="order-history-mobile-content">
     <div class="order-history-header">
       <button class="order-history-back" @click="emit('back')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -50,7 +50,7 @@
     <p v-if="!loading && finishedOrdersView.length > 0" class="order-history-count">
       {{ t('desktop.orders.records', { count: finishedOrdersView.length }) }}
     </p>
-  </template>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -74,6 +74,13 @@ const { t } = useI18n()
 </script>
 
 <style scoped>
+.order-history-mobile-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .order-history-header {
   display: flex;
   align-items: center;

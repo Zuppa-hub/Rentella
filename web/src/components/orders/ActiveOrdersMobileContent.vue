@@ -1,5 +1,5 @@
 <template>
-  <template>
+  <div class="active-orders-mobile-content">
     <div class="active-orders-header">
       <button class="active-orders-back" @click="emit('back')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -54,7 +54,7 @@
     </div>
 
     <p v-if="actionError" class="desktop-action-error" role="alert">{{ actionError }}</p>
-  </template>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -81,6 +81,13 @@ const { t } = useI18n()
 </script>
 
 <style scoped>
+.active-orders-mobile-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .active-orders-header {
   display: flex;
   align-items: center;
