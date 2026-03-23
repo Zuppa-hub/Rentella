@@ -7,7 +7,12 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint . --ext .ts,.vue,.js",
+    "lint:fix": "eslint . --ext .ts,.vue,.js --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "quality": "npm run typecheck && npm run lint && npm run format:check"
   },
   "dependencies": {
     "keycloak-js": "^26.0.0",
@@ -17,9 +22,16 @@
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.21",
+    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@typescript-eslint/parser": "^8.57.2",
     "@vitejs/plugin-vue": "^5.2.4",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^9.33.0",
+    "prettier": "^3.8.1",
     "typescript": "^5.6.2",
     "vite": "^6.4.1",
+    "vue-eslint-parser": "^10.4.0",
     "vue-tsc": "^2.1.6"
   }
 }

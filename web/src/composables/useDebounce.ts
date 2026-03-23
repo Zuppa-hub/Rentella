@@ -1,15 +1,12 @@
 import { ref, onUnmounted } from 'vue'
 import { debounce } from '../utils/timing'
 
-export function useDebounce<T extends (...args: unknown[]) => void>(
-  callback: T,
-  delay: number = 300
-) {
+export function useDebounce<T extends (...args: unknown[]) => void>(callback: T, delay: number = 300) {
   const isCancelled = ref(false)
 
-  const debounced = debounce((...args: Parameters<T>) => {
+  const debounced = debounce((...args: unknown[]) => {
     if (!isCancelled.value) {
-      callback(...args)
+      callback(...(args as Parameters<T>))
     }
   }, delay)
 

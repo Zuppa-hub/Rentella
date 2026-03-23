@@ -14,7 +14,14 @@
             :title="t('common.close')"
             :aria-label="t('common.close')"
           >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -33,7 +40,13 @@
             @keydown.enter.prevent="emit('confirm', beach!)"
             @keydown.space.prevent="emit('confirm', beach!)"
           >
-            <img v-if="beach.photo_url" :src="beach.photo_url" :alt="beach.name" class="beach-image" loading="lazy" />
+            <img
+              v-if="beach.photo_url"
+              :src="beach.photo_url"
+              :alt="beach.name"
+              class="beach-image"
+              loading="lazy"
+            />
             <div v-else class="beach-image-placeholder">🏖️</div>
           </div>
 
@@ -41,8 +54,12 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn-cancel rt-btn rt-btn-secondary" type="button" @click="emit('close')">{{ t('common.cancel') }}</button>
-          <button class="btn-select rt-btn rt-btn-primary" type="button" @click="emit('confirm', beach)">{{ t('desktop.common.selectBeach') }}</button>
+          <button class="btn-cancel rt-btn rt-btn-secondary" type="button" @click="emit('close')">
+            {{ t('common.cancel') }}
+          </button>
+          <button class="btn-select rt-btn rt-btn-primary" type="button" @click="emit('confirm', beach)">
+            {{ t('desktop.common.selectBeach') }}
+          </button>
         </div>
       </div>
     </div>
@@ -139,7 +156,9 @@ const handleOverlayClick = () => {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
   flex-shrink: 0;
 }
 
@@ -178,7 +197,9 @@ const handleOverlayClick = () => {
   background: #d6dcde;
   aspect-ratio: 16 / 9;
   cursor: pointer;
-  transition: transform 0.2s, filter 0.2s;
+  transition:
+    transform 0.2s,
+    filter 0.2s;
   flex-shrink: 0;
 }
 

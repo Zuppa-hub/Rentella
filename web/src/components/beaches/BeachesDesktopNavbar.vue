@@ -5,19 +5,39 @@
         <img :src="logoDark" :alt="t('desktop.brand.alt')" class="logo" />
       </div>
       <div class="nav-items">
-        <button class="nav-item" :class="{ active: currentTab === 'home' }" type="button" @click="emit('navigate', 'home')">
+        <button
+          class="nav-item"
+          :class="{ active: currentTab === 'home' }"
+          type="button"
+          @click="emit('navigate', 'home')"
+        >
           <img :src="homeIcon" alt="" class="nav-icon" />
           <span>{{ t('desktop.nav.home') }}</span>
         </button>
-        <button class="nav-item" :class="{ active: currentTab === 'active' }" type="button" @click="emit('navigate', 'active')">
+        <button
+          class="nav-item"
+          :class="{ active: currentTab === 'active' }"
+          type="button"
+          @click="emit('navigate', 'active')"
+        >
           <img :src="activeIcon" alt="" class="nav-icon" />
           <span>{{ t('desktop.nav.active') }}</span>
         </button>
-        <button class="nav-item" :class="{ active: currentTab === 'history' }" type="button" @click="emit('navigate', 'history')">
+        <button
+          class="nav-item"
+          :class="{ active: currentTab === 'history' }"
+          type="button"
+          @click="emit('navigate', 'history')"
+        >
           <img :src="historyIcon" alt="" class="nav-icon" />
           <span>{{ t('desktop.nav.history') }}</span>
         </button>
-        <button class="nav-item" :class="{ active: currentTab === 'settings' }" type="button" @click="emit('navigate', 'settings')">
+        <button
+          class="nav-item"
+          :class="{ active: currentTab === 'settings' }"
+          type="button"
+          @click="emit('navigate', 'settings')"
+        >
           <img :src="settingsIcon" alt="" class="nav-icon" />
           <span>{{ t('desktop.nav.settings') }}</span>
         </button>

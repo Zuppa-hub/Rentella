@@ -156,10 +156,7 @@ interface FetchOptions extends RequestInit {
   authenticated?: boolean
 }
 
-async function fetchApi<T>(
-  endpoint: string,
-  options: FetchOptions = {}
-): Promise<T> {
+async function fetchApi<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
   const { authenticated = true, ...fetchOptions } = options
 
   const url = `${API_BASE_URL}${endpoint}`
@@ -391,4 +388,3 @@ export async function deleteOrder(id: number): Promise<void> {
     method: 'DELETE',
   })
 }
-

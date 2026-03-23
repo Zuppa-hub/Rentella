@@ -325,7 +325,9 @@ onMounted(() => {
   justify-content: space-between;
   gap: 10px;
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .active-order-card:hover {
@@ -338,7 +340,12 @@ onMounted(() => {
   outline-offset: 2px;
 }
 
-.active-order-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.active-order-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .active-order-main h3 {
   margin: 0;
   font-size: 14px;
@@ -363,6 +370,10 @@ onMounted(() => {
   color: #fff;
   white-space: nowrap;
 }
-.mobile-action-btn.active { background: #7a8d91; }
-.mobile-action-btn.cancel { background: var(--color-primary); }
+.mobile-action-btn.active {
+  background: #7a8d91;
+}
+.mobile-action-btn.cancel {
+  background: var(--color-primary);
+}
 </style>

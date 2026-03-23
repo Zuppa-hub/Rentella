@@ -6,7 +6,14 @@
         <div class="modal-header">
           <h2 class="modal-title">{{ location.name }}</h2>
           <button class="close-button" @click="close" :title="t('common.close')">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -16,7 +23,7 @@
         <!-- Body -->
         <div class="modal-body">
           <!-- Info Grid -->
-            <LocationInfoGrid :location="location" :beaches="beaches" />
+          <LocationInfoGrid :location="location" :beaches="beaches" />
         </div>
 
         <!-- Footer -->

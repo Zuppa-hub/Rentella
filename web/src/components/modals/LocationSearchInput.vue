@@ -22,8 +22,13 @@
           title="Use current location"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-            <path d="M12 2V6M12 18V22M22 12H18M6 12H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+            <path
+              d="M12 2V6M12 18V22M22 12H18M6 12H2"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
           </svg>
         </button>
       </div>
@@ -34,7 +39,7 @@
           v-for="(city, index) in results"
           :key="city.id"
           class="location-result-item"
-          :class="{ 'highlighted': index === highlightedIndex }"
+          :class="{ highlighted: index === highlightedIndex }"
           role="option"
           :aria-selected="index === highlightedIndex"
           @click="selectLocation(city)"

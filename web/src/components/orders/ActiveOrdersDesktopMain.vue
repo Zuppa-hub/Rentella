@@ -15,7 +15,12 @@
       <p>{{ t('desktop.orders.noActiveOrders') }}</p>
     </div>
 
-    <div v-else class="desktop-orders-list" role="list" :aria-label="t('desktop.orders.activeOrdersListAria')">
+    <div
+      v-else
+      class="desktop-orders-list"
+      role="list"
+      :aria-label="t('desktop.orders.activeOrdersListAria')"
+    >
       <button
         v-for="order in activeOrdersView"
         :key="order.id"
@@ -57,13 +62,21 @@
             :disabled="!order.isCancellable || loadingActionId === order.id"
             @click.stop="emit('cancel', order.id)"
           >
-            {{ loadingActionId === order.id ? t('desktop.orders.cancelling') : order.isCancellable ? t('desktop.orders.cancelOrder') : t('desktop.orders.activeStatus') }}
+            {{
+              loadingActionId === order.id
+                ? t('desktop.orders.cancelling')
+                : order.isCancellable
+                  ? t('desktop.orders.cancelOrder')
+                  : t('desktop.orders.activeStatus')
+            }}
           </button>
         </div>
       </button>
 
       <p v-if="actionError" class="desktop-action-error" role="alert">{{ actionError }}</p>
-      <p class="desktop-records-count">{{ t('desktop.orders.recordsShown', { count: activeOrdersView.length }) }}</p>
+      <p class="desktop-records-count">
+        {{ t('desktop.orders.recordsShown', { count: activeOrdersView.length }) }}
+      </p>
     </div>
   </section>
 </template>
@@ -128,8 +141,17 @@ const { t } = useI18n()
   box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
 }
 
-.desktop-order-col { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.desktop-order-label { font-size: 11px; color: #73858a; font-weight: 600; }
+.desktop-order-col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.desktop-order-label {
+  font-size: 11px;
+  color: #73858a;
+  font-weight: 600;
+}
 .desktop-order-col strong {
   font-size: 15px;
   color: var(--color-text, #414d4f);

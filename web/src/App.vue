@@ -3,9 +3,23 @@
     <p class="auth-redirect">Redirecting to login...</p>
   </div>
   <div v-else-if="isDesktop" class="app-desktop">
-    <DesktopHome v-if="!isBeachesViewOpen && !isOrderHistoryOpen && !isActiveOrdersOpen && !isSettingsOpen" :locations="locations" :initials="initials" :user-location="userLocation" :selected-location="selectedLocation" @location-click="openLocationModal" @navigate="handleDesktopNavigation" />
+    <DesktopHome
+      v-if="!isBeachesViewOpen && !isOrderHistoryOpen && !isActiveOrdersOpen && !isSettingsOpen"
+      :locations="locations"
+      :initials="initials"
+      :user-location="userLocation"
+      :selected-location="selectedLocation"
+      @location-click="openLocationModal"
+      @navigate="handleDesktopNavigation"
+    />
     <DesktopBeachesLayout
-      v-if="isBeachesViewOpen && beachesViewLocation && !isOrderHistoryOpen && !isActiveOrdersOpen && !isSettingsOpen"
+      v-if="
+        isBeachesViewOpen &&
+        beachesViewLocation &&
+        !isOrderHistoryOpen &&
+        !isActiveOrdersOpen &&
+        !isSettingsOpen
+      "
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
       :expand-beach-id="beachToExpandId"
@@ -73,7 +87,13 @@
     />
 
     <BeachesView
-      v-if="isBeachesViewOpen && beachesViewLocation && !isOrderHistoryOpen && !isActiveOrdersOpen && !isSettingsOpen"
+      v-if="
+        isBeachesViewOpen &&
+        beachesViewLocation &&
+        !isOrderHistoryOpen &&
+        !isActiveOrdersOpen &&
+        !isSettingsOpen
+      "
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
       :expand-beach-id="beachToExpandId"
@@ -123,15 +143,37 @@
     <p v-if="error" class="error">{{ error }}</p>
   </div>
 
-  <div v-if="authenticated && showGeoPrompt" class="geo-auth-overlay" role="dialog" aria-modal="true" aria-labelledby="geo-auth-title" aria-describedby="geo-auth-text">
+  <div
+    v-if="authenticated && showGeoPrompt"
+    class="geo-auth-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="geo-auth-title"
+    aria-describedby="geo-auth-text"
+  >
     <div class="geo-auth-card">
-      <button type="button" class="geo-auth-close" aria-label="Close" @click="closeGeoPrompt" ref="geoCloseBtn">&times;</button>
+      <button
+        type="button"
+        class="geo-auth-close"
+        aria-label="Close"
+        @click="closeGeoPrompt"
+        ref="geoCloseBtn"
+      >
+        &times;
+      </button>
       <h2 id="geo-auth-title" class="geo-auth-title">Location is needed</h2>
-      <p id="geo-auth-text" class="geo-auth-text">In order to provide you with the best experience and accurate results, we need your location.</p>
+      <p id="geo-auth-text" class="geo-auth-text">
+        In order to provide you with the best experience and accurate results, we need your location.
+      </p>
       <p v-if="geoPromptError" class="geo-auth-error">{{ geoPromptError }}</p>
       <div class="geo-auth-actions">
         <button type="button" class="geo-auth-secondary" @click="handleSetLocationClick">Set Location</button>
-        <button type="button" class="geo-auth-primary" :disabled="geoPromptLoading" @click="requestGeoFromPrompt">
+        <button
+          type="button"
+          class="geo-auth-primary"
+          :disabled="geoPromptLoading"
+          @click="requestGeoFromPrompt"
+        >
           {{ geoPromptLoading ? 'Loading...' : 'Use Current' }}
         </button>
       </div>
@@ -172,7 +214,14 @@ import DesktopBeachesLayout from './components/DesktopBeachesLayout.vue'
 import SetLocationModal from './components/SetLocationModal.vue'
 import BeachSelectionModal from './components/BeachSelectionModal.vue'
 import type { LocationItem } from './components/LocationCard.vue'
-import { getLocations, getBeaches, getBeachTypes, type Beach, type Location, type CityLocation } from './services/api'
+import {
+  getLocations,
+  getBeaches,
+  getBeachTypes,
+  type Beach,
+  type Location,
+  type CityLocation,
+} from './services/api'
 import { toNumber } from './utils/helpers'
 
 const geolocation = useGeolocation()
@@ -235,12 +284,7 @@ const filteredLocations = computed(() => {
 })
 
 const initials = computed(() => {
-  const name = String(
-    user.value?.name ||
-      user.value?.preferred_username ||
-      user.value?.email ||
-      'JD'
-  )
+  const name = String(user.value?.name || user.value?.preferred_username || user.value?.email || 'JD')
   const parts = name.trim().split(/\s+/)
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
   return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
@@ -312,7 +356,7 @@ const handleLocationSet = (location: CityLocation) => {
   // Update user location with the selected city's coordinates
   userLocation.value = {
     lat: location.latitude,
-    lng: location.longitude
+    lng: location.longitude,
   }
   showGeoPrompt.value = false
   showSetLocationModal.value = false
@@ -359,7 +403,7 @@ const hydrateGeoLocationAfterAuth = async () => {
   if (!shouldPrompt) return
 
   clearCookieValue(GEO_CONFIG.COOKIE_NAME)
-  
+
   if (permissionState === 'granted') {
     // Auto-fetch location if already authorized
     try {
@@ -556,9 +600,9 @@ const confirmBeachSelection = async (beach: Beach) => {
 
 const loadBeaches = async () => {
   if (!isAuthenticated()) return
-  
+
   error.value = null
-  
+
   try {
     const locations_data = await getLocations()
 
@@ -580,7 +624,7 @@ const loadBeaches = async () => {
       try {
         const allBeaches = await getBeaches() // Load ALL beaches without filters
         console.log(`Loaded ${allBeaches.length} beaches total`)
-        
+
         // Group beaches by location_id (clear and rebuild to avoid duplicates)
         beachesCache.value.clear()
         for (const beach of allBeaches) {
@@ -594,7 +638,7 @@ const loadBeaches = async () => {
         console.error('Failed to load beaches:', err)
       }
     }
-    
+
     const uniqueLocations: Location[] = []
     const seenLocationKeys = new Set<string>()
 
@@ -619,16 +663,16 @@ const loadBeaches = async () => {
         const lng = toNumber(location.longitude)
 
         if (lat === null || lng === null) return null
-      
-      // Extract min and max prices from cached beaches
-      const prices = beaches
-        .filter((b: any) => b.min_price && b.max_price)
-        .flatMap((b: any) => [b.min_price, b.max_price])
-      
-      const minPrice = prices.length > 0 ? Math.min(...prices) : null
-      const maxPrice = prices.length > 0 ? Math.max(...prices) : null
-      const priceRange = minPrice && maxPrice ? `€${minPrice} - €${maxPrice}` : 'N/A'
-      
+
+        // Extract min and max prices from cached beaches
+        const prices = beaches
+          .filter((b: any) => b.min_price && b.max_price)
+          .flatMap((b: any) => [b.min_price, b.max_price])
+
+        const minPrice = prices.length > 0 ? Math.min(...prices) : null
+        const maxPrice = prices.length > 0 ? Math.max(...prices) : null
+        const priceRange = minPrice && maxPrice ? `€${minPrice} - €${maxPrice}` : 'N/A'
+
         return {
           id: location.id,
           name: location.city_name,
@@ -642,8 +686,7 @@ const loadBeaches = async () => {
       })
       .filter((loc): loc is LocationItem & MapLocation => loc !== null)
 
-    locations.value = locationsWithPrices
-      .sort((a, b) => a.distance - b.distance) // Sort by distance (closest first)
+    locations.value = locationsWithPrices.sort((a, b) => a.distance - b.distance) // Sort by distance (closest first)
   } catch (err) {
     console.error('Failed to load locations:', err)
     error.value = 'Failed to load locations'
@@ -690,12 +733,12 @@ watch(authenticated, (isAuth) => {
 // Recalculate distances when user location changes (debounced to avoid rate limiting)
 watch(userLocation, () => {
   if (!authenticated.value) return
-  
+
   // Clear previous debounce timer
   if (locationDebounceTimer) {
     window.clearTimeout(locationDebounceTimer)
   }
-  
+
   // Debounce for 500ms to avoid too many requests
   locationDebounceTimer = window.setTimeout(() => {
     loadBeaches()
@@ -902,5 +945,4 @@ watch(userLocation, () => {
   color: #33515e;
   font-size: 0.95rem;
 }
-
 </style>

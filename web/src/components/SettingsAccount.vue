@@ -1,12 +1,21 @@
 <template>
   <div class="settings-page" :class="{ desktop: isDesktop }">
     <template v-if="isDesktop">
-        <DesktopHomeNavbar :initials="initials || 'JD'" active-tab="settings" @navigate="emit('navigate', $event)" />
+      <DesktopHomeNavbar
+        :initials="initials || 'JD'"
+        active-tab="settings"
+        @navigate="emit('navigate', $event)"
+      />
 
       <div class="desktop-layout" role="main" :aria-label="t('desktop.settings.title')">
         <section class="desktop-main" :aria-label="t('desktop.settings.manageAccount')">
           <h2 class="desktop-main-title">{{ t('desktop.settings.title') }}</h2>
-          <AccountDetailsCard :full-name="fullName" :email="email" :username="username" @logout="emit('logout')" />
+          <AccountDetailsCard
+            :full-name="fullName"
+            :email="email"
+            :username="username"
+            @logout="emit('logout')"
+          />
         </section>
       </div>
     </template>
@@ -25,7 +34,12 @@
 
       <section class="settings-mobile-section" :aria-label="t('desktop.settings.account')">
         <h2>{{ t('desktop.settings.account') }}</h2>
-        <AccountDetailsCard :full-name="fullName" :email="email" :username="username" @logout="emit('logout')" />
+        <AccountDetailsCard
+          :full-name="fullName"
+          :email="email"
+          :username="username"
+          @logout="emit('logout')"
+        />
       </section>
     </template>
   </div>

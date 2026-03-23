@@ -45,7 +45,6 @@
       @back="handleZonePickerBack"
       @primary-action="handlePrimaryAction"
     />
-
   </div>
 </template>
 
@@ -114,7 +113,6 @@ const generateOrderId = (): string => {
     .padStart(4, '0')
   return `ORD-${date}-${random}`
 }
-
 
 const resetReservationForm = () => {
   reservationName.value = ''
@@ -193,7 +191,9 @@ const formattedDuration = computed(() => {
 const primaryActionLabel = computed(() => {
   if (zonePickerStep.value === 'success') return t('desktop.zonePicker.newReservation')
   if (zonePickerStep.value === 'payment') return t('desktop.zonePicker.payment')
-  return zonePickerStep.value === 'summary' ? t('desktop.zonePicker.payment') : t('desktop.zonePicker.checkout')
+  return zonePickerStep.value === 'summary'
+    ? t('desktop.zonePicker.payment')
+    : t('desktop.zonePicker.checkout')
 })
 
 const isCheckoutValid = computed(() => {
@@ -209,7 +209,14 @@ const isCheckoutValid = computed(() => {
   const hasName = reservationName.value.trim().length > 0
   const hasDates = Boolean(reservationFrom.value) && Boolean(reservationTo.value)
   const isDateRangeValid = reservationFrom.value <= reservationTo.value
-  return Boolean(selectedZone.value && selectedZoneBeach.value && hasName && hasDates && isDateRangeValid && !isSubmittingCheckout.value)
+  return Boolean(
+    selectedZone.value &&
+    selectedZoneBeach.value &&
+    hasName &&
+    hasDates &&
+    isDateRangeValid &&
+    !isSubmittingCheckout.value
+  )
 })
 
 const handleCheckout = async () => {

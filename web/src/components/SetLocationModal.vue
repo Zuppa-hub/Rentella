@@ -1,30 +1,25 @@
 <template>
-  <div 
-    v-if="isOpen" 
-    class="location-modal-overlay" 
-    @click.self="handleClose"
-    @keydown.esc="handleClose"
-  >
+  <div v-if="isOpen" class="location-modal-overlay" @click.self="handleClose" @keydown.esc="handleClose">
     <div class="location-modal-card">
       <button type="button" class="location-modal-close" @click="handleClose" :aria-label="t('common.close')">
         &times;
       </button>
-      
+
       <h2 class="location-modal-title">{{ t('setLocation.title') }}</h2>
-      
+
       <p class="location-modal-text">
         {{ t('setLocation.description') }}
       </p>
-      
+
       <LocationSearchInput
         ref="searchInputComponent"
         @location-selected="handleLocationSelected"
         @use-current-location="emit('use-current-location')"
         @error="handleSearchError"
       />
-      
+
       <p v-if="error" class="location-error">{{ error }}</p>
-      
+
       <div class="location-modal-actions">
         <button type="button" class="location-btn-secondary" @click="handleClose">
           {{ t('setLocation.back') }}
@@ -100,16 +95,19 @@ const handleClose = () => {
 }
 
 // Reset state when modal closes and focus input when it opens
-watch(() => props.isOpen, async (isOpen) => {
-  if (!isOpen) {
-    searchInputComponent.value?.clearSearch()
-    selectedLocation.value = null
-    error.value = null
-  } else {
-    await nextTick()
-    searchInputComponent.value?.focusInput()
+watch(
+  () => props.isOpen,
+  async (isOpen) => {
+    if (!isOpen) {
+      searchInputComponent.value?.clearSearch()
+      selectedLocation.value = null
+      error.value = null
+    } else {
+      await nextTick()
+      searchInputComponent.value?.focusInput()
+    }
   }
-})
+)
 </script>
 
 <style scoped>

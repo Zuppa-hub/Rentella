@@ -1,7 +1,12 @@
 <template>
   <section class="map-section" :class="{ expanded: sheetCollapsed }">
     <div ref="mapEl" class="map"></div>
-    <button class="location-indicator" :class="{ active: props.userLocation }" @click="centerMapOnUser" :disabled="!props.userLocation">
+    <button
+      class="location-indicator"
+      :class="{ active: props.userLocation }"
+      @click="centerMapOnUser"
+      :disabled="!props.userLocation"
+    >
       <span class="location-dot" :class="{ pulse: userLocation }"></span>
     </button>
   </section>
@@ -32,7 +37,7 @@ type MarkerPoint = {
   lng: number
 }
 
-const props = defineProps<{ 
+const props = defineProps<{
   locations: MapLocation[]
   beaches?: Beach[]
   useBeachMarkers?: boolean
@@ -132,10 +137,9 @@ const renderUserLocation = () => {
       iconAnchor: [8, 8],
     })
 
-    userLocationMarker = L.marker(
-      [props.userLocation.lat, props.userLocation.lng],
-      { icon: userIcon }
-    ).addTo(map)
+    userLocationMarker = L.marker([props.userLocation.lat, props.userLocation.lng], { icon: userIcon }).addTo(
+      map
+    )
   }
 }
 

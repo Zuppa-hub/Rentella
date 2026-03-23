@@ -11,14 +11,17 @@
       </div>
 
       <!-- Sidebar -->
-      <DesktopSidebar :locations="desktopLocations" :user-location="props.userLocation" @location-click="emit('location-click', $event)" />
+      <DesktopSidebar
+        :locations="desktopLocations"
+        :user-location="props.userLocation"
+        @location-click="emit('location-click', $event)"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 import L from 'leaflet'
 import type { MapLocation } from './MapSection.vue'
 import DesktopSidebar from './DesktopSidebar.vue'
@@ -48,8 +51,6 @@ const emit = defineEmits<{
   (event: 'location-click', locationId: number): void
   (event: 'navigate', tab: string): void
 }>()
-
-const { t } = useI18n()
 
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: L.Map | undefined
@@ -137,10 +138,9 @@ const renderUserLocation = () => {
       iconAnchor: [8, 8],
     })
 
-    userLocationMarker = L.marker(
-      [props.userLocation.lat, props.userLocation.lng],
-      { icon: userIcon }
-    ).addTo(map)
+    userLocationMarker = L.marker([props.userLocation.lat, props.userLocation.lng], { icon: userIcon }).addTo(
+      map
+    )
   }
 }
 
@@ -152,8 +152,6 @@ const centerMapOnUser = () => {
     })
   }
 }
-
-
 
 onMounted(() => {
   initMap()

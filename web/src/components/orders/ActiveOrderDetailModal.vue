@@ -1,7 +1,17 @@
 <template>
-  <div class="order-detail-modal-overlay" role="dialog" aria-modal="true" :aria-label="t('desktop.orders.orderDetails')" @click="emit('close')">
+  <div
+    class="order-detail-modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    :aria-label="t('desktop.orders.orderDetails')"
+    @click="emit('close')"
+  >
     <div class="order-detail-modal" @click.stop>
-      <button class="order-detail-close" @click="emit('close')" :aria-label="t('desktop.orders.closeOrderDetails')">
+      <button
+        class="order-detail-close"
+        @click="emit('close')"
+        :aria-label="t('desktop.orders.closeOrderDetails')"
+      >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -9,13 +19,27 @@
       </button>
       <h3 class="order-detail-title">{{ order.beachName }}</h3>
       <div class="order-detail-content">
-        <div class="order-detail-row"><span>{{ t('desktop.orders.orderId') }}:</span><strong>#{{ order.id }}</strong></div>
-        <div class="order-detail-row"><span>{{ t('desktop.orders.location') }}:</span><strong>{{ order.cityName }}</strong></div>
-        <div class="order-detail-row"><span>{{ t('desktop.orders.section') }}:</span><strong>{{ order.zoneName }}</strong></div>
-        <div class="order-detail-row"><span>{{ t('desktop.orders.umbrella') }}:</span><strong>{{ order.umbrellaNumber }}</strong></div>
-        <div class="order-detail-row"><span>{{ t('desktop.orders.checkIn') }}:</span><strong>{{ order.checkInFormatted }}</strong></div>
-        <div class="order-detail-row"><span>{{ t('desktop.orders.checkOut') }}:</span><strong>{{ order.checkOutFormatted }}</strong></div>
-        <div class="order-detail-row"><span>{{ t('desktop.orders.totalPrice') }}:</span><strong>{{ order.totalPrice }}</strong></div>
+        <div class="order-detail-row">
+          <span>{{ t('desktop.orders.orderId') }}:</span><strong>#{{ order.id }}</strong>
+        </div>
+        <div class="order-detail-row">
+          <span>{{ t('desktop.orders.location') }}:</span><strong>{{ order.cityName }}</strong>
+        </div>
+        <div class="order-detail-row">
+          <span>{{ t('desktop.orders.section') }}:</span><strong>{{ order.zoneName }}</strong>
+        </div>
+        <div class="order-detail-row">
+          <span>{{ t('desktop.orders.umbrella') }}:</span><strong>{{ order.umbrellaNumber }}</strong>
+        </div>
+        <div class="order-detail-row">
+          <span>{{ t('desktop.orders.checkIn') }}:</span><strong>{{ order.checkInFormatted }}</strong>
+        </div>
+        <div class="order-detail-row">
+          <span>{{ t('desktop.orders.checkOut') }}:</span><strong>{{ order.checkOutFormatted }}</strong>
+        </div>
+        <div class="order-detail-row">
+          <span>{{ t('desktop.orders.totalPrice') }}:</span><strong>{{ order.totalPrice }}</strong>
+        </div>
       </div>
     </div>
   </div>

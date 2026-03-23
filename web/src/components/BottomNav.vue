@@ -8,11 +8,19 @@
       <img :src="icons.active" alt="" />
       {{ t('desktop.nav.active') }}
     </button>
-    <button class="nav-item" :class="{ active: activeTab === 'history' }" @click="handleNavigation('history')">
+    <button
+      class="nav-item"
+      :class="{ active: activeTab === 'history' }"
+      @click="handleNavigation('history')"
+    >
       <img :src="icons.history" alt="" />
       {{ t('desktop.nav.history') }}
     </button>
-    <button class="nav-item" :class="{ active: activeTab === 'settings' }" @click="handleNavigation('settings')">
+    <button
+      class="nav-item"
+      :class="{ active: activeTab === 'settings' }"
+      @click="handleNavigation('settings')"
+    >
       <img :src="icons.settings" alt="" />
       {{ t('desktop.nav.settings') }}
     </button>

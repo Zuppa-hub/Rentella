@@ -7,7 +7,12 @@
       <!-- Map Section -->
       <div class="map-wrapper">
         <div ref="mapEl" class="map"></div>
-        <button class="map-location-indicator" :class="{ active: userLocation }" @click="centerMapOnUser" :disabled="!userLocation">
+        <button
+          class="map-location-indicator"
+          :class="{ active: userLocation }"
+          @click="centerMapOnUser"
+          :disabled="!userLocation"
+        >
           <span class="location-dot" :class="{ pulse: userLocation }"></span>
           <span class="location-text">
             {{ userLocation ? t('desktop.map.myLocation') : t('desktop.map.loading') }}
@@ -54,13 +59,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const mapEl = ref<HTMLDivElement | null>(null)
-const {
-  initMap,
-  renderMarkers,
-  renderUserLocation,
-  centerMapOnUser,
-  destroyMap,
-} = useBeachesMap({
+const { initMap, renderMarkers, renderUserLocation, centerMapOnUser, destroyMap } = useBeachesMap({
   mapEl,
   getLocation: () => props.location,
   getBeaches: () => props.beaches,
@@ -236,6 +235,8 @@ onBeforeUnmount(() => {
   background: #3b82f6;
   border: 3px solid white;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px #3b82f6, 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 0 0 2px #3b82f6,
+    0 2px 6px rgba(0, 0, 0, 0.3);
 }
 </style>

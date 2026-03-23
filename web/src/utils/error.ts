@@ -40,31 +40,16 @@ export class ErrorHandler {
 
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
       logger.error('Network error detected', error)
-      return new ApiError(
-        ERROR_MESSAGES.API_NETWORK_ERROR,
-        0,
-        'NETWORK_ERROR',
-        error
-      )
+      return new ApiError(ERROR_MESSAGES.API_NETWORK_ERROR, 0, 'NETWORK_ERROR', error)
     }
 
     if (error instanceof Error) {
       logger.error('Unexpected error', error)
-      return new ApiError(
-        error.message,
-        500,
-        'UNKNOWN_ERROR',
-        error
-      )
+      return new ApiError(error.message, 500, 'UNKNOWN_ERROR', error)
     }
 
     logger.error('Unknown error type', error)
-    return new ApiError(
-      ERROR_MESSAGES.API_SERVER_ERROR,
-      500,
-      'UNKNOWN_ERROR',
-      error
-    )
+    return new ApiError(ERROR_MESSAGES.API_SERVER_ERROR, 500, 'UNKNOWN_ERROR', error)
   }
 
   /**

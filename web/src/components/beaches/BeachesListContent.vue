@@ -9,7 +9,11 @@
       </button>
     </div>
 
-    <SearchBox :model-value="modelValue" :placeholder="t('desktop.search.placeholder')" @update:model-value="emit('update:modelValue', $event)" />
+    <SearchBox
+      :model-value="modelValue"
+      :placeholder="t('desktop.search.placeholder')"
+      @update:model-value="emit('update:modelValue', $event)"
+    />
 
     <div class="divider"></div>
 
@@ -32,7 +36,12 @@
         :class="{ expanded: expandedBeachId === beach.id }"
       >
         <div class="beach-main" @click="emit('selectBeach', beach)">
-          <button class="beach-image" type="button" @click.stop="emit('photoClick', beach)" :aria-label="beach.name">
+          <button
+            class="beach-image"
+            type="button"
+            @click.stop="emit('photoClick', beach)"
+            :aria-label="beach.name"
+          >
             <img
               v-if="beach.photo_url"
               :src="beach.photo_url"
@@ -55,7 +64,11 @@
                 <img :src="icons.allowedAnimals" alt="" class="detail-icon" />
                 {{ isAnimalsAllowed(beach.allowed_animals) ? t('desktop.beach.yes') : t('desktop.beach.no') }}
               </span>
-              <span class="detail-item" v-if="beach.min_price && beach.max_price" :title="t('desktop.beach.priceRange')">
+              <span
+                class="detail-item"
+                v-if="beach.min_price && beach.max_price"
+                :title="t('desktop.beach.priceRange')"
+              >
                 <img :src="icons.money" alt="" class="detail-icon" />
                 €{{ beach.min_price }}-{{ beach.max_price }}
               </span>
@@ -63,16 +76,29 @@
           </div>
 
           <div class="expand-icon" :class="{ expanded: expandedBeachId === beach.id }">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
           </div>
         </div>
 
         <div v-if="expandedBeachId === beach.id" class="zones-section">
-          <p v-if="loadingZonesByBeach[beach.id]" class="zones-state">{{ t('desktop.beach.loadingZones') }}</p>
-          <p v-else-if="zonesErrorByBeach[beach.id]" class="zones-state error">{{ zonesErrorByBeach[beach.id] }}</p>
-          <p v-else-if="!(zonesByBeach[beach.id]?.length)" class="zones-state">{{ t('desktop.beach.noZones') }}</p>
+          <p v-if="loadingZonesByBeach[beach.id]" class="zones-state">
+            {{ t('desktop.beach.loadingZones') }}
+          </p>
+          <p v-else-if="zonesErrorByBeach[beach.id]" class="zones-state error">
+            {{ zonesErrorByBeach[beach.id] }}
+          </p>
+          <p v-else-if="!zonesByBeach[beach.id]?.length" class="zones-state">
+            {{ t('desktop.beach.noZones') }}
+          </p>
 
           <div v-else class="zones-list">
             <div
@@ -101,7 +127,14 @@
                 <p v-if="zone.description" class="zone-description">{{ zone.description }}</p>
               </div>
               <div class="zone-arrow">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               </div>
@@ -359,7 +392,9 @@ const getBeachTypeLabel = (beach: BeachViewModel) => {
   justify-content: center;
   color: #9ca3af;
   flex-shrink: 0;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .beach-main:hover .expand-icon {

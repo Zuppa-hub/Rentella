@@ -69,7 +69,9 @@ const dogsAllowedLabel = computed(() => {
   font-size: clamp(14px, 3.4vw, 15px);
   padding: 12px 4px;
   border-bottom: 1px solid #d6dee0;
-  transition: background 0.15s, padding 0.15s;
+  transition:
+    background 0.15s,
+    padding 0.15s;
   cursor: default;
 }
 

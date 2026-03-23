@@ -41,7 +41,15 @@
           </div>
           <span class="order-card-date">{{ order.startDateFormatted }}</span>
         </div>
-        <svg class="order-card-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          class="order-card-arrow"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
       </button>
@@ -169,7 +177,10 @@ const { t } = useI18n()
   border-radius: 16px;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .order-card:hover {

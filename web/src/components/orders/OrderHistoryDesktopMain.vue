@@ -51,7 +51,9 @@
         </div>
       </button>
 
-      <p class="desktop-records-count">{{ t('desktop.orders.recordsShown', { count: finishedOrdersView.length }) }}</p>
+      <p class="desktop-records-count">
+        {{ t('desktop.orders.recordsShown', { count: finishedOrdersView.length }) }}
+      </p>
     </div>
   </section>
 </template>
@@ -113,7 +115,10 @@ const { t } = useI18n()
   text-align: left;
   cursor: pointer;
   box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
-  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .desktop-order-row:hover {

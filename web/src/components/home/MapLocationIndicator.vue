@@ -1,5 +1,10 @@
 <template>
-  <button class="map-location-indicator" :class="{ active: hasLocation }" @click="emit('center-map')" :disabled="!hasLocation">
+  <button
+    class="map-location-indicator"
+    :class="{ active: hasLocation }"
+    @click="emit('center-map')"
+    :disabled="!hasLocation"
+  >
     <span class="location-dot" :class="{ pulse: hasLocation }"></span>
     <span class="location-text">
       {{ hasLocation ? t('desktop.map.myLocation') : t('desktop.map.loading') }}

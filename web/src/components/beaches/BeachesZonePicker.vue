@@ -1,7 +1,13 @@
 <template>
   <div class="zone-picker-menu">
     <div class="zone-picker-hero">
-      <img v-if="selectedZoneBeach?.photo_url" :src="selectedZoneBeach.photo_url" :alt="selectedZoneBeach.name" class="zone-picker-hero-image" loading="lazy" />
+      <img
+        v-if="selectedZoneBeach?.photo_url"
+        :src="selectedZoneBeach.photo_url"
+        :alt="selectedZoneBeach.name"
+        class="zone-picker-hero-image"
+        loading="lazy"
+      />
       <div v-else class="zone-picker-hero-placeholder">🏖️</div>
     </div>
 
@@ -58,7 +64,9 @@
     </div>
 
     <div class="zone-picker-actions">
-      <button class="zone-picker-back-btn rt-btn rt-btn-ghost" type="button" @click="emit('back')">{{ t('common.back') }}</button>
+      <button class="zone-picker-back-btn rt-btn rt-btn-ghost" type="button" @click="emit('back')">
+        {{ t('common.back') }}
+      </button>
       <button
         class="zone-picker-checkout-btn rt-btn rt-btn-primary"
         type="button"

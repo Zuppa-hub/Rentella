@@ -12,7 +12,9 @@
       <span>{{ t('desktop.settings.username') }}</span>
       <strong>{{ username || '-' }}</strong>
     </div>
-    <button type="button" class="logout-btn" @click="emit('logout')">{{ t('desktop.settings.logout') }}</button>
+    <button type="button" class="logout-btn" @click="emit('logout')">
+      {{ t('desktop.settings.logout') }}
+    </button>
   </div>
 </template>
 

@@ -1,7 +1,15 @@
 <template>
   <div class="zone-success-page">
     <div class="zone-success-header">
-      <svg class="zone-success-icon" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        class="zone-success-icon"
+        width="56"
+        height="56"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <polyline points="20 6 9 17 4 12"></polyline>
       </svg>
       <h3 class="zone-success-title">{{ t('desktop.zonePicker.reservationConfirmed') }}</h3>

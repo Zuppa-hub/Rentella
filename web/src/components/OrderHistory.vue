@@ -56,11 +56,7 @@ import {
   getOrderUmbrellaNumber,
   getOrderZoneName,
 } from '../composables/useOrderPresentation'
-import {
-  formatOrderDate,
-  formatOrderTotalPrice,
-  useOrderTimeline,
-} from '../composables/useOrderTimeline'
+import { formatOrderDate, formatOrderTotalPrice, useOrderTimeline } from '../composables/useOrderTimeline'
 import type { HistoryOrderDetailView, HistoryOrderView } from '../types/orders'
 
 const { t } = useI18n()

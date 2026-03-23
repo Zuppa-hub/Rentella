@@ -13,7 +13,8 @@ export const messages = {
     },
     setLocation: {
       title: 'Location Sharing',
-      description: 'In order to provide you with the best experience and to ensure accurate results, we need to know your location. You can use your Current Location or set it Manually',
+      description:
+        'In order to provide you with the best experience and to ensure accurate results, we need to know your location. You can use your Current Location or set it Manually',
       searchLabel: 'Set your Location',
       searchPlaceholder: 'Choose your Location...',
       back: 'Back',
@@ -158,9 +159,11 @@ export const messages = {
         cvv: 'CVV',
         cvvPlaceholder: 'e.g. 345',
         cvvInfo: 'CVV Info',
-        disclaimer: '*All transactions within the App are secure and encrypted, we do not store any card information.',
+        disclaimer:
+          '*All transactions within the App are secure and encrypted, we do not store any card information.',
         cvvModalTitle: 'What is CVC/CVV?',
-        cvvModalText: 'CVC or sometimes CVV is a 3 or 4 digit security code you can usually find on the back of your Credit/Debit Card.',
+        cvvModalText:
+          'CVC or sometimes CVV is a 3 or 4 digit security code you can usually find on the back of your Credit/Debit Card.',
         cvvModalDone: 'Done',
         reservationConfirmed: 'Reservation Confirmed!',
         orderId: 'Order ID',
@@ -186,7 +189,8 @@ export const messages = {
     },
     setLocation: {
       title: 'Condivisione Posizione',
-      description: 'Per offrirti la migliore esperienza e garantire risultati accurati, abbiamo bisogno di conoscere la tua posizione. Puoi usare la Posizione Attuale o impostarla Manualmente',
+      description:
+        'Per offrirti la migliore esperienza e garantire risultati accurati, abbiamo bisogno di conoscere la tua posizione. Puoi usare la Posizione Attuale o impostarla Manualmente',
       searchLabel: 'Imposta la tua Posizione',
       searchPlaceholder: 'Scegli la tua Posizione...',
       back: 'Indietro',
@@ -331,18 +335,21 @@ export const messages = {
         cvv: 'CVV',
         cvvPlaceholder: 'es. 345',
         cvvInfo: 'Informazioni CVV',
-        disclaimer: '*Tutte le transazioni nell\'App sono sicure e crittografate, non conserviamo alcun dato della carta.',
-        cvvModalTitle: 'Cos\'è il CVC/CVV?',
-        cvvModalText: 'CVC o talvolta CVV è un codice di sicurezza di 3 o 4 cifre che di solito si trova sul retro della tua carta di credito/debito.',
+        disclaimer:
+          "*Tutte le transazioni nell'App sono sicure e crittografate, non conserviamo alcun dato della carta.",
+        cvvModalTitle: "Cos'è il CVC/CVV?",
+        cvvModalText:
+          'CVC o talvolta CVV è un codice di sicurezza di 3 o 4 cifre che di solito si trova sul retro della tua carta di credito/debito.',
         cvvModalDone: 'Fatto',
         reservationConfirmed: 'Prenotazione Confermata!',
         orderId: 'ID Ordine',
         checkIn: 'Check-in:',
         checkOut: 'Check-out:',
         totalPrice: 'Prezzo Totale:',
-        successNote: 'Riceverai a breve un\'email di conferma con tutti i dettagli.',
+        successNote: "Riceverai a breve un'email di conferma con tutti i dettagli.",
         newReservation: 'Nuova Prenotazione',
-        demoModeNotice: 'Modalità demo — il pagamento è simulato. Nessun dato reale della carta viene raccolto o processato.',
+        demoModeNotice:
+          'Modalità demo — il pagamento è simulato. Nessun dato reale della carta viene raccolto o processato.',
         demoCardholder: 'INTESTATARIO DEMO',
       },
     },

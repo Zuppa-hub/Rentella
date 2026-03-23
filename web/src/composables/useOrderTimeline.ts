@@ -9,20 +9,10 @@ export const parseOrderDate = (value: string): Date | null => {
     return nativeDate
   }
 
-  const match = value.match(
-    /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/
-  )
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/)
   if (!match) return null
 
-  const [
-    _,
-    yearStr,
-    monthStr,
-    dayStr,
-    hourStr = '00',
-    minuteStr = '00',
-    secondStr = '00',
-  ] = match
+  const [_, yearStr, monthStr, dayStr, hourStr = '00', minuteStr = '00', secondStr = '00'] = match
 
   const year = Number(yearStr)
   const monthIndex = Number(monthStr) - 1
