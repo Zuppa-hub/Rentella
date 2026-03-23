@@ -216,6 +216,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { getOrders, type Order } from '../services/api'
+import { parseOrderDate, useOrderTimeline } from '../composables/useOrderTimeline'
 import logoDark from '../assets/LogoDark.svg'
 import homeIcon from '../assets/icons/Home.svg'
 import activeIcon from '../assets/icons/Active.svg'
@@ -244,6 +245,8 @@ const icons = {
   history: historyIcon,
   settings: settingsIcon,
 }
+
+const { finishedOrders } = useOrderTimeline(orders)
 
 const fetchOrders = async () => {
   loading.value = true
@@ -276,30 +279,30 @@ const getUmbrellaNumber = (order: Order): string => {
 
 const getPrice = (order: Order): string => {
   const price = order.price?.price
+  if (order.end_date != order.start_date) {
+    const start = parseOrderDate(order.start_date)
+    const end = parseOrderDate(order.end_date)
+    if (start && end) {
+      // Calculate total price based on days
+      const durationDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+      return `${price ? price * durationDays : 'N/'}€`
+    }
+  }
   return price != null ? `${price}€` : 'N/A'
 }
 
 const formatDate = (dateStr: string): string => {
-  try {
-    const [year, month, day] = dateStr.split('-')
-    return `${day}.${month}.${year}`
-  } catch {
-    return dateStr
-  }
+  const parsed = parseOrderDate(dateStr)
+  if (!parsed) return dateStr
+
+  const day = String(parsed.getDate()).padStart(2, '0')
+  const month = String(parsed.getMonth() + 1).padStart(2, '0')
+  const year = parsed.getFullYear()
+  return `${day}.${month}.${year}`
 }
 
 const selectOrder = (order: Order) => {
   selectedOrder.value = order
-}
-
-const parseDate = (dateStr: string): Date | null => {
-  const match = dateStr.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/)
-  if (!match) return null
-
-  const [, year, month, day, hour, minute, second] = match.map(Number)
-  const monthIndex = month - 1
-  const date = new Date(year, monthIndex, day, hour, minute, second)
-  return Number.isNaN(date.getTime()) ? null : date
 }
 
 const onKeyDown = (event: KeyboardEvent) => {
@@ -307,15 +310,6 @@ const onKeyDown = (event: KeyboardEvent) => {
     selectedOrder.value = null
   }
 }
-
-const finishedOrders = computed(() => {
-  const now = new Date()
-  return orders.value.filter((order) => {
-    const endDate = parseDate(order.end_date)
-    if (!endDate) return false
-    return endDate < now
-  })
-})
 
 const favouriteCity = computed(() => {
   if (finishedOrders.value.length === 0) return '-'

@@ -224,6 +224,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { deleteOrder, getOrders, type Order } from '../services/api'
+import { parseOrderDate, useOrderTimeline } from '../composables/useOrderTimeline'
 import logoDark from '../assets/LogoDark.svg'
 import homeIcon from '../assets/icons/Home.svg'
 import activeIcon from '../assets/icons/Active.svg'
@@ -255,50 +256,7 @@ const icons = {
   settings: settingsIcon,
 }
 
-const parseDate = (value: string): Date | null => {
-  if (!value) return null
-
-  // First, try native parsing. This preserves existing behavior wherever it works.
-  const nativeDate = new Date(value)
-  if (!Number.isNaN(nativeDate.getTime())) {
-    return nativeDate
-  }
-
-  // Fallback for non-ISO formats such as Laravel "YYYY-MM-DD HH:MM:SS"
-  const match = value.match(
-    /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/
-  )
-  if (!match) return null
-
-  const [
-    _,
-    yearStr,
-    monthStr,
-    dayStr,
-    hourStr = '00',
-    minuteStr = '00',
-    secondStr = '00',
-  ] = match
-
-  const year = Number(yearStr)
-  const monthIndex = Number(monthStr) - 1 // JS Date months are 0-based
-  const day = Number(dayStr)
-  const hour = Number(hourStr)
-  const minute = Number(minuteStr)
-  const second = Number(secondStr)
-
-  const date = new Date(year, monthIndex, day, hour, minute, second)
-  return Number.isNaN(date.getTime()) ? null : date
-}
-
-const activeOrders = computed(() => {
-  const now = new Date()
-  return orders.value.filter((order) => {
-    const endDate = parseDate(order.end_date)
-    if (!endDate) return false
-    return endDate > now
-  })
-})
+const { activeOrders } = useOrderTimeline(orders)
 
 const favouriteCity = computed(() => {
   const counter = new Map<string, number>()
@@ -360,7 +318,7 @@ const fetchOrders = async () => {
 }
 
 const isOrderCancellable = (order: Order): boolean => {
-  const startDate = parseDate(order.start_date)
+  const startDate = parseOrderDate(order.start_date)
   if (!startDate) return false
 
   const now = new Date()
@@ -405,11 +363,20 @@ const getUmbrellaNumber = (order: Order): string => {
 
 const getPrice = (order: Order): string => {
   const price = order.price?.price
-  return typeof price === 'number' ? `${price}€` : 'N/A'
+  if (order.end_date != order.start_date) {
+    const start = parseOrderDate(order.start_date)
+    const end = parseOrderDate(order.end_date)
+    if (start && end) {
+      // Calculate total price based on days
+      const durationDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+      return `${price ? price * durationDays : 'N/'}€`
+    }
+  }
+  return price != null ? `${price}€` : 'N/A'
 }
 
 const formatDate = (dateStr: string): string => {
-  const parsed = parseDate(dateStr)
+  const parsed = parseOrderDate(dateStr)
   if (!parsed) return dateStr
 
   const day = String(parsed.getDate()).padStart(2, '0')
