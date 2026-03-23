@@ -254,7 +254,38 @@ const icons = {
 }
 
 const parseDate = (value: string): Date | null => {
-  const date = new Date(value)
+  if (!value) return null
+
+  // First, try native parsing. This preserves existing behavior wherever it works.
+  const nativeDate = new Date(value)
+  if (!Number.isNaN(nativeDate.getTime())) {
+    return nativeDate
+  }
+
+  // Fallback for non-ISO formats such as Laravel "YYYY-MM-DD HH:MM:SS"
+  const match = value.match(
+    /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/
+  )
+  if (!match) return null
+
+  const [
+    _,
+    yearStr,
+    monthStr,
+    dayStr,
+    hourStr = '00',
+    minuteStr = '00',
+    secondStr = '00',
+  ] = match
+
+  const year = Number(yearStr)
+  const monthIndex = Number(monthStr) - 1 // JS Date months are 0-based
+  const day = Number(dayStr)
+  const hour = Number(hourStr)
+  const minute = Number(minuteStr)
+  const second = Number(secondStr)
+
+  const date = new Date(year, monthIndex, day, hour, minute, second)
   return Number.isNaN(date.getTime()) ? null : date
 }
 
