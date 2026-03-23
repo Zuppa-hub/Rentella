@@ -22,3 +22,24 @@ export interface OrderDetailView {
   checkOutFormatted: string
   totalPrice: string
 }
+
+export interface HistoryOrderView {
+  id: number
+  raw: Order
+  beachName: string
+  cityName: string
+  zoneName: string
+  umbrellaNumber: string
+  price: string
+  startDateFormatted: string
+}
+
+export interface HistoryOrderDetailView {
+  id: number
+  beachName: string
+  cityName: string
+  zoneName: string
+  checkInFormatted: string
+  checkOutFormatted: string
+  totalPrice: string
+}
