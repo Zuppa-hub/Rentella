@@ -151,6 +151,8 @@
         <h1 class="active-orders-title">Active Orders</h1>
       </div>
 
+      <p class="active-orders-subtitle">See your upcoming bookings</p>
+
       <div v-if="loading" class="active-orders-loading" aria-live="polite">
         <p>Loading orders...</p>
       </div>
@@ -449,6 +451,8 @@ onMounted(() => {
   height: 100vh;
   background: #f3f4f5;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar {
@@ -474,13 +478,17 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
   padding: 0 16px;
+  height: 100%;
   border: 0;
   background: transparent;
   color: #d2eef1;
   font-size: 11px;
   font-weight: 600;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
+  transition: opacity 0.3s ease;
 }
+.nav-item:hover { opacity: 0.8; }
 .nav-item.active { color: #fff; }
 .nav-icon { width: 22px; height: 22px; }
 .profile-avatar {
@@ -496,15 +504,19 @@ onMounted(() => {
 }
 
 .desktop-layout {
+  flex: 1;
+  min-height: 0;
   display: grid;
-  grid-template-columns: 320px 1fr;
-  height: calc(100vh - 72px);
+  grid-template-columns: 300px 1fr;
+  overflow: hidden;
 }
 
 .desktop-sidebar {
   border-right: 1px solid #c9d1d4;
-  padding: 24px 22px;
+  padding: 32px 24px;
+  background: #f3f4f5;
   overflow-y: auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -629,15 +641,18 @@ onMounted(() => {
 }
 
 .desktop-main {
-  padding: 24px;
-  overflow: hidden;
+  padding: 24px 24px 18px;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .desktop-main-title {
-  margin: 0 0 16px;
+  margin: 0 0 18px;
   font-size: 20px;
+  line-height: 1.2;
   font-weight: 600;
   color: #414d4f;
 }
@@ -720,25 +735,42 @@ onMounted(() => {
 .active-orders-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   position: sticky;
   top: 0;
   z-index: 2;
   background: #ffffff;
-  padding-bottom: 8px;
+  padding-bottom: 12px;
   margin-bottom: 8px;
 }
 
 .active-orders-back {
-  border: 0;
-  background: transparent;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
   color: #414d4f;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.active-orders-back:hover {
+  color: #005f6f;
 }
 
 .active-orders-title {
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
+  font-weight: 700;
   color: #242b2c;
+}
+
+.active-orders-subtitle {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #78898c;
+  font-weight: 400;
 }
 
 .active-orders-list {

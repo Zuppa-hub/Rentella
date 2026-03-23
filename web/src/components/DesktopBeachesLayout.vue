@@ -19,7 +19,7 @@
             <img :src="icons.history" alt="" class="nav-icon" />
             <span>{{ t('desktop.nav.history') }}</span>
           </button>
-          <button class="nav-item" type="button">
+          <button class="nav-item" type="button" @click="emit('navigate', 'settings')">
             <img :src="icons.settings" alt="" class="nav-icon" />
             <span>{{ t('desktop.nav.settings') }}</span>
           </button>
