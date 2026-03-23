@@ -37,7 +37,7 @@
           <div class="desktop-metrics">
             <div class="desktop-metric-row">
               <span>Total Orders</span>
-              <strong>{{ orders.length }}</strong>
+              <strong>{{ finishedOrders.length }}</strong>
             </div>
             <div class="desktop-metric-row">
               <span>Favourite City</span>
@@ -67,13 +67,13 @@
             <button @click="fetchOrders" class="rt-btn rt-btn-primary">Retry</button>
           </div>
 
-          <div v-else-if="orders.length === 0" class="order-history-empty">
+          <div v-else-if="finishedOrders.length === 0" class="order-history-empty">
             <p>No orders found</p>
           </div>
 
           <div v-else class="desktop-orders-list" role="list" aria-label="Orders list">
             <button
-              v-for="order in orders"
+              v-for="order in finishedOrders"
               :key="order.id"
               type="button"
               class="desktop-order-row"
@@ -107,7 +107,7 @@
               </div>
             </button>
 
-            <p class="desktop-records-count">{{ orders.length }} Records Shown</p>
+            <p class="desktop-records-count">{{ finishedOrders.length }} Records Shown</p>
           </div>
         </section>
       </div>
@@ -134,13 +134,13 @@
         <button @click="fetchOrders" class="rt-btn rt-btn-primary">Retry</button>
       </div>
 
-      <div v-else-if="orders.length === 0" class="order-history-empty">
+      <div v-else-if="finishedOrders.length === 0" class="order-history-empty">
         <p>No orders found</p>
       </div>
 
       <div v-else class="order-history-list" role="list" aria-label="Orders list">
         <button
-          v-for="order in orders"
+          v-for="order in finishedOrders"
           :key="order.id"
           class="order-card"
           type="button"
@@ -292,17 +292,36 @@ const selectOrder = (order: Order) => {
   selectedOrder.value = order
 }
 
+const parseDate = (dateStr: string): Date | null => {
+  const match = dateStr.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/)
+  if (!match) return null
+
+  const [, year, month, day, hour, minute, second] = match.map(Number)
+  const monthIndex = month - 1
+  const date = new Date(year, monthIndex, day, hour, minute, second)
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
 const onKeyDown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && selectedOrder.value) {
     selectedOrder.value = null
   }
 }
 
+const finishedOrders = computed(() => {
+  const now = new Date()
+  return orders.value.filter((order) => {
+    const endDate = parseDate(order.end_date)
+    if (!endDate) return false
+    return endDate < now
+  })
+})
+
 const favouriteCity = computed(() => {
-  if (orders.value.length === 0) return '-'
+  if (finishedOrders.value.length === 0) return '-'
 
   const counter = new Map<string, number>()
-  for (const order of orders.value) {
+  for (const order of finishedOrders.value) {
     const city = getCityName(order)
     if (city === 'Unknown City') continue
     counter.set(city, (counter.get(city) || 0) + 1)
@@ -314,10 +333,10 @@ const favouriteCity = computed(() => {
 })
 
 const favouriteBeach = computed(() => {
-  if (orders.value.length === 0) return '-'
+  if (finishedOrders.value.length === 0) return '-'
 
   const counter = new Map<string, number>()
-  for (const order of orders.value) {
+  for (const order of finishedOrders.value) {
     const beach = getBeachName(order)
     if (beach === 'Unknown Beach') continue
     counter.set(beach, (counter.get(beach) || 0) + 1)
