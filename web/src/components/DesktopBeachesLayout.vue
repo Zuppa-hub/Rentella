@@ -31,10 +31,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import L from 'leaflet'
 import BeachesView from './BeachesView.vue'
 import BeachesDesktopNavbar from './beaches/BeachesDesktopNavbar.vue'
-import { toNumber } from '../utils/helpers'
+import { useBeachesMap } from '../composables/useBeachesMap'
 import type { BeachViewModel, Location } from '../types/beaches'
 
 const props = defineProps<{
@@ -55,101 +54,18 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const mapEl = ref<HTMLDivElement | null>(null)
-let map: L.Map | undefined
-let markersLayer: L.LayerGroup | undefined
-let userLocationMarker: L.Marker | undefined
-
-const initMap = () => {
-  if (!mapEl.value || map) return
-
-  // Always center on the selected location, not user location
-  const initialLat = props.location.lat
-  const initialLng = props.location.lng
-  const initialZoom = 13
-
-  map = L.map(mapEl.value, {
-    zoomControl: false,
-    attributionControl: false,
-  }).setView([initialLat, initialLng], initialZoom)
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-  }).addTo(map)
-
-  markersLayer = L.layerGroup().addTo(map)
-  renderMarkers()
-  renderUserLocation()
-}
-
-const renderMarkers = () => {
-  if (!map || !markersLayer) return
-  markersLayer.clearLayers()
-
-  // Only show beach markers (numbered dots), not location marker
-  props.beaches.forEach((beach, idx) => {
-    const lat = toNumber(beach.latitude)
-    const lng = toNumber(beach.longitude)
-
-    if (lat !== null && lng !== null) {
-      let markerLat = lat
-      let markerLng = lng
-
-      if (idx > 0) {
-        const angle = idx * 1.25
-        const radius = 0.00018 * Math.sqrt(idx)
-        markerLat += Math.cos(angle) * radius
-        markerLng += Math.sin(angle) * radius
-      }
-
-      const beachIcon = L.divIcon({
-        className: 'map-pin leaflet-div-icon',
-        html: `<span class="map-pin__label">${idx + 1}</span>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-      })
-
-      L.marker([markerLat, markerLng], {
-        icon: beachIcon,
-        title: beach.name,
-      }).addTo(markersLayer!)
-    }
-  })
-}
-
-const renderUserLocation = () => {
-  if (!map || !props.userLocation) return
-
-  if (userLocationMarker) {
-    userLocationMarker.remove()
-  }
-
-  const userIcon = L.divIcon({
-    className: 'user-location-marker',
-    html: '<div class="user-dot"></div>',
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-  })
-
-  userLocationMarker = L.marker([props.userLocation.lat, props.userLocation.lng], {
-    icon: userIcon,
-    title: 'Your location',
-  }).addTo(map)
-}
-
-const centerMapOnUser = () => {
-  if (map && props.userLocation) {
-    map.setView([props.userLocation.lat, props.userLocation.lng], 13, {
-      animate: true,
-    })
-  }
-}
-
-const destroyMap = () => {
-  if (map) {
-    map.remove()
-    map = undefined
-  }
-}
+const {
+  initMap,
+  renderMarkers,
+  renderUserLocation,
+  centerMapOnUser,
+  destroyMap,
+} = useBeachesMap({
+  mapEl,
+  getLocation: () => props.location,
+  getBeaches: () => props.beaches,
+  getUserLocation: () => props.userLocation,
+})
 
 onMounted(() => {
   setTimeout(() => initMap(), 100)
