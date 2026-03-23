@@ -73,17 +73,17 @@
 
           <div v-else class="desktop-orders-list" role="list" :aria-label="t('desktop.orders.ordersListAria')">
             <button
-              v-for="order in finishedOrders"
+              v-for="order in finishedOrdersView"
               :key="order.id"
               type="button"
               class="desktop-order-row"
-              @click="selectOrder(order)"
+              @click="selectOrder(order.raw)"
               :aria-label="t('desktop.orders.openOrderDetails', { id: order.id })"
               role="listitem"
             >
               <div class="desktop-order-col desktop-order-col-beach">
                 <span class="desktop-order-label">{{ t('desktop.orders.beachName') }}</span>
-                <strong>{{ getBeachName(order) }}</strong>
+                <strong>{{ order.beachName }}</strong>
               </div>
               <div class="desktop-order-col">
                 <span class="desktop-order-label">{{ t('desktop.orders.orderId') }}</span>
@@ -91,23 +91,23 @@
               </div>
               <div class="desktop-order-col">
                 <span class="desktop-order-label">{{ t('desktop.orders.section') }}</span>
-                <strong>{{ getZoneName(order) }}</strong>
+                <strong>{{ order.zoneName }}</strong>
               </div>
               <div class="desktop-order-col">
                 <span class="desktop-order-label">{{ t('desktop.orders.umbrella') }}</span>
-                <strong>{{ getUmbrellaNumber(order) }}</strong>
+                <strong>{{ order.umbrellaNumber }}</strong>
               </div>
               <div class="desktop-order-col">
                 <span class="desktop-order-label">{{ t('desktop.orders.price') }}</span>
-                <strong>{{ getPrice(order) }}</strong>
+                <strong>{{ order.price }}</strong>
               </div>
               <div class="desktop-order-col">
                 <span class="desktop-order-label">{{ t('desktop.orders.date') }}</span>
-                <strong>{{ formatDate(order.start_date) }}</strong>
+                <strong>{{ order.startDateFormatted }}</strong>
               </div>
             </button>
 
-            <p class="desktop-records-count">{{ t('desktop.orders.recordsShown', { count: finishedOrders.length }) }}</p>
+            <p class="desktop-records-count">{{ t('desktop.orders.recordsShown', { count: finishedOrdersView.length }) }}</p>
           </div>
         </section>
       </div>
@@ -140,20 +140,20 @@
 
       <div v-else class="order-history-list" role="list" :aria-label="t('desktop.orders.ordersListAria')">
         <button
-          v-for="order in finishedOrders"
+          v-for="order in finishedOrdersView"
           :key="order.id"
           class="order-card"
           type="button"
-          @click="selectOrder(order)"
+          @click="selectOrder(order.raw)"
           :aria-label="t('desktop.orders.openOrderDetails', { id: order.id })"
           role="listitem"
         >
           <div class="order-card-content">
             <div class="order-card-main">
-              <h3 class="order-card-beach">{{ getBeachName(order) }}</h3>
-              <span class="order-card-city">{{ getCityName(order) }}</span>
+              <h3 class="order-card-beach">{{ order.beachName }}</h3>
+              <span class="order-card-city">{{ order.cityName }}</span>
             </div>
-            <span class="order-card-date">{{ formatDate(order.start_date) }}</span>
+            <span class="order-card-date">{{ order.startDateFormatted }}</span>
           </div>
           <svg class="order-card-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="9 18 15 12 9 6"></polyline>
@@ -161,7 +161,7 @@
         </button>
       </div>
 
-      <p v-if="!loading && finishedOrders.length > 0" class="order-history-count">{{ t('desktop.orders.records', { count: finishedOrders.length }) }}</p>
+      <p v-if="!loading && finishedOrdersView.length > 0" class="order-history-count">{{ t('desktop.orders.records', { count: finishedOrdersView.length }) }}</p>
     </template>
 
     <div
@@ -261,6 +261,19 @@ const icons = {
 
 const { finishedOrders } = useOrderTimeline(orders)
 
+const finishedOrdersView = computed(() => {
+  return finishedOrders.value.map((order) => ({
+    id: order.id,
+    raw: order,
+    beachName: getOrderBeachName(order),
+    cityName: getOrderCityName(order),
+    zoneName: getOrderZoneName(order),
+    umbrellaNumber: getOrderUmbrellaNumber(order),
+    price: formatOrderTotalPrice(order),
+    startDateFormatted: formatOrderDate(order.start_date),
+  }))
+})
+
 const fetchOrders = async () => {
   loading.value = true
   error.value = null
@@ -286,10 +299,6 @@ const getZoneName = (order: Order): string => {
   return getOrderZoneName(order)
 }
 
-const getUmbrellaNumber = (order: Order): string => {
-  return getOrderUmbrellaNumber(order)
-}
-
 const getPrice = (order: Order): string => {
   return formatOrderTotalPrice(order)
 }
@@ -309,11 +318,11 @@ const onKeyDown = (event: KeyboardEvent) => {
 }
 
 const favouriteCity = computed(() => {
-  if (finishedOrders.value.length === 0) return '-'
+  if (finishedOrdersView.value.length === 0) return '-'
 
   const counter = new Map<string, number>()
-  for (const order of finishedOrders.value) {
-    const city = getCityName(order)
+  for (const order of finishedOrdersView.value) {
+    const city = order.cityName
     if (city === 'Unknown City') continue
     counter.set(city, (counter.get(city) || 0) + 1)
   }
@@ -324,11 +333,11 @@ const favouriteCity = computed(() => {
 })
 
 const favouriteBeach = computed(() => {
-  if (finishedOrders.value.length === 0) return '-'
+  if (finishedOrdersView.value.length === 0) return '-'
 
   const counter = new Map<string, number>()
-  for (const order of finishedOrders.value) {
-    const beach = getBeachName(order)
+  for (const order of finishedOrdersView.value) {
+    const beach = order.beachName
     if (beach === 'Unknown Beach') continue
     counter.set(beach, (counter.get(beach) || 0) + 1)
   }
