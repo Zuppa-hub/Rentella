@@ -24,7 +24,7 @@
 
                     <form id="kc-form-login" class="auth-form" action="${url.loginAction}" method="post">
                         <div class="input-group">
-                            <label for="username" class="input-label">Email</label>
+                            <label for="username" class="input-label">Username</label>
                             <input
                                 id="username"
                                 name="username"
@@ -61,20 +61,16 @@
                             </div>
                         </div>
 
-                        <#if realm.resetPasswordAllowed?? && realm.resetPasswordAllowed>
-                            <div class="forgot-wrap">
-                                <a href="${url.loginResetCredentialsUrl}" class="forgot-link">Forgot your Password</a>
-                            </div>
-                        </#if>
+                        <div class="forgot-wrap">
+                            <a href="${(url.loginResetCredentialsUrl!'#')}" class="forgot-link">Forgot your Password</a>
+                        </div>
 
                         <button type="submit" class="btn-primary">Login</button>
 
-                        <#if realm.registrationAllowed?? && realm.registrationAllowed>
-                            <div class="register-section">
-                                <p class="register-text">Don't have an Account?</p>
-                                <a href="${url.registrationUrl}" class="register-link">Register for FREE</a>
-                            </div>
-                        </#if>
+                        <div class="register-section">
+                            <p class="register-text">Don't have an Account?</p>
+                            <a href="${(url.registrationUrl!'#')}" class="register-link">Register for FREE</a>
+                        </div>
                     </form>
                 </div>
             </main>
