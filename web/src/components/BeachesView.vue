@@ -321,7 +321,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { checkZoneAvailability, getBeach, type Beach } from '../services/api'
+import { checkZoneAvailability, createZoneOrder, getBeach, type Beach } from '../services/api'
 import SearchBox from './SearchBox.vue'
 import allowedAnimalsIcon from '../assets/icons/AllowedAnimals.svg'
 import beachTypeIcon from '../assets/icons/BeachType.svg'
@@ -546,13 +546,36 @@ const handlePayment = async () => {
     message: 'Processing payment...',
   }
 
-  // Simulate payment processing delay
+  // Simulate payment gateway processing delay
   await new Promise((resolve) => setTimeout(resolve, 2000))
 
   try {
-    // Simulate API call (in real app, would call createZoneOrder here)
-    const generatedOrderId = generateOrderId()
-    orderId.value = generatedOrderId
+    const checkoutResult = await createZoneOrder({
+      zoneId: selectedZone.value.id,
+      startDate: reservationFrom.value,
+      endDate: reservationTo.value,
+      priceId: selectedPriceId.value,
+    })
+
+    orderId.value = String(checkoutResult.order.id ?? generateOrderId())
+
+    // Keep local cache in sync with persisted backend order
+    const newOrder = {
+      id: orderId.value,
+      beachName: selectedZoneBeach.value?.name || '',
+      zoneName: selectedZone.value?.name || '',
+      location: props.location.name,
+      checkInDate: reservationFrom.value,
+      checkOutDate: reservationTo.value,
+      totalPrice: selectedZonePrice.value,
+      createdAt: Date.now(),
+      status: 'active' as const,
+    }
+
+    const existingOrders = localStorage.getItem('rentella_orders')
+    const orders = existingOrders ? JSON.parse(existingOrders) : []
+    orders.unshift(newOrder)
+    localStorage.setItem('rentella_orders', JSON.stringify(orders))
 
     // Move to success step
     zonePickerStep.value = 'success'

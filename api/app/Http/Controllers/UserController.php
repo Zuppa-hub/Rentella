@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ResolvesCurrentUser;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use App\Http\Requests\UserRequest;
@@ -18,6 +19,7 @@ properties and methods from the `Controller` class, allowing it to use and overr
 needed. */
 class UserController extends Controller
 {
+    use ResolvesCurrentUser;
     protected $config;
 
     public function __construct(Config $config)
@@ -45,68 +47,6 @@ class UserController extends Controller
         return response()->json(['error' => 'An internal server error occurred.'], 500);
     }
 
-    /**
-     * Resolve current authenticated principal to a local User row.
-     * Works with Keycloak claims where id can be UUID/non-numeric.
-     */
-    private function resolveCurrentLocalUser(): ?User
-    {
-        $authUser = auth()->user();
-        if (!$authUser) {
-            return null;
-        }
-
-        // If the auth principal is already a persisted local model, use it directly.
-        if ($authUser instanceof User && $authUser->exists) {
-            return $authUser;
-        }
-
-        $authId = $authUser->id ?? null;
-        $uuid = $authUser->uuid ?? $authUser->sub ?? (!is_numeric((string) $authId) ? $authId : null);
-        $email = $authUser->email ?? null;
-        $name = $authUser->name ?? $authUser->given_name ?? 'User';
-        $surname = $authUser->surname ?? $authUser->family_name ?? 'Keycloak';
-
-        if (is_numeric((string) $authId)) {
-            $user = User::find((int) $authId);
-            if ($user) {
-                return $user;
-            }
-        }
-
-        if ($uuid) {
-            $user = User::where('uuid', $uuid)->first();
-            if ($user) {
-                return $user;
-            }
-        }
-
-        if ($email) {
-            $user = User::where('email', $email)->first();
-            if ($user) {
-                return $user;
-            }
-        }
-
-        if (!$email) {
-            $email = sprintf('kc_%s@local.invalid', Str::random(12));
-        }
-
-        if (!$uuid) {
-            do {
-                $uuid = (string) Str::uuid();
-            } while (User::where('uuid', $uuid)->exists());
-        }
-
-        // Create a valid local row with all required columns filled.
-        return User::create([
-            'email' => $email,
-            'name' => $name,
-            'surname' => $surname,
-            'uuid' => $uuid,
-            'password' => bcrypt(Str::random(32)),
-        ]);
-    }
     public function index()
     {
         try {

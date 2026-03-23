@@ -7,22 +7,22 @@
           <img :src="icons.logo" :alt="t('desktop.brand.alt')" class="logo" />
         </div>
         <div class="nav-items">
-          <div class="nav-item active">
+          <button class="nav-item active" type="button" @click="emit('navigate', 'home')">
             <img :src="icons.home" alt="" class="nav-icon" />
             <span>{{ t('desktop.nav.home') }}</span>
-          </div>
-          <div class="nav-item">
+          </button>
+          <button class="nav-item" type="button" @click="emit('navigate', 'active')">
             <img :src="icons.active" alt="" class="nav-icon" />
             <span>{{ t('desktop.nav.active') }}</span>
-          </div>
-          <div class="nav-item">
+          </button>
+          <button class="nav-item" type="button" @click="emit('navigate', 'history')">
             <img :src="icons.history" alt="" class="nav-icon" />
             <span>{{ t('desktop.nav.history') }}</span>
-          </div>
-          <div class="nav-item">
+          </button>
+          <button class="nav-item" type="button">
             <img :src="icons.settings" alt="" class="nav-icon" />
             <span>{{ t('desktop.nav.settings') }}</span>
-          </div>
+          </button>
         </div>
         <div class="profile-section">
           <div class="profile-avatar">{{ initials }}</div>
@@ -82,6 +82,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'location-click', locationId: number): void
+  (event: 'navigate', tab: string): void
 }>()
 
 const { t } = useI18n()
@@ -305,6 +306,8 @@ watch(
   padding: 0 16px;
   height: 100%;
   cursor: pointer;
+  border: 0;
+  background: transparent;
   color: var(--color-primary-light);
   font-size: 11px;
   font-weight: 600;

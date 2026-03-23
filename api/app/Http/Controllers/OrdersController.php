@@ -2,77 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ResolvesCurrentUser;
 use App\Http\Requests\OrderRequest;
 use App\Http\Requests\OrdersFilterRequest;
 use App\Models\BeachZone;
 use App\Models\Order;
 use App\Models\Umbrella;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class OrdersController extends Controller
 {
-    /**
-     * Resolve authenticated principal (Keycloak/local) to a persisted local User row.
-     */
-    private function resolveCurrentLocalUser(): ?User
-    {
-        $authUser = auth()->user();
-        if (!$authUser) {
-            return null;
-        }
-
-        if ($authUser instanceof User && $authUser->exists) {
-            return $authUser;
-        }
-
-        $authId = $authUser->id ?? null;
-        $uuid = $authUser->uuid ?? $authUser->sub ?? (!is_numeric((string) $authId) ? $authId : null);
-        $email = $authUser->email ?? null;
-        $name = $authUser->name ?? $authUser->given_name ?? 'User';
-        $surname = $authUser->surname ?? $authUser->family_name ?? 'Keycloak';
-
-        if (is_numeric((string) $authId)) {
-            $user = User::find((int) $authId);
-            if ($user) {
-                return $user;
-            }
-        }
-
-        if ($uuid) {
-            $user = User::where('uuid', $uuid)->first();
-            if ($user) {
-                return $user;
-            }
-        }
-
-        if ($email) {
-            $user = User::where('email', $email)->first();
-            if ($user) {
-                return $user;
-            }
-        }
-
-        if (!$email) {
-            $email = sprintf('kc_%s@local.invalid', Str::random(12));
-        }
-
-        if (!$uuid) {
-            do {
-                $uuid = (string) Str::uuid();
-            } while (User::where('uuid', $uuid)->exists());
-        }
-
-        return User::create([
-            'email' => $email,
-            'name' => $name,
-            'surname' => $surname,
-            'uuid' => $uuid,
-            'password' => bcrypt(Str::random(32)),
-        ]);
-    }
+    use ResolvesCurrentUser;
 
     public function checkAvailability(\Illuminate\Http\Request $request)
     {
