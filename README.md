@@ -24,6 +24,7 @@ https://github.com/user-attachments/assets/8dbfe115-81bd-4bcd-9bcb-92a2e1721738
 - Frontend: Vue 3, TypeScript, Vite
 - Infra: Docker, Nginx, Keycloak
 
+> Back office in progress: we are building the admin area to allow beach owners to add and manage their beaches.
 ## Quick start
 
 ### Prerequisites
