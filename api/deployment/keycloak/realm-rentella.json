@@ -2,6 +2,11 @@
   "realm": "rentella",
   "enabled": true,
   "sslRequired": "none",
+  "registrationAllowed": true,
+  "resetPasswordAllowed": true,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
   "displayName": "Rentella",
   "loginTheme": "Rentella",
   "clients": [
