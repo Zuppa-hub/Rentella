@@ -1,6 +1,6 @@
 import { getToken, login } from '../keycloak'
 
-const API_BASE_URL = 'http://localhost:9000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000/api'
 
 export interface ApiResponse<T> {
   data: T
@@ -156,10 +156,7 @@ interface FetchOptions extends RequestInit {
   authenticated?: boolean
 }
 
-async function fetchApi<T>(
-  endpoint: string,
-  options: FetchOptions = {}
-): Promise<T> {
+async function fetchApi<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
   const { authenticated = true, ...fetchOptions } = options
 
   const url = `${API_BASE_URL}${endpoint}`
@@ -319,8 +316,14 @@ export async function createZoneOrder(payload: {
 }
 
 // Orders endpoints
-export async function getOrders(): Promise<Order[]> {
-  const raw = await fetchApi<Array<Order | RawOrderEnvelope> | null>('/orders')
+export async function getOrders(filters?: { active?: boolean }): Promise<Order[]> {
+  const params = new URLSearchParams()
+  if (typeof filters?.active === 'boolean') {
+    params.append('active', String(filters.active))
+  }
+
+  const query = params.toString() ? `?${params.toString()}` : ''
+  const raw = await fetchApi<Array<Order | RawOrderEnvelope> | null>(`/orders${query}`)
 
   if (!Array.isArray(raw)) {
     return []
@@ -385,4 +388,3 @@ export async function deleteOrder(id: number): Promise<void> {
     method: 'DELETE',
   })
 }
-

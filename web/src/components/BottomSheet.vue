@@ -2,21 +2,21 @@
   <section class="sheet" :class="{ collapsed: isCollapsed }">
     <div class="sheet-header">
       <button class="sheet-toggle" @click="toggleCollapsed">
-        {{ isCollapsed ? 'Show' : 'Hide' }}
+        {{ isCollapsed ? t('common.show') : t('common.hide') }}
         <img :src="icons.arrowDown" alt="" :class="{ rotated: isCollapsed }" />
       </button>
     </div>
 
     <SearchBox
       :model-value="searchTerm"
-      placeholder="Search for a location..."
+      :placeholder="t('desktop.search.placeholder')"
       class="mobile-search"
       @update:model-value="emit('update:searchTerm', $event)"
     />
 
     <div v-show="!isCollapsed" class="list-header">
-      <h2>Available locations</h2>
-      <span>{{ totalCount }} Locations</span>
+      <h2>{{ t('desktop.locations.title') }}</h2>
+      <span>{{ t('desktop.locations.count', { count: totalCount }) }}</span>
     </div>
 
     <div v-show="!isCollapsed" class="location-list">
@@ -32,9 +32,12 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import iconArrowDown from '../assets/icons/ArrowDown.svg'
 import SearchBox from './SearchBox.vue'
 import LocationCard, { type LocationItem } from './LocationCard.vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   locations: LocationItem[]

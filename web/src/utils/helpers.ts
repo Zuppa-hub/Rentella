@@ -5,7 +5,7 @@
 /**
  * Normalize allowed animals value to boolean
  */
-export function isAnimalsAllowed(value: any): boolean {
+export function isAnimalsAllowed(value: boolean | string | number | null | undefined): boolean {
   if (typeof value === 'boolean') return value
   if (typeof value === 'number') return value === 1
   if (typeof value === 'string') {
@@ -27,7 +27,7 @@ export function toNumber(value: unknown): number | null {
 /**
  * Parse beach type ID safely
  */
-export function parseBeachTypeId(rawId: any): number | null {
+export function parseBeachTypeId(rawId: number | string | null | undefined): number | null {
   const parsed = typeof rawId === 'number' ? rawId : Number.parseInt(String(rawId), 10)
   return Number.isFinite(parsed) ? parsed : null
 }

@@ -1,35 +1,30 @@
 import { ref, onUnmounted } from 'vue'
+import { debounce } from '../utils/timing'
 
-export function useDebounce<T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number = 300
-) {
-  const timerId = ref<number | undefined>(undefined)
+export function useDebounce<T extends (...args: unknown[]) => void>(callback: T, delay: number = 300) {
+  const isCancelled = ref(false)
+
+  const debounced = debounce((...args: unknown[]) => {
+    if (!isCancelled.value) {
+      callback(...(args as Parameters<T>))
+    }
+  }, delay)
 
   const debouncedFunction = (...args: Parameters<T>) => {
-    if (timerId.value !== undefined) {
-      clearTimeout(timerId.value)
-    }
-
-    timerId.value = window.setTimeout(() => {
-      callback(...args)
-    }, delay)
+    if (isCancelled.value) return
+    debounced(...args)
   }
 
   const cancel = () => {
-    if (timerId.value !== undefined) {
-      clearTimeout(timerId.value)
-      timerId.value = undefined
-    }
+    isCancelled.value = true
   }
 
-  // Cleanup on component unmount
   onUnmounted(() => {
     cancel()
   })
 
   return {
     debouncedFunction,
-    cancel
+    cancel,
   }
 }

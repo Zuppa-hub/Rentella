@@ -31,12 +31,7 @@ export const useGeolocation = () => {
   let currentRequest: Promise<UserLocation> | null = null
 
   // Haversine distance (km)
-  const calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number => {
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     if (!validateCoordinates(lat1, lon1) || !validateCoordinates(lat2, lon2)) {
       console.warn('Invalid coordinates provided to calculateDistance')
       return 0
@@ -58,11 +53,9 @@ export const useGeolocation = () => {
     return Math.round(R * c * 10) / 10
   }
 
-  const requestLocation = async (
-    options: GeolocationOptions = {}
-  ): Promise<UserLocation> => {
+  const requestLocation = async (options: GeolocationOptions = {}): Promise<UserLocation> => {
     logger.debug('Requesting location', { options })
-    
+
     if (currentRequest) {
       logger.debug('Location request already in progress, returning cached result')
       return currentRequest
@@ -108,7 +101,7 @@ export const useGeolocation = () => {
 
           const message = errorMessages[err.code] || 'Unknown error'
           error.value = `Geolocation: ${message}`
-          logger.warn(`Geolocation error (code ${err.code}):`, {'message': message})
+          logger.warn(`Geolocation error (code ${err.code}):`, { message: message })
 
           if (isDevelopment) {
             logger.debug('Using mock location for development')
@@ -125,31 +118,20 @@ export const useGeolocation = () => {
           maximumAge: options.maximumAge ?? 60000, // 1 min cache
         }
       )
+    }).finally(() => {
+      isLoading.value = false
+      currentRequest = null
     })
-      .finally(() => {
-        isLoading.value = false
-        currentRequest = null
-      })
 
     return currentRequest
   }
 
-  const getDistanceToLocation = (
-    lat: number,
-    lng: number
-  ): number | null => {
+  const getDistanceToLocation = (lat: number, lng: number): number | null => {
     if (!userLocation.value) return null
-    return calculateDistance(
-      userLocation.value.lat,
-      userLocation.value.lng,
-      lat,
-      lng
-    )
+    return calculateDistance(userLocation.value.lat, userLocation.value.lng, lat, lng)
   }
 
-  const isLocationAvailable = computed(
-    () => userLocation.value !== null
-  )
+  const isLocationAvailable = computed(() => userLocation.value !== null)
 
   return {
     userLocation,
