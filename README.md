@@ -2,18 +2,27 @@
 
 ![Rentella Logo](web/src/assets/LogoLight.svg)
 
-Rentella is a beach umbrella rental platform. Think Airbnb for umbrellas: beach owners list availability, users search by location and book.
+Rentella is a beach umbrella rental platform. Think Airbnb for umbrellas: beach owners list availability, and users search by location and book.
 
 ![Version](https://img.shields.io/badge/version-1.2.0-blue)
 ![Status](https://img.shields.io/badge/status-In%20Development-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+## Highlights
+
 - Role-based access: admin, owners, users
 - Secure API with Keycloak (OAuth2)
 - Fully dockerized stack
 - Feature tests for core endpoints
-## Demo 
+
+## Status
+
+> Back office in progress: we are building the admin area to allow beach owners to add and manage their beaches.
+
+## Demo
+
 https://github.com/user-attachments/assets/8dbfe115-81bd-4bcd-9bcb-92a2e1721738
+
 ## Design
 
 🎨 **Figma Design**: [View on Figma](https://www.figma.com/design/yAW6er4mw2SGyWjvUOUgJG/Rentella?node-id=1542-19194&t=QtE33frejJYOoWbq-1)
@@ -24,7 +33,6 @@ https://github.com/user-attachments/assets/8dbfe115-81bd-4bcd-9bcb-92a2e1721738
 - Frontend: Vue 3, TypeScript, Vite
 - Infra: Docker, Nginx, Keycloak
 
-> Back office in progress: we are building the admin area to allow beach owners to add and manage their beaches.
 ## Quick start
 
 ### Prerequisites
@@ -45,6 +53,8 @@ make -C api setup
 make -C api data
 ```
 
+This initializes containers, dependencies, migrations, and seed data.
+
 ### URLs
 
 - Frontend: http://localhost:5173
@@ -53,7 +63,8 @@ make -C api data
 
 ## API overview
 
-Authentication required:
+### Authentication required
+
 - `/api/users`
 - `/api/beaches`
 - `/api/beach-pictures`
@@ -63,12 +74,14 @@ Authentication required:
 - `/api/opening-dates`
 - `/api/orders`
 
-Admin only:
+### Admin only
+
 - `/api/owners`
 - `/api/locations`
 - `/api/beach-types`
 
-Public:
+### Public
+
 - `POST /api/users`
 - `GET /api/health`
 
@@ -90,7 +103,7 @@ docker exec Rentella_app php artisan test tests/Feature/
 
 ## CI quality gates
 
-GitHub Actions runs automatically:
+GitHub Actions runs automatically on push and pull requests:
 
 - `web`: `npm ci` + `npm run build`
 - `api`: `composer install` + `php artisan migrate:fresh --force` + `php artisan test`
