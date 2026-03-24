@@ -2,30 +2,11 @@
 
 ![Rentella Logo](web/src/assets/LogoLight.svg)
 
-Rentella is a beach umbrella rental platform. Think Airbnb for umbrellas: beach owners list availability, and users search by location and book.
+Rentella is a beach umbrella rental platform built to demonstrate real-world backend architecture, security practices, and system design. A full-stack reference project: secure REST API with OAuth2 (Keycloak), role-based access, ownership validation on every write, comprehensive security tests, and a production-like Docker environment.
 
 ![Version](https://img.shields.io/badge/version-1.2.0-blue)
 ![Status](https://img.shields.io/badge/status-In%20Development-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
-
-## About the project
-
-Rentella is a full-stack application built to demonstrate real-world backend architecture, security practices, and system design—not just to ship features.
-
-The focus: secure REST API with role-based access control, OAuth2 authentication (Keycloak), ownership validation on every write operation, comprehensive security tests, and a production-like Docker environment.
-
-For developers: this is a reference project for secure API design and full-stack integration.
-
-## Highlights
-
-- Role-based access: admin, owners, users
-- Secure API with Keycloak (OAuth2)
-- Fully dockerized stack
-- Feature tests for core endpoints
-
-## What's next
-
-> Back office in progress: building the admin area so beach owners can add and manage their own beaches.
 
 ## Demo
 
@@ -37,13 +18,10 @@ https://github.com/user-attachments/assets/8dbfe115-81bd-4bcd-9bcb-92a2e1721738
 
 ## What this project demonstrates
 
-- **OAuth2 / OpenID Connect**: Keycloak integration from scratch—token validation, realm config, local/prod separations
-- **Security-first API design**: ownership checks, role-based access, request validation (Laravel Form Requests), 40+ security tests
-- **Backend architecture**: RESTful endpoints, Laravel best practices (models, migrations, seeders), proper error handling
-- **Frontend UX**: Vue 3 Composition API, TypeScript, form validation, Keycloak SSO flow, responsive design
-- **DevOps mindset**: Docker Compose, local/prod parity, multi-service orchestration (PHP + Node + PostgreSQL + Keycloak)
-- **Test-driven development**: Feature tests for all security rules, CI automation, zero-trust model
-- **Git workflow**: Conventional commits, branching strategy, documented code review process
+- **OAuth2 / OpenID Connect**: Keycloak integration—token validation, realm configuration, local/prod separation
+- **Security-first API design**: ownership checks, role-based access, request validation, 40+ security tests
+- **DevOps mindset**: Docker Compose with 8 containerized services, local/prod parity, multi-service orchestration
+- **Full-stack architecture**: RESTful API (Laravel), Vue 3 frontend with TypeScript, Keycloak auth integration
 
 ## Architecture
 
