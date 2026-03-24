@@ -103,6 +103,25 @@ docker-compose -f api/deployment/docker-compose.yml down -v --remove-orphans
 
 - **Keycloak HTTPS error**: recreate containers with `docker-compose -f api/deployment/docker-compose.yml down -v` and re-run setup.
 - **Port 5173 not reachable**: check `docker-compose -f api/deployment/docker-compose.yml ps` to verify `vue` is running.
+- **401/403 on protected API endpoints in strict mode**: with `KEYCLOAK_IGNORE_RESOURCES_VALIDATION=false` and DB-backed users enabled, tokens must include `resource_access` for `rentella-api` and the authenticated user must exist in the local `users` table.
+
+### Strict mode quick alignment
+
+If you keep strict defaults (`KEYCLOAK_IGNORE_RESOURCES_VALIDATION=false` and DB-backed users enabled), align your local auth flow with these commands:
+
+```bash
+# 1) Verify token contains `resource_access.rentella-api`
+curl -sS -X POST "http://localhost:8080/realms/rentella/protocol/openid-connect/token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    --data "grant_type=password&client_id=rentella-web&username=testuser&password=test123" \
+    | node -e 'let d="";process.stdin.on("data",c=>d+=c);process.stdin.on("end",()=>{const t=JSON.parse(d).access_token||"";const p=t.split(".")[1]||"";const j=JSON.parse(Buffer.from(p,"base64url").toString("utf8"));console.log(JSON.stringify(j.resource_access||{},null,2));});'
+
+# 2) Ensure user exists in local API DB
+docker exec Rentella_app php artisan tinker --execute="dump(App\\Models\\User::where('email','testuser@rentella.local')->exists());"
+
+# 3) If missing, create local user record for strict DB lookup
+docker exec Rentella_app php artisan tinker --execute="App\\Models\\User::firstOrCreate(['email'=>'testuser@rentella.local'], ['name'=>'Test User']);"
+```
 
 See [DOCS.md](DOCS.md) for full API reference and commands.
 

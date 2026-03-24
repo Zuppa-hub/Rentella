@@ -22,6 +22,24 @@ API base URL: `http://localhost:9000/api`
 
 If Keycloak shows `HTTPS required` during login, run the reset command above and start again.
 
+If protected endpoints return `401` or `403` with strict Keycloak settings, verify both conditions:
+- token has `resource_access` for `rentella-api`
+- authenticated Keycloak user exists in local `users` table (when DB user loading is enabled)
+
+Quick checks:
+
+```bash
+# Check token resource_access
+curl -sS -X POST "http://localhost:8080/realms/rentella/protocol/openid-connect/token" \
+	-H "Content-Type: application/x-www-form-urlencoded" \
+	--data "grant_type=password&client_id=rentella-web&username=testuser&password=test123" \
+	| node -e 'let d="";process.stdin.on("data",c=>d+=c);process.stdin.on("end",()=>{const t=JSON.parse(d).access_token||"";const p=t.split(".")[1]||"";const j=JSON.parse(Buffer.from(p,"base64url").toString("utf8"));console.log(JSON.stringify(j.resource_access||{},null,2));});'
+
+# Check / create local user for strict DB lookup
+docker exec Rentella_app php artisan tinker --execute="dump(App\\Models\\User::where('email','testuser@rentella.local')->exists());"
+docker exec Rentella_app php artisan tinker --execute="App\\Models\\User::firstOrCreate(['email'=>'testuser@rentella.local'], ['name'=>'Test User']);"
+```
+
 ## Authentication
 
 All protected endpoints require a Bearer token from Keycloak:

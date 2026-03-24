@@ -5,7 +5,9 @@ namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Illuminate\Auth\AuthenticationException;
+use KeycloakGuard\Exceptions\ResourceAccessNotAllowedException;
 use KeycloakGuard\Exceptions\TokenException;
+use KeycloakGuard\Exceptions\UserNotFoundException;
 
 class Handler extends ExceptionHandler
 {
@@ -39,6 +41,30 @@ class Handler extends ExceptionHandler
             }
 
             return response()->json($response, 401);
+        });
+
+        $this->renderable(function (UserNotFoundException $exception, $request) {
+            $response = [
+                'message' => 'Unauthenticated',
+            ];
+
+            if (config('app.debug')) {
+                $response['error'] = $exception->getMessage();
+            }
+
+            return response()->json($response, 401);
+        });
+
+        $this->renderable(function (ResourceAccessNotAllowedException $exception, $request) {
+            $response = [
+                'message' => 'Forbidden',
+            ];
+
+            if (config('app.debug')) {
+                $response['error'] = $exception->getMessage();
+            }
+
+            return response()->json($response, 403);
         });
     }
 
