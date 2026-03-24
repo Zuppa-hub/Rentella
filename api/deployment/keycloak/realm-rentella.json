@@ -1,6 +1,7 @@
 {
   "realm": "rentella",
   "enabled": true,
+  "sslRequired": "none",
   "displayName": "Rentella",
   "loginTheme": "Rentella",
   "clients": [

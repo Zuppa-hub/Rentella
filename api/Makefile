@@ -1,16 +1,18 @@
+COMPOSE := $(shell if command -v docker-compose >/dev/null 2>&1; then echo docker-compose; else echo "docker compose"; fi)
+
 setup:
 	@make build
 	@make up 
 	@make composer-update
 
 build:
-	docker-compose -f ./deployment/docker-compose.yml build --no-cache --force-rm
+	$(COMPOSE) -f ./deployment/docker-compose.yml build --no-cache --force-rm
 
 stop:
-	docker-compose -f ./deployment/docker-compose.yml stop
+	$(COMPOSE) -f ./deployment/docker-compose.yml stop
 
 up:
-	docker-compose -f ./deployment/docker-compose.yml up -d
+	$(COMPOSE) -f ./deployment/docker-compose.yml up -d
 
 composer-update:
 	docker exec Rentella_app bash -c "composer install --no-interaction --prefer-dist"

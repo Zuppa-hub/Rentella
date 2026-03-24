@@ -81,6 +81,25 @@ Uses Keycloak (OAuth2). Every endpoint requires Bearer token. Implemented via mi
 - **ApiHealthCheckTest**: Ensures endpoints work correctly
 - All tests use `actingAs()` to mock authentication
 
+## Production hardening checklist
+
+Before deploying to production:
+
+- Set strong credentials in `api/.env`:
+  - `MYSQL_ROOT_PASSWORD` (use strong random password)
+  - `POSTGRES_PASSWORD` (use strong random password)
+  - `KEYCLOAK_ADMIN_PASSWORD` (use strong random password)
+  - `KEYCLOAK_CLIENT_SECRET` (generate and secure)
+- Set `APP_ENV=production` and `APP_DEBUG=false`
+- Set `LOG_LEVEL=warning` or `error`
+- Restrict `CORS_ALLOWED_ORIGINS` to authorized public domains only
+- Avoid default admin accounts (`KEYCLOAK_ADMIN=admin`); use a dedicated name
+- Enable HTTPS/TLS by setting `KC_HOSTNAME_STRICT_HTTPS=true` in Keycloak
+- Set `sslRequired=external` or `sslRequired=all` in Keycloak realm (not `none`)
+- Rotate all credentials regularly
+- Use a secret management tool (HashiCorp Vault, AWS Secrets Manager, etc.)
+- Monitor API logs for unauthorized access attempts
+
 ## Next steps
 
 - Phase 2: Frontend security & validation

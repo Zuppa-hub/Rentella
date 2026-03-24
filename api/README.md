@@ -12,7 +12,15 @@ make setup
 make data
 ```
 
+If you already had older local containers/volumes, reset before `make setup`:
+
+```bash
+docker-compose -f ./deployment/docker-compose.yml down -v --remove-orphans
+```
+
 API base URL: `http://localhost:9000/api`
+
+If Keycloak shows `HTTPS required` during login, run the reset command above and start again.
 
 ## Authentication
 
