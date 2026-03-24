@@ -1,5 +1,6 @@
 import { computed, type Ref } from 'vue'
 import type { Order } from '../services/api'
+import { calculateBookingDays } from '../utils/date'
 
 export const parseOrderDate = (value: string): Date | null => {
   if (!value) return null
@@ -64,15 +65,6 @@ export const formatOrderTotalPrice = (order: Pick<Order, 'start_date' | 'end_dat
   const price = order.price?.price
   if (typeof price !== 'number') return 'N/A'
 
-  const start = parseOrderDate(order.start_date)
-  const end = parseOrderDate(order.end_date)
-
-  if (!start || !end) return `${price}€`
-
-  const durationMs = end.getTime() - start.getTime()
-  if (durationMs <= 0) return `${price}€`
-
-  const dayMs = 1000 * 60 * 60 * 24
-  const durationDays = Math.max(1, Math.ceil(durationMs / dayMs))
+  const durationDays = calculateBookingDays(order.start_date, order.end_date)
   return `${price * durationDays}€`
 }

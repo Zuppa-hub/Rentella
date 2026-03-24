@@ -58,7 +58,7 @@ import allowedAnimalsIcon from '../assets/icons/AllowedAnimals.svg'
 import beachTypeIcon from '../assets/icons/BeachType.svg'
 import distanceIcon from '../assets/icons/Distance.svg'
 import moneyIcon from '../assets/icons/Money.svg'
-import { getCompactTodayDate, getTodayIsoDate } from '../utils/date'
+import { calculateBookingDays, getCompactTodayDate, getTodayIsoDate } from '../utils/date'
 import type { BeachViewModel, BeachZoneViewModel, Location } from '../types/beaches'
 
 const { t } = useI18n()
@@ -161,11 +161,7 @@ const closeZonePicker = () => {
 
 const calculateDays = (): number => {
   if (!reservationFrom.value || !reservationTo.value) return 0
-  const from = new Date(reservationFrom.value)
-  const to = new Date(reservationTo.value)
-  const diffTime = Math.abs(to.getTime() - from.getTime())
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return Math.max(1, diffDays) // Minimum 1 day
+  return calculateBookingDays(reservationFrom.value, reservationTo.value)
 }
 
 const selectedZonePrice = computed(() => {
