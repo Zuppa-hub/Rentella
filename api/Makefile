@@ -16,8 +16,8 @@ composer-update:
 	docker exec Rentella_app bash -c "composer install --no-interaction --prefer-dist"
 
 data: 
-	docker exec Rentella_app bash -c "php artisan migrate"
-	docker exec Rentella_app bash -c "php artisan db:seed"
+	docker exec Rentella_app bash -c "php artisan migrate --force"
+	docker exec Rentella_app bash -c "php artisan db:seed --force"
 
 squeeze:xs
 	php artisan schema:dump
