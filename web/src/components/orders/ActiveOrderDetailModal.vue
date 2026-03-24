@@ -8,6 +8,7 @@
   >
     <div class="order-detail-modal" @click.stop>
       <button
+        type="button"
         class="order-detail-close"
         @click="emit('close')"
         :aria-label="t('desktop.orders.closeOrderDetails')"

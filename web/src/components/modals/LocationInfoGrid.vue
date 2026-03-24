@@ -24,15 +24,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Beach } from '../../services/api'
-
-interface Location {
-  id: number
-  name: string
-  lat: number
-  lng: number
-  distance?: number
-  priceRange: string
-}
+import type { Location } from '../../types/beaches'
 
 const props = defineProps<{
   location: Location
