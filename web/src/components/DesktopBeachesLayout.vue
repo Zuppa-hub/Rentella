@@ -24,6 +24,7 @@
       <BeachesView
         :location="location"
         :beaches="beaches"
+        :loading-beaches="loadingBeaches"
         :expand-beach-id="expandBeachId"
         :beach-types="beachTypes"
         @back="emit('back')"
@@ -44,6 +45,7 @@ import type { BeachViewModel, Location } from '../types/beaches'
 const props = defineProps<{
   location: Location
   beaches: BeachViewModel[]
+  loadingBeaches?: boolean
   expandBeachId?: number | null
   beachTypes?: Record<number, string>
   initials: string

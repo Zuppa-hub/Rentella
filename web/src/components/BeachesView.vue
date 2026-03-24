@@ -5,6 +5,7 @@
         :model-value="searchTerm"
         :location="location"
         :beaches="beaches"
+        :loading-beaches="loadingBeaches"
         :filtered-beaches="filteredBeaches"
         :expanded-beach-id="expandedBeachId"
         :zones-by-beach="zonesByBeach"
@@ -78,6 +79,7 @@ type BeachZoneSource = {
 const props = defineProps<{
   location: Location
   beaches: BeachViewModel[]
+  loadingBeaches?: boolean
   expandBeachId?: number | null
   beachTypes?: Record<number, string>
 }>()

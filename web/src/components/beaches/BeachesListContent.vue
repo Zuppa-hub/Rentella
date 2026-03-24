@@ -29,7 +29,18 @@
     </div>
 
     <div class="beaches-list">
+      <div v-if="loadingBeaches" class="beaches-loading" aria-live="polite">
+        <SkeletonLoader
+          :rows="5"
+          :height="18"
+          :gap="12"
+          :widths="['100%', '95%', '98%', '92%', '96%']"
+          :aria-label="t('desktop.orders.loadingOrders')"
+        />
+      </div>
+
       <div
+        v-else
         v-for="(beach, idx) in filteredBeaches"
         :key="beach.id"
         class="beach-card"
@@ -90,9 +101,15 @@
         </div>
 
         <div v-if="expandedBeachId === beach.id" class="zones-section">
-          <p v-if="loadingZonesByBeach[beach.id]" class="zones-state">
-            {{ t('desktop.beach.loadingZones') }}
-          </p>
+          <div v-if="loadingZonesByBeach[beach.id]" class="zones-skeleton-wrap">
+            <SkeletonLoader
+              :rows="3"
+              :height="16"
+              :gap="10"
+              :widths="['88%', '96%', '84%']"
+              :aria-label="t('desktop.beach.loadingZones')"
+            />
+          </div>
           <p v-else-if="zonesErrorByBeach[beach.id]" class="zones-state error">
             {{ zonesErrorByBeach[beach.id] }}
           </p>
@@ -149,6 +166,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import SearchBox from '../SearchBox.vue'
+import SkeletonLoader from '../common/SkeletonLoader.vue'
 import { isAnimalsAllowed, parseBeachTypeId } from '../../utils/helpers'
 import type { BeachViewModel, BeachZoneViewModel, Location } from '../../types/beaches'
 
@@ -156,6 +174,7 @@ const props = defineProps<{
   modelValue: string
   location: Location
   beaches: BeachViewModel[]
+  loadingBeaches?: boolean
   filteredBeaches: BeachViewModel[]
   expandedBeachId: number | null
   zonesByBeach: Record<number, BeachZoneViewModel[]>
@@ -273,6 +292,10 @@ const getBeachTypeLabel = (beach: BeachViewModel) => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.beaches-loading {
+  padding: 4px 2px;
 }
 
 .beach-card {
@@ -415,6 +438,10 @@ const getBeachTypeLabel = (beach: BeachViewModel) => {
   margin: 4px 0;
   font-size: 13px;
   color: #6b7280;
+}
+
+.zones-skeleton-wrap {
+  padding: 4px 0;
 }
 
 .zones-state.error {

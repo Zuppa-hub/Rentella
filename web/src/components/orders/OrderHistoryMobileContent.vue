@@ -12,7 +12,13 @@
     <p class="order-history-subtitle">{{ t('desktop.orders.historySubtitle') }}</p>
 
     <div v-if="loading" class="order-history-loading" aria-live="polite">
-      <p>{{ t('desktop.orders.loadingOrders') }}</p>
+      <SkeletonLoader
+        :rows="4"
+        :height="16"
+        :gap="10"
+        :widths="['96%', '100%', '92%', '98%']"
+        :aria-label="t('desktop.orders.loadingOrders')"
+      />
     </div>
 
     <div v-else-if="error" class="order-history-error" role="alert">
@@ -65,6 +71,7 @@
 import { useI18n } from 'vue-i18n'
 import type { Order } from '../../services/api'
 import type { HistoryOrderView } from '../../types/orders'
+import SkeletonLoader from '../common/SkeletonLoader.vue'
 
 defineProps<{
   loading: boolean
@@ -141,6 +148,11 @@ const { t } = useI18n()
   align-items: center;
   justify-content: center;
   gap: 16px;
+}
+
+.order-history-loading {
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
 .order-history-error p {

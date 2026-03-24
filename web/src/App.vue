@@ -22,6 +22,7 @@
       "
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
+      :loading-beaches="isLoadingBeachesData"
       :expand-beach-id="beachToExpandId"
       :beach-types="beachTypesMap"
       :initials="initials"
@@ -96,6 +97,7 @@
       "
       :location="beachesViewLocation"
       :beaches="beachesViewBeaches"
+      :loading-beaches="isLoadingBeachesData"
       :expand-beach-id="beachToExpandId"
       :beach-types="beachTypesMap"
       @back="closeBeachesView"
@@ -267,6 +269,7 @@ const beachToExpandId = ref<number | null>(null)
 const beachTypesMap = ref<Record<number, string>>({})
 const isBeachModalOpen = ref(false)
 const selectedBeach = ref<Beach | null>(null)
+const isLoadingBeachesData = ref(false)
 
 // Order History state
 const isOrderHistoryOpen = ref(false)
@@ -602,6 +605,7 @@ const loadBeaches = async () => {
   if (!isAuthenticated()) return
 
   error.value = null
+  isLoadingBeachesData.value = true
 
   try {
     const locations_data = await getLocations()
@@ -690,6 +694,8 @@ const loadBeaches = async () => {
   } catch (err) {
     console.error('Failed to load locations:', err)
     error.value = 'Failed to load locations'
+  } finally {
+    isLoadingBeachesData.value = false
   }
 }
 

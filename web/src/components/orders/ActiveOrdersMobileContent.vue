@@ -12,7 +12,13 @@
     <p class="active-orders-subtitle">{{ t('desktop.orders.activeSubtitle') }}</p>
 
     <div v-if="loading" class="active-orders-loading" aria-live="polite">
-      <p>{{ t('desktop.orders.loadingOrders') }}</p>
+      <SkeletonLoader
+        :rows="4"
+        :height="16"
+        :gap="10"
+        :widths="['96%', '100%', '92%', '98%']"
+        :aria-label="t('desktop.orders.loadingOrders')"
+      />
     </div>
 
     <div v-else-if="error" class="active-orders-error" role="alert">
@@ -67,6 +73,7 @@
 import { useI18n } from 'vue-i18n'
 import type { Order } from '../../services/api'
 import type { ActiveOrderView } from '../../types/orders'
+import SkeletonLoader from '../common/SkeletonLoader.vue'
 
 defineProps<{
   loading: boolean
@@ -213,6 +220,11 @@ const { t } = useI18n()
   justify-content: center;
   flex-direction: column;
   gap: 12px;
+}
+
+.active-orders-loading {
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
 .desktop-action-error {
